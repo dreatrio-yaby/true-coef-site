@@ -290,16 +290,18 @@
             return 1 - overProb;
         }
         
-        // Функция для форматирования вероятности в проценты
+        // Функция для форматирования вероятности в коэффициенты
         function formatProb(prob) {
-            return (prob * 100).toFixed(1) + '%';
+            if (prob === 0) return '∞';
+            return (1 / prob).toFixed(2);
         }
         
-        // Функция для определения класса цвета в зависимости от вероятности
+        // Функция для определения класса цвета в зависимости от коэффициента
         function getProbClass(prob) {
-            if (prob >= 0.7) return 'prob-high';
-            if (prob >= 0.4) return 'prob-medium';
-            return 'prob-low';
+            const coef = 1 / prob;
+            if (coef <= 1.5) return 'prob-high';  // Низкий коэффициент = высокая вероятность
+            if (coef <= 2.5) return 'prob-medium'; // Средний коэффициент
+            return 'prob-low';                     // Высокий коэффициент = низкая вероятность
         }
         
         // Функция установки фильтра
