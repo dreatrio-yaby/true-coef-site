@@ -354,32 +354,152 @@
             }
         }
         
-        // Простая функция для загрузки известного файла матчей (если есть)
-        async function tryLoadKnownFile(bucketUrl, date) {
-            // Пробуем несколько известных имен файлов для конкретной даты
+        // Попытка получить список файлов через S3 API (ListObjects)
+        async function getS3FileList(bucketUrl, prefix) {
+            const listUrl = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`;
+            
+            try {
+                console.log(`🗂️ Trying S3 ListObjects: ${listUrl}`);
+                
+                const response = await fetch(listUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/xml'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Проверяем на ошибки
+                const error = xmlDoc.getElementsByTagName('Error')[0];
+                if (error) {
+                    const code = error.getElementsByTagName('Code')[0]?.textContent;
+                    throw new Error(`S3 Error: ${code}`);
+                }
+                
+                // Извлекаем файлы
+                const contents = xmlDoc.getElementsByTagName('Contents');
+                const files = [];
+                
+                for (let i = 0; i < contents.length; i++) {
+                    const keyElement = contents[i].getElementsByTagName('Key')[0];
+                    if (keyElement) {
+                        const key = keyElement.textContent;
+                        if (key.endsWith('.json')) {
+                            files.push(key);
+                        }
+                    }
+                }
+                
+                console.log(`✅ S3 API returned ${files.length} files`);
+                return files;
+                
+            } catch (error) {
+                console.log(`❌ S3 API failed: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Альтернативный подход через простой GET на папку
+        async function tryDirectoryListing(bucketUrl, folderPath) {
+            try {
+                console.log(`📁 Trying directory listing: ${bucketUrl}/${folderPath}/`);
+                
+                const response = await fetch(`${bucketUrl}/${folderPath}/`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    
+                    // Пробуем найти ссылки на .json файлы в HTML
+                    const jsonLinks = [];
+                    const linkRegex = /href="([^"]*\.json)"/gi;
+                    let match;
+                    
+                    while ((match = linkRegex.exec(html)) !== null) {
+                        jsonLinks.push(`${folderPath}/${match[1]}`);
+                    }
+                    
+                    console.log(`✅ Directory listing found ${jsonLinks.length} files`);
+                    return jsonLinks;
+                }
+                
+                throw new Error(`HTTP ${response.status}`);
+                
+            } catch (error) {
+                console.log(`❌ Directory listing failed: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Функция для загрузки файлов матчей для конкретной даты
+        async function tryLoadMatchFiles(bucketUrl, date) {
+            const foundMatches = [];
+            const folderPath = `head-to-head/${date}`;
+            
+            // Способ 1: Пробуем S3 API
+            let fileList = await getS3FileList(bucketUrl, folderPath + '/');
+            
+            // Способ 2: Пробуем листинг директории
+            if (!fileList) {
+                fileList = await tryDirectoryListing(bucketUrl, folderPath);
+            }
+            
+            // Если удалось получить список файлов, загружаем их
+            if (fileList && fileList.length > 0) {
+                console.log(`📥 Loading ${fileList.length} files for ${date}`);
+                
+                const batchSize = 10;
+                for (let i = 0; i < fileList.length; i += batchSize) {
+                    const batch = fileList.slice(i, i + batchSize);
+                    
+                    const promises = batch.map(async (filePath) => {
+                        const data = await tryFetchFile(bucketUrl, filePath);
+                        return data;
+                    });
+                    
+                    const results = await Promise.all(promises);
+                    const validMatches = results.filter(data => 
+                        data && data.probs && data.league && data.home_name && data.away_name
+                    );
+                    
+                    foundMatches.push(...validMatches);
+                    
+                    console.log(`📊 Batch ${Math.floor(i / batchSize) + 1}: Loaded ${validMatches.length} matches`);
+                }
+                
+                console.log(`🎯 Total loaded for ${date}: ${foundMatches.length} matches`);
+                return foundMatches;
+            }
+            
+            // Способ 3: Fallback - пробуем известные файлы
+            console.log(`🔄 Fallback to known patterns for ${date}`);
             const knownPatterns = [
-                `head-to-head/${date}/matches.json`,
-                `head-to-head/${date}/index.json`,
-                `head-to-head/${date}/data.json`
+                `${folderPath}/matches.json`,
+                `${folderPath}/index.json`,
+                `${folderPath}/data.json`
             ];
             
             for (const pattern of knownPatterns) {
-                console.log(`Trying: ${pattern}`);
                 const data = await tryFetchFile(bucketUrl, pattern);
                 if (data) {
-                    console.log(`✅ Found data in: ${pattern}`);
-                    // Если это массив матчей
                     if (Array.isArray(data)) {
                         return data;
                     }
-                    // Если это один матч
                     if (data.probs && data.league) {
                         return [data];
                     }
                 }
             }
             
-            console.log(`❌ No known files found for ${date}`);
+            console.log(`❌ No files found for ${date}`);
             return [];
         }
         
@@ -401,8 +521,8 @@
                 for (const date of dates) {
                     console.log(`📅 Checking date: ${date}`);
                     
-                    // Пробуем загрузить известные файлы для этой даты
-                    const matchesFromDate = await tryLoadKnownFile(bucketUrl, date);
+                    // Пробуем загрузить файлы матчей для этой даты
+                    const matchesFromDate = await tryLoadMatchFiles(bucketUrl, date);
                     
                     console.log(`Found ${matchesFromDate.length} matches for ${date}`);
                     
