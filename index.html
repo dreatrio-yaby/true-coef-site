@@ -672,10 +672,26 @@
                     headers += '<th>1 (Победа хозяев)</th><th>X (Ничья)</th><th>2 (Победа гостей)</th>';
                     break;
                 case 'goals':
-                    headers += '<th>ТБ 0.5</th><th>ТМ 0.5</th><th>ТБ 1.5</th><th>ТМ 1.5</th><th>ТБ 2.5</th><th>ТМ 2.5</th>';
+                    headers += `
+                        <th>Тотал 0.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 1.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 2.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 0.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 1.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 0.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 1.5</th><th>Б</th><th>М</th>
+                    `;
                     break;
                 case 'corners':
-                    headers += '<th>ТБ 7.5</th><th>ТМ 7.5</th><th>ТБ 8.5</th><th>ТМ 8.5</th><th>ТБ 9.5</th><th>ТМ 9.5</th>';
+                    headers += `
+                        <th>Тотал 7.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 8.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 9.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 3.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 4.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 3.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 4.5</th><th>Б</th><th>М</th>
+                    `;
                     break;
             }
             
@@ -714,14 +730,33 @@
                     const goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
                     const goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
                     const goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
+                    const homeGoalsOver05 = match.probs.target_home_goals_over_0_5 || 0;
+                    const homeGoalsOver15 = match.probs.target_home_goals_over_1_5 || 0;
+                    const awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
+                    const awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
                     
                     row += `
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
                         <td class="prob-cell ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
                         <td class="prob-cell ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">2.5</td>
                         <td class="prob-cell ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
+                        <td class="prob-cell ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
+                        <td class="prob-cell ${getProbClass(homeGoalsOver15)}">${formatProb(homeGoalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver15))}">${formatProb(calculateUnder(homeGoalsOver15))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
+                        <td class="prob-cell ${getProbClass(awayGoalsOver05)}">${formatProb(awayGoalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver05))}">${formatProb(calculateUnder(awayGoalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
+                        <td class="prob-cell ${getProbClass(awayGoalsOver15)}">${formatProb(awayGoalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver15))}">${formatProb(calculateUnder(awayGoalsOver15))}</td>
                     `;
                     break;
                     
@@ -729,14 +764,33 @@
                     const cornersOver75 = match.probs.target_total_corners_over_7_5 || 0;
                     const cornersOver85 = match.probs.target_total_corners_over_8_5 || 0;
                     const cornersOver95 = match.probs.target_total_corners_over_9_5 || 0;
+                    const homeCornersOver35 = match.probs.target_home_corners_over_3_5 || 0;
+                    const homeCornersOver45 = match.probs.target_home_corners_over_4_5 || 0;
+                    const awayCornersOver35 = match.probs.target_away_corners_over_3_5 || 0;
+                    const awayCornersOver45 = match.probs.target_away_corners_over_4_5 || 0;
                     
                     row += `
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">7.5</td>
                         <td class="prob-cell ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">8.5</td>
                         <td class="prob-cell ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">9.5</td>
                         <td class="prob-cell ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</td>
                         <td class="prob-cell ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
+                        <td class="prob-cell ${getProbClass(homeCornersOver35)}">${formatProb(homeCornersOver35)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver35))}">${formatProb(calculateUnder(homeCornersOver35))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
+                        <td class="prob-cell ${getProbClass(homeCornersOver45)}">${formatProb(homeCornersOver45)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver45))}">${formatProb(calculateUnder(homeCornersOver45))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
+                        <td class="prob-cell ${getProbClass(awayCornersOver35)}">${formatProb(awayCornersOver35)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver35))}">${formatProb(calculateUnder(awayCornersOver35))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
+                        <td class="prob-cell ${getProbClass(awayCornersOver45)}">${formatProb(awayCornersOver45)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver45))}">${formatProb(calculateUnder(awayCornersOver45))}</td>
                     `;
                     break;
             }
