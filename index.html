@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Футбольная статистика - ML/AI коэффициенты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Фильтры */
+        .filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        /* Загрузчик */
+        .loader {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Настройки S3 */
+        .settings {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .settings input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .settings input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Таблицы матчей */
+        .league-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .league-header {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .match-count {
+            font-size: 0.8em;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .match-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-name {
+            font-weight: 500;
+        }
+
+        .vs {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+
+        .prob-cell {
+            text-align: center;
+            font-weight: 500;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .prob-high {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
+            color: #81c784;
+        }
+
+        .prob-medium {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.1));
+            color: #ffd54f;
+        }
+
+        .prob-low {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1));
+            color: #ff8a80;
+        }
+
+        .date-time {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 8px 5px;
+            }
+
+            .match-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ Футбольная статистика ML/AI</h1>
+        
+        <!-- Настройки подключения к S3 -->
+        <div class="settings">
+            <h3 style="margin-bottom: 15px;">Настройки подключения к S3</h3>
+            <input type="text" id="bucketUrl" placeholder="URL вашего S3 bucket (например: https://storage.yandexcloud.net/your-bucket)" value="">
+            <input type="text" id="filePattern" placeholder="Паттерн файлов (например: matches/*.json)" value="*.json">
+            <button class="filter-btn" onclick="loadMatches()">Загрузить данные</button>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="filters">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="1x2" onclick="setFilter('1x2')">
+                    1X2 (Исход матча)
+                </button>
+                <button class="filter-btn" data-filter="goals" onclick="setFilter('goals')">
+                    Тотал голов
+                </button>
+                <button class="filter-btn" data-filter="corners" onclick="setFilter('corners')">
+                    Тотал угловых
+                </button>
+            </div>
+        </div>
+
+        <!-- Загрузчик -->
+        <div id="loader" class="loader" style="display: none;">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px;">Загрузка данных...</p>
+        </div>
+
+        <!-- Контейнер для таблиц -->
+        <div id="matches-container"></div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let allMatches = [];
+        let currentFilter = '1x2';
+        
+        // Функция для расчета вероятности "меньше"
+        function calculateUnder(overProb) {
+            return 1 - overProb;
+        }
+        
+        // Функция для форматирования вероятности в проценты
+        function formatProb(prob) {
+            return (prob * 100).toFixed(1) + '%';
+        }
+        
+        // Функция для определения класса цвета в зависимости от вероятности
+        function getProbClass(prob) {
+            if (prob >= 0.7) return 'prob-high';
+            if (prob >= 0.4) return 'prob-medium';
+            return 'prob-low';
+        }
+        
+        // Функция установки фильтра
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Перерисовываем таблицы
+            renderMatches();
+        }
+        
+        // Функция для загрузки данных (заглушка для демо)
+        async function loadMatches() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+            
+            // Здесь будет загрузка из S3
+            // Для демонстрации используем пример данных
+            setTimeout(() => {
+                // Пример данных из вашего JSON
+                const sampleMatch = {
+                    "league": "Serie A",
+                    "date": "2025-08-20",
+                    "time": "19:00",
+                    "home_name": "Juventude",
+                    "away_name": "Vasco da Gama",
+                    "probs": {
+                        "target_away_corners_over_3_5": 0.7293,
+                        "target_away_corners_over_4_5": 0.6167,
+                        "target_away_corners_over_5_5": 0.4544,
+                        "target_away_goals_over_0_5": 0.8358,
+                        "target_away_goals_over_1_5": 0.5338,
+                        "target_away_goals_over_2_5": 0.2367,
+                        "target_away_win": 0.5462,
+                        "target_draw": 0.2601,
+                        "target_home_corners_over_3_5": 0.5997,
+                        "target_home_corners_over_4_5": 0.4437,
+                        "target_home_goals_over_0_5": 0.6664,
+                        "target_home_goals_over_1_5": 0.2897,
+                        "target_home_goals_over_2_5": 0.0707,
+                        "target_home_win": 0.2123,
+                        "target_total_corners_over_10_5": 0.383,
+                        "target_total_corners_over_7_5": 0.7415,
+                        "target_total_corners_over_8_5": 0.6079,
+                        "target_total_corners_over_9_5": 0.4976,
+                        "target_total_goals_over_0_5": 0.9143,
+                        "target_total_goals_over_1_5": 0.7928,
+                        "target_total_goals_over_2_5": 0.5336,
+                        "target_total_goals_over_3_5": 0.2772
+                    }
+                };
+                
+                // Создаем несколько примеров матчей
+                allMatches = [
+                    sampleMatch,
+                    {
+                        ...sampleMatch,
+                        league: "Premier League",
+                        date: "2025-08-21",
+                        time: "20:30",
+                        home_name: "Manchester United",
+                        away_name: "Liverpool",
+                        probs: {
+                            ...sampleMatch.probs,
+                            target_home_win: 0.4523,
+                            target_draw: 0.2891,
+                            target_away_win: 0.2586
+                        }
+                    },
+                    {
+                        ...sampleMatch,
+                        league: "La Liga",
+                        date: "2025-08-22",
+                        time: "21:00",
+                        home_name: "Real Madrid",
+                        away_name: "Barcelona",
+                        probs: {
+                            ...sampleMatch.probs,
+                            target_home_win: 0.5234,
+                            target_draw: 0.2456,
+                            target_away_win: 0.2310
+                        }
+                    }
+                ];
+                
+                loader.style.display = 'none';
+                renderMatches();
+            }, 1500);
+        }
+        
+        // Функция отрисовки матчей
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            
+            if (allMatches.length === 0) {
+                container.innerHTML = '<div class="no-data">Нет данных для отображения. Загрузите данные из S3.</div>';
+                return;
+            }
+            
+            // Группируем матчи по лигам
+            const matchesByLeague = {};
+            allMatches.forEach(match => {
+                if (!matchesByLeague[match.league]) {
+                    matchesByLeague[match.league] = [];
+                }
+                matchesByLeague[match.league].push(match);
+            });
+            
+            // Сортируем матчи внутри каждой лиги по дате и времени
+            Object.keys(matchesByLeague).forEach(league => {
+                matchesByLeague[league].sort((a, b) => {
+                    const dateA = new Date(a.date + ' ' + a.time);
+                    const dateB = new Date(b.date + ' ' + b.time);
+                    return dateA - dateB;
+                });
+            });
+            
+            // Создаем HTML
+            let html = '';
+            
+            Object.keys(matchesByLeague).forEach(league => {
+                const matches = matchesByLeague[league];
+                
+                html += `
+                    <div class="league-section">
+                        <div class="league-header">
+                            <span>${league}</span>
+                            <span class="match-count">${matches.length} матч(ей)</span>
+                        </div>
+                        <table>
+                            ${getTableHeaders()}
+                            <tbody>
+                                ${matches.map(match => getMatchRow(match)).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Функция для получения заголовков таблицы
+        function getTableHeaders() {
+            let headers = '<thead><tr><th>Дата/Время</th><th>Матч</th>';
+            
+            switch(currentFilter) {
+                case '1x2':
+                    headers += '<th>1 (Победа хозяев)</th><th>X (Ничья)</th><th>2 (Победа гостей)</th>';
+                    break;
+                case 'goals':
+                    headers += '<th>ТБ 0.5</th><th>ТМ 0.5</th><th>ТБ 1.5</th><th>ТМ 1.5</th><th>ТБ 2.5</th><th>ТМ 2.5</th>';
+                    break;
+                case 'corners':
+                    headers += '<th>ТБ 7.5</th><th>ТМ 7.5</th><th>ТБ 8.5</th><th>ТМ 8.5</th><th>ТБ 9.5</th><th>ТМ 9.5</th>';
+                    break;
+            }
+            
+            headers += '</tr></thead>';
+            return headers;
+        }
+        
+        // Функция для получения строки матча
+        function getMatchRow(match) {
+            let row = `
+                <tr>
+                    <td class="date-time">${formatDateTime(match.date, match.time)}</td>
+                    <td>
+                        <div class="match-info">
+                            <span class="team-name">${match.home_name}</span>
+                            <span class="vs">vs</span>
+                            <span class="team-name">${match.away_name}</span>
+                        </div>
+                    </td>
+            `;
+            
+            switch(currentFilter) {
+                case '1x2':
+                    const homeWin = match.probs.target_home_win || 0;
+                    const draw = match.probs.target_draw || 0;
+                    const awayWin = match.probs.target_away_win || 0;
+                    
+                    row += `
+                        <td class="prob-cell ${getProbClass(homeWin)}">${formatProb(homeWin)}</td>
+                        <td class="prob-cell ${getProbClass(draw)}">${formatProb(draw)}</td>
+                        <td class="prob-cell ${getProbClass(awayWin)}">${formatProb(awayWin)}</td>
+                    `;
+                    break;
+                    
+                case 'goals':
+                    const goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
+                    const goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
+                    const goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
+                    
+                    row += `
+                        <td class="prob-cell ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</td>
+                        <td class="prob-cell ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</td>
+                        <td class="prob-cell ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</td>
+                    `;
+                    break;
+                    
+                case 'corners':
+                    const cornersOver75 = match.probs.target_total_corners_over_7_5 || 0;
+                    const cornersOver85 = match.probs.target_total_corners_over_8_5 || 0;
+                    const cornersOver95 = match.probs.target_total_corners_over_9_5 || 0;
+                    
+                    row += `
+                        <td class="prob-cell ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</td>
+                        <td class="prob-cell ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</td>
+                        <td class="prob-cell ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</td>
+                    `;
+                    break;
+            }
+            
+            row += '</tr>';
+            return row;
+        }
+        
+        // Функция форматирования даты и времени
+        function formatDateTime(date, time) {
+            const d = new Date(date + ' ' + time);
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            return d.toLocaleString('ru-RU', options);
+        }
+        
+        // Загрузка при старте (для демо)
+        window.onload = function() {
+            // Автоматически загружаем демо-данные
+            loadMatches();
+        };
+    </script>
+</body>
+</html>
