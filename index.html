@@ -1,529 +1,821 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>⚽ Футбольная статистика — ML/AI коэффициенты</title>
-  <meta name="color-scheme" content="dark light" />
-  <style>
-    /* ========= 1) Дизайн-система на переменных ========= */
-    :root {
-      --bg: #0b0f16;
-      --surface: #101625;
-      --surface-2: #0e1422;
-      --text: #e6e8ef;
-      --muted: #98a2b3;
-      --brand: #7c88ff;
-      --brand-2: #5cc1ff;
-      --ring: #2a3756;
-      --ok: #3ad29f;
-      --warn: #ffd166;
-      --bad: #ff7d7d;
-      --divider: rgba(230,232,239,0.08);
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 14px;
-      --radius-sm: 10px;
-      --radius-xs: 8px;
-      --dense-y: 12px;
-      --dense-x: 14px;
-    }
-    @media (prefers-color-scheme: light) {
-      html[data-theme="light"]:root,
-      html:not([data-theme]),
-      :root:has(#theme-toggle:checked) {}
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Футбольная статистика - ML/AI коэффициенты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html[data-theme="light"] {
-      --bg: #f6f7fb;
-      --surface: #ffffff;
-      --surface-2: #f3f5fb;
-      --text: #0f172a;
-      --muted: #5b6472;
-      --brand: #5b6cff;
-      --brand-2: #2aa6ff;
-      --ring: #dfe7ff;
-      --ok: #0ea672;
-      --warn: #b48a00;
-      --bad: #c23d3d;
-      --divider: rgba(15,23,42,0.08);
-      --shadow: 0 8px 22px rgba(10,12,18,.08);
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
 
-    /* ========= 2) Базовые стили ========= */
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font: 14.5px/1.55 ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI,
-            Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 80% -10%, rgba(124,136,255,.15), transparent 40%),
-                  radial-gradient(1000px 900px at -10% 20%, rgba(92,193,255,.12), transparent 40%),
-                  var(--bg);
-      color: var(--text);
-    }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 28px 18px 60px;
-    }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
 
-    header.header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 22px;
-    }
-    .title {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .title h1 {
-      margin: 0;
-      font-size: clamp(20px, 3.6vw, 28px);
-      letter-spacing: -.02em;
-      font-weight: 700;
-    }
-    .subtitle { color: var(--muted); font-size: 13px; margin-top: 6px; }
+        /* Фильтры */
+        .filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
 
-    .toolbar {
-      display: flex; gap: 10px; flex-wrap: wrap; justify-self: end;
-    }
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-    .segmented {
-      background: var(--surface);
-      border: 1px solid var(--divider);
-      border-radius: 999px;
-      padding: 4px;
-      box-shadow: var(--shadow);
-      display: inline-flex; gap: 4px;
-    }
-    .segmented button {
-      border: 0; background: transparent; color: var(--muted);
-      padding: 8px 14px; border-radius: 999px; cursor: pointer;
-      font-weight: 600; letter-spacing: .01em; transition: .2s;
-    }
-    .segmented button[aria-pressed="true"] {
-      color: var(--text);
-      background: linear-gradient(180deg, rgba(124,136,255,.22), rgba(124,136,255,.08));
-      border: 1px solid var(--ring);
-      box-shadow: inset 0 0 0 1px rgba(124,136,255,.25);
-    }
+        .filter-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
 
-    .toggle {
-      border: 1px solid var(--divider);
-      background: var(--surface);
-      padding: 6px 10px; border-radius: 999px; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 8px;
-      font-weight: 600; color: var(--muted);
-    }
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
 
-    /* ========= 3) Карточки лиг (аккордеоны) ========= */
-    details.league {
-      border: 1px solid var(--divider);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 60%);
-      box-shadow: var(--shadow);
-      margin-top: 14px;
-      overflow: clip;
-    }
-    summary.league__header {
-      list-style: none; cursor: pointer; user-select: none;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 14px 16px;
-      background: var(--surface-2);
-      position: sticky; top: 0; z-index: 1;
-      border-bottom: 1px solid var(--divider);
-    }
-    summary.league__header::-webkit-details-marker { display: none; }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
 
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12px; color: var(--muted);
-      background: rgba(124,136,255,.12);
-      border: 1px solid var(--ring);
-      padding: 6px 10px; border-radius: 999px;
-    }
+        /* Загрузчик */
+        .loader {
+            text-align: center;
+            padding: 50px;
+        }
 
-    .table-wrap {
-      overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
-      background: linear-gradient(180deg, rgba(124,136,255,.06), transparent 60%);
-    }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
 
-    /* ========= 4) Современная таблица ========= */
-    table.data {
-      width: 100%; border-collapse: separate; border-spacing: 0;
-      background: var(--surface); min-width: 860px;
-    }
-    thead th {
-      position: sticky; top: 0; z-index: 1;
-      background: linear-gradient(180deg, var(--surface-2), var(--surface));
-      border-bottom: 1px solid var(--divider);
-      text-align: left; font-size: 12px; letter-spacing: .06em;
-      text-transform: uppercase; color: var(--muted);
-      padding: 12px var(--dense-x);
-    }
-    tbody td, tbody th {
-      padding: var(--dense-y) var(--dense-x);
-      border-bottom: 1px solid var(--divider);
-      vertical-align: middle;
-    }
-    tbody tr:hover td { background: rgba(124,136,255,.06); }
-    tbody tr:last-child td { border-bottom: 0; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    tbody th.match {
-      font-weight: 600; white-space: nowrap; width: 1%;
-    }
-    .when { color: var(--muted); white-space: nowrap; }
+        /* Настройки S3 */
+        .settings {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
 
-    /* Ячейка-метрика с баром */
-    .metric { position: relative; width: 120px; }
-    .metric .bar {
-      position: absolute; inset: 0; z-index: 0;
-      background: linear-gradient(90deg, rgba(124,136,255,.18), transparent);
-      width: calc(var(--p, 0) * 1%);
-      border-right: 1px dashed rgba(124,136,255,.35);
-    }
-    .metric .v { position: relative; z-index: 1; font-weight: 600; }
-    .metric .s { position: relative; z-index: 1; font-size: 12px; color: var(--muted); }
+        .settings input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 10px;
+        }
 
-    .kicker { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+        .settings input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-    /* Подсказка про прокрутку на мобильном */
-    .scroll-hint { display: none; margin-top: 6px; color: var(--muted); font-size: 12px; }
-    .table-wrap:has(> table.data) + .scroll-hint { display: block; }
+        /* Таблицы матчей */
+        .league-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
 
-    /* ========= 5) Лоадер ========= */
-    .loader {
-      display: grid; place-items: center; gap: 10px; padding: 28px; color: var(--muted);
-    }
-    .spinner {
-      width: 30px; height: 30px; border: 3px solid rgba(124,136,255,.25);
-      border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+        .league-header {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    /* ========= 6) Адаптивность ========= */
-    @media (max-width: 820px) {
-      .toolbar { justify-self: start; }
-      .metric { width: 100px; }
-      thead th { font-size: 11px; }
-      tbody td, tbody th { padding: 10px 12px; }
-    }
-  </style>
+        .match-count {
+            font-size: 0.8em;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .match-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-name {
+            font-weight: 500;
+        }
+
+        .vs {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+
+        .prob-cell {
+            text-align: center;
+            font-weight: 500;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .prob-high {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
+            color: #81c784;
+        }
+
+        .prob-medium {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.1));
+            color: #ffd54f;
+        }
+
+        .prob-low {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1));
+            color: #ff8a80;
+        }
+
+        .date-time {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 8px 5px;
+            }
+
+            .match-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="title">
-        <div style="width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 0 20px rgba(124,136,255,.6)"></div>
-        <div>
-          <h1>Футбольная статистика ML/AI</h1>
-          <div class="subtitle">Лаконичная таблица с коэффициентами и вероятностями. Без библиотек — идеально для GitHub Pages.</div>
+    <div class="container">
+        <h1>⚽ Футбольная статистика ML/AI</h1>
+        
+        <!-- Фильтры -->
+        <div class="filters">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="1x2" onclick="setFilter('1x2')">
+                    1X2 (Исход матча)
+                </button>
+                <button class="filter-btn" data-filter="goals" onclick="setFilter('goals')">
+                    Тотал голов
+                </button>
+                <button class="filter-btn" data-filter="corners" onclick="setFilter('corners')">
+                    Тотал угловых
+                </button>
+            </div>
         </div>
-      </div>
 
-      <div class="toolbar">
-        <div class="segmented" role="tablist" aria-label="Фильтры">
-          <button id="tab-1x2" role="tab" aria-pressed="true" onclick="setFilter('1x2')">1X2</button>
-          <button id="tab-goals" role="tab" aria-pressed="false" onclick="setFilter('goals')">Голы</button>
-          <button id="tab-corners" role="tab" aria-pressed="false" onclick="setFilter('corners')">Угловые</button>
+        <!-- Загрузчик -->
+        <div id="loader" class="loader" style="display: none;">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px;">Загрузка данных...</p>
         </div>
-        <label class="toggle" title="Переключить тему">
-          <input id="theme-toggle" type="checkbox" onchange="toggleTheme(this)" aria-label="Тема" />
-          Тема
-        </label>
-      </div>
-    </header>
 
-    <div id="loader" class="loader" hidden>
-      <div class="spinner" aria-hidden="true"></div>
-      <div>Загрузка данных…</div>
+        <!-- Контейнер для таблиц -->
+        <div id="matches-container"></div>
     </div>
 
-    <div id="matches-container"></div>
-  </div>
-
-  <script>
-    // ======== Состояние ========
-    let allMatches = [];
-    let currentFilter = '1x2';
-
-    // ======== Утилиты форматирования ========
-    function clamp(n, min, max) { return Math.min(Math.max(n, min), max); }
-    function toCoef(prob) {
-      const p = clamp(prob || 0, 0.0001, 0.9999);
-      return (1 / p).toFixed(2);
-    }
-    function toPct(prob) { return Math.round(clamp(prob || 0, 0, 1) * 100); }
-    function fmtWhen(date, time) {
-      const d = new Date(`${date}T${(time||'00:00')}:00`);
-      return d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-    }
-    function under(p) { return clamp(1 - (p || 0), 0, 1); }
-
-    // ======== Тема ========
-    (function initTheme() {
-      const saved = localStorage.getItem('theme');
-      if (saved) document.documentElement.setAttribute('data-theme', saved);
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      document.querySelector('#theme-toggle').checked = isLight;
-    })();
-    function toggleTheme(cb) {
-      const theme = cb.checked ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-    }
-
-    // ======== Загрузка данных из S3 (без библиотек) ========
-    function getNextDays(days = 7) {
-      const dates = []; const today = new Date();
-      for (let i=0; i<days; i++) { const d = new Date(today); d.setDate(today.getDate()+i); dates.push(d.toISOString().split('T')[0]); }
-      return dates;
-    }
-
-    async function tryFetchFile(bucketUrl, filePath) {
-      try {
-        const res = await fetch(`${bucketUrl}/${filePath}`);
-        if (res.status === 404) return null;
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      } catch (e) { console.warn('fetch fail', filePath, e); return null; }
-    }
-
-    async function getS3FileList(bucketUrl, prefix) {
-      const url = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`;
-      try {
-        const res = await fetch(url, { headers: { 'Accept': 'application/xml' } });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const xml = await res.text();
-        const doc = new DOMParser().parseFromString(xml, 'text/xml');
-        if (doc.getElementsByTagName('Error')[0]) return null;
-        const items = doc.getElementsByTagName('Contents');
-        const files = [];
-        for (let i=0; i<items.length; i++) {
-          const k = items[i].getElementsByTagName('Key')[0]?.textContent || '';
-          if (k.endsWith('.json')) files.push(k);
+    <script>
+        // Глобальные переменные
+        let allMatches = [];
+        let currentFilter = '1x2';
+        
+        // Функция для расчета вероятности "меньше"
+        function calculateUnder(overProb) {
+            return 1 - overProb;
         }
-        return files;
-      } catch (e) { console.warn('S3 list fail', e); return null; }
-    }
-
-    async function tryDirectoryListing(bucketUrl, folderPath) {
-      try {
-        const res = await fetch(`${bucketUrl}/${folderPath}/`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const html = await res.text();
-        const rx = /href="([^\"]*\.json)"/gi; const out = []; let m;
-        while ((m = rx.exec(html)) !== null) out.push(`${folderPath}/${m[1]}`);
-        return out;
-      } catch (e) { console.warn('dir listing fail', e); return null; }
-    }
-
-    async function tryLoadMatchFiles(bucketUrl, date) {
-      const folder = `head-to-head/${date}`;
-      let files = await getS3FileList(bucketUrl, folder + '/');
-      if (!files) files = await tryDirectoryListing(bucketUrl, folder);
-      if (!files || files.length === 0) return [];
-      const batch = 10; const acc = [];
-      for (let i=0; i<files.length; i += batch) {
-        const slice = files.slice(i, i+batch);
-        const chunk = await Promise.all(slice.map(fp => tryFetchFile(bucketUrl, fp)));
-        for (const data of chunk) {
-          if (data && data.probs && data.league && data.home_name && data.away_name) acc.push(data);
+        
+        // Функция для форматирования вероятности в коэффициенты
+        function formatProb(prob) {
+            if (prob === 0) return '∞';
+            return (1 / prob).toFixed(2);
         }
-      }
-      return acc;
-    }
-
-    async function loadMatches() {
-      document.getElementById('loader').hidden = false;
-      const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
-      const dates = getNextDays(7);
-      allMatches = [];
-      try {
-        for (const date of dates) {
-          const items = await tryLoadMatchFiles(bucketUrl, date);
-          for (const m of items) allMatches.push(m);
+        
+        // Функция для определения класса цвета в зависимости от коэффициента
+        function getProbClass(prob) {
+            const coef = 1 / prob;
+            if (coef <= 1.5) return 'prob-high';  // Низкий коэффициент = высокая вероятность
+            if (coef <= 2.5) return 'prob-medium'; // Средний коэффициент
+            return 'prob-low';                     // Высокий коэффициент = низкая вероятность
         }
-        if (allMatches.length === 0) await loadDemoData();
-      } catch (e) {
-        console.error('load error', e); await loadDemoData();
-      }
-      document.getElementById('loader').hidden = true;
-      renderMatches();
-    }
-
-    async function loadDemoData() {
-      const sample = {
-        "league": "Serie A",
-        "date": "2025-08-20",
-        "time": "19:00",
-        "home_name": "Juventude",
-        "away_name": "Vasco da Gama",
-        "probs": {
-          "target_away_corners_over_3_5": 0.7293,
-          "target_away_corners_over_4_5": 0.6167,
-          "target_away_corners_over_5_5": 0.4544,
-          "target_away_goals_over_0_5": 0.8358,
-          "target_away_goals_over_1_5": 0.5338,
-          "target_away_goals_over_2_5": 0.2367,
-          "target_away_win": 0.5462,
-          "target_draw": 0.2601,
-          "target_home_corners_over_3_5": 0.5997,
-          "target_home_corners_over_4_5": 0.4437,
-          "target_home_goals_over_0_5": 0.6664,
-          "target_home_goals_over_1_5": 0.2897,
-          "target_home_goals_over_2_5": 0.0707,
-          "target_home_win": 0.2123,
-          "target_total_corners_over_10_5": 0.383,
-          "target_total_corners_over_7_5": 0.7415,
-          "target_total_corners_over_8_5": 0.6079,
-          "target_total_corners_over_9_5": 0.4976,
-          "target_total_goals_over_0_5": 0.9143,
-          "target_total_goals_over_1_5": 0.7928,
-          "target_total_goals_over_2_5": 0.5336,
-          "target_total_goals_over_3_5": 0.2772
+        
+        // Функция установки фильтра
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Перерисовываем таблицы
+            renderMatches();
         }
-      };
-      allMatches = [
-        sample,
-        { ...sample, league: 'Premier League', date:'2025-08-21', time:'20:30', home_name:'Manchester United', away_name:'Liverpool', probs: { ...sample.probs, target_home_win: 0.4523, target_draw: 0.2891, target_away_win: 0.2586 } },
-        { ...sample, league: 'La Liga', date:'2025-08-22', time:'21:00', home_name:'Real Madrid', away_name:'Barcelona', probs: { ...sample.probs, target_home_win: 0.5234, target_draw: 0.2456, target_away_win: 0.2310 } }
-      ];
-    }
-
-    // ======== Рендер ========
-    function setFilter(filter) {
-      currentFilter = filter;
-      document.querySelector('#tab-1x2').setAttribute('aria-pressed', filter==='1x2');
-      document.querySelector('#tab-goals').setAttribute('aria-pressed', filter==='goals');
-      document.querySelector('#tab-corners').setAttribute('aria-pressed', filter==='corners');
-      renderMatches();
-    }
-
-    function renderMatches() {
-      const wrap = document.getElementById('matches-container');
-      if (!allMatches.length) { wrap.innerHTML = ''; return; }
-
-      // Группировка по лигам
-      const leagues = new Map();
-      for (const m of allMatches) {
-        if (!leagues.has(m.league)) leagues.set(m.league, []);
-        leagues.get(m.league).push(m);
-      }
-      for (const [, arr] of leagues) {
-        arr.sort((a,b) => new Date(`${a.date}T${a.time||'00:00'}`) - new Date(`${b.date}T${b.time||'00:00'}`));
-      }
-
-      // Разметка
-      let html = '';
-      for (const [league, matches] of leagues) {
-        html += `
-          <details class="league" open>
-            <summary class="league__header">
-              <div>
-                <div class="kicker">ЛИГА</div>
-                <div style="font-weight:700; font-size:15px">${league}</div>
-              </div>
-              <span class="badge" aria-label="Количество матчей">${matches.length} матч(ей)</span>
-            </summary>
-            <div class="table-wrap">
-              ${renderTable(matches)}
-            </div>
-            <div class="scroll-hint">Проведите по таблице влево/вправо для просмотра всех колонок</div>
-          </details>`;
-      }
-      wrap.innerHTML = html;
-    }
-
-    function renderTable(matches) {
-      const h = getHeaders();
-      const rows = matches.map(m => getRow(m)).join('');
-      return `<table class="data"><thead>${h}</thead><tbody>${rows}</tbody></table>`;
-    }
-
-    function getHeaders() {
-      if (currentFilter === '1x2') {
-        return `<tr>
-          <th>Дата/время</th>
-          <th>Матч</th>
-          <th title="Победа хозяев">1</th>
-          <th title="Ничья">X</th>
-          <th title="Победа гостей">2</th>
-        </tr>`;
-      }
-      if (currentFilter === 'goals') {
-        return `<tr>
-          <th>Дата/время</th>
-          <th>Матч</th>
-          <th>Тотал 0.5 Б</th><th>М</th>
-          <th>Тотал 1.5 Б</th><th>М</th>
-          <th>Тотал 2.5 Б</th><th>М</th>
-          <th>ИТ1 0.5 Б</th><th>М</th>
-          <th>ИТ1 1.5 Б</th><th>М</th>
-          <th>ИТ2 0.5 Б</th><th>М</th>
-          <th>ИТ2 1.5 Б</th><th>М</th>
-        </tr>`;
-      }
-      // corners
-      return `<tr>
-        <th>Дата/время</th>
-        <th>Матч</th>
-        <th>Тотал 7.5 Б</th><th>М</th>
-        <th>Тотал 8.5 Б</th><th>М</th>
-        <th>Тотал 9.5 Б</th><th>М</th>
-        <th>ИТ1 3.5 Б</th><th>М</th>
-        <th>ИТ1 4.5 Б</th><th>М</th>
-        <th>ИТ2 3.5 Б</th><th>М</th>
-        <th>ИТ2 4.5 Б</th><th>М</th>
-      </tr>`;
-    }
-
-    function metricCell(prob) {
-      const pct = toPct(prob);
-      return `<td class="metric" style="--p:${pct}">
-        <div class="bar" aria-hidden="true"></div>
-        <div class="v">${toCoef(prob)}</div>
-        <div class="s">${pct}%</div>
-      </td>`;
-    }
-
-    function getRow(m) {
-      let cells = '';
-      if (currentFilter === '1x2') {
-        cells = [m.probs.target_home_win, m.probs.target_draw, m.probs.target_away_win]
-          .map(metricCell).join('');
-      } else if (currentFilter === 'goals') {
-        const g05 = m.probs.target_total_goals_over_0_5;
-        const g15 = m.probs.target_total_goals_over_1_5;
-        const g25 = m.probs.target_total_goals_over_2_5;
-        const h05 = m.probs.target_home_goals_over_0_5;
-        const h15 = m.probs.target_home_goals_over_1_5;
-        const a05 = m.probs.target_away_goals_over_0_5;
-        const a15 = m.probs.target_away_goals_over_1_5;
-        cells = [g05, under(g05), g15, under(g15), g25, under(g25), h05, under(h05), h15, under(h15), a05, under(a05), a15, under(a15)]
-          .map(metricCell).join('');
-      } else {
-        const t75 = m.probs.target_total_corners_over_7_5;
-        const t85 = m.probs.target_total_corners_over_8_5;
-        const t95 = m.probs.target_total_corners_over_9_5;
-        const h35 = m.probs.target_home_corners_over_3_5;
-        const h45 = m.probs.target_home_corners_over_4_5;
-        const a35 = m.probs.target_away_corners_over_3_5;
-        const a45 = m.probs.target_away_corners_over_4_5;
-        cells = [t75, under(t75), t85, under(t85), t95, under(t95), h35, under(h35), h45, under(h45), a35, under(a35), a45, under(a45)]
-          .map(metricCell).join('');
-      }
-      return `<tr>
-        <td class="when">${fmtWhen(m.date, m.time)}</td>
-        <th class="match">${m.home_name} <span style="color:var(--muted);">vs</span> ${m.away_name}</th>
-        ${cells}
-      </tr>`;
-    }
-
-    // ======== Старт ========
-    window.addEventListener('load', () => { loadMatches(); });
-  </script>
+        
+        // Функция для получения следующих N дней в формате YYYY-MM-DD
+        function getNextDays(days = 7) {
+            const dates = [];
+            const today = new Date();
+            
+            for (let i = 0; i < days; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                dates.push(date.toISOString().split('T')[0]); // Формат YYYY-MM-DD
+            }
+            
+            return dates;
+        }
+        
+        // Функция для попытки загрузки файла с обработкой 404
+        async function tryFetchFile(bucketUrl, filePath) {
+            try {
+                const response = await fetch(`${bucketUrl}/${filePath}`);
+                
+                if (response.status === 404) {
+                    return null; // Файл не найден, это нормально
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${filePath}:`, error);
+                return null;
+            }
+        }
+        
+        // Попытка получить список файлов через S3 API (ListObjects)
+        async function getS3FileList(bucketUrl, prefix) {
+            const listUrl = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`;
+            
+            try {
+                console.log(`🗂️ Trying S3 ListObjects: ${listUrl}`);
+                
+                const response = await fetch(listUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/xml'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Проверяем на ошибки
+                const error = xmlDoc.getElementsByTagName('Error')[0];
+                if (error) {
+                    const code = error.getElementsByTagName('Code')[0]?.textContent;
+                    throw new Error(`S3 Error: ${code}`);
+                }
+                
+                // Извлекаем файлы
+                const contents = xmlDoc.getElementsByTagName('Contents');
+                const files = [];
+                
+                for (let i = 0; i < contents.length; i++) {
+                    const keyElement = contents[i].getElementsByTagName('Key')[0];
+                    if (keyElement) {
+                        const key = keyElement.textContent;
+                        if (key.endsWith('.json')) {
+                            files.push(key);
+                        }
+                    }
+                }
+                
+                console.log(`✅ S3 API returned ${files.length} files`);
+                return files;
+                
+            } catch (error) {
+                console.log(`❌ S3 API failed: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Альтернативный подход через простой GET на папку
+        async function tryDirectoryListing(bucketUrl, folderPath) {
+            try {
+                console.log(`📁 Trying directory listing: ${bucketUrl}/${folderPath}/`);
+                
+                const response = await fetch(`${bucketUrl}/${folderPath}/`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    
+                    // Пробуем найти ссылки на .json файлы в HTML
+                    const jsonLinks = [];
+                    const linkRegex = /href="([^"]*\.json)"/gi;
+                    let match;
+                    
+                    while ((match = linkRegex.exec(html)) !== null) {
+                        jsonLinks.push(`${folderPath}/${match[1]}`);
+                    }
+                    
+                    console.log(`✅ Directory listing found ${jsonLinks.length} files`);
+                    return jsonLinks;
+                }
+                
+                throw new Error(`HTTP ${response.status}`);
+                
+            } catch (error) {
+                console.log(`❌ Directory listing failed: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Функция для загрузки файлов матчей для конкретной даты
+        async function tryLoadMatchFiles(bucketUrl, date) {
+            const foundMatches = [];
+            const folderPath = `head-to-head/${date}`;
+            
+            // Способ 1: Пробуем S3 API
+            let fileList = await getS3FileList(bucketUrl, folderPath + '/');
+            
+            // Способ 2: Пробуем листинг директории
+            if (!fileList) {
+                fileList = await tryDirectoryListing(bucketUrl, folderPath);
+            }
+            
+            // Если удалось получить список файлов, загружаем их
+            if (fileList && fileList.length > 0) {
+                console.log(`📥 Loading ${fileList.length} files for ${date}`);
+                
+                const batchSize = 10;
+                for (let i = 0; i < fileList.length; i += batchSize) {
+                    const batch = fileList.slice(i, i + batchSize);
+                    
+                    const promises = batch.map(async (filePath) => {
+                        const data = await tryFetchFile(bucketUrl, filePath);
+                        return data;
+                    });
+                    
+                    const results = await Promise.all(promises);
+                    const validMatches = results.filter(data => 
+                        data && data.probs && data.league && data.home_name && data.away_name
+                    );
+                    
+                    foundMatches.push(...validMatches);
+                    
+                    console.log(`📊 Batch ${Math.floor(i / batchSize) + 1}: Loaded ${validMatches.length} matches`);
+                }
+                
+                console.log(`🎯 Total loaded for ${date}: ${foundMatches.length} matches`);
+                return foundMatches;
+            }
+            
+            // Если список файлов получить не удалось, просто возвращаем пустой массив
+            console.log(`❌ No file listing available for ${date}`);
+            return [];
+        }
+        
+        
+        // Основная функция для загрузки данных из S3
+        async function loadMatches() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+            
+            try {
+                const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
+                const dates = getNextDays(7);
+                
+                console.log('Loading matches for dates:', dates);
+                
+                allMatches = [];
+                
+                // Загружаем данные для каждой даты
+                for (const date of dates) {
+                    console.log(`📅 Checking date: ${date}`);
+                    
+                    // Пробуем загрузить файлы матчей для этой даты
+                    const matchesFromDate = await tryLoadMatchFiles(bucketUrl, date);
+                    
+                    console.log(`Found ${matchesFromDate.length} matches for ${date}`);
+                    
+                    // Добавляем найденные матчи
+                    matchesFromDate.forEach(matchData => {
+                        if (matchData && matchData.probs) {
+                            // Проверяем, что у матча есть необходимые поля
+                            if (matchData.league && matchData.home_name && matchData.away_name) {
+                                allMatches.push(matchData);
+                            }
+                        }
+                    });
+                }
+                
+                console.log(`Loaded ${allMatches.length} matches total`);
+                
+                // Если нет данных, показываем демо-данные
+                if (allMatches.length === 0) {
+                    console.log('No S3 data found, using demo data');
+                    await loadDemoData();
+                }
+                
+            } catch (error) {
+                console.error('Error loading S3 data:', error);
+                console.log('Fallback to demo data');
+                await loadDemoData();
+            }
+            
+            loader.style.display = 'none';
+            renderMatches();
+        }
+        
+        // Функция для загрузки демо-данных (fallback)
+        async function loadDemoData() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // Пример данных из вашего JSON
+                    const sampleMatch = {
+                        "league": "Serie A",
+                        "date": "2025-08-20",
+                        "time": "19:00",
+                        "home_name": "Juventude",
+                        "away_name": "Vasco da Gama",
+                        "probs": {
+                            "target_away_corners_over_3_5": 0.7293,
+                            "target_away_corners_over_4_5": 0.6167,
+                            "target_away_corners_over_5_5": 0.4544,
+                            "target_away_goals_over_0_5": 0.8358,
+                            "target_away_goals_over_1_5": 0.5338,
+                            "target_away_goals_over_2_5": 0.2367,
+                            "target_away_win": 0.5462,
+                            "target_draw": 0.2601,
+                            "target_home_corners_over_3_5": 0.5997,
+                            "target_home_corners_over_4_5": 0.4437,
+                            "target_home_goals_over_0_5": 0.6664,
+                            "target_home_goals_over_1_5": 0.2897,
+                            "target_home_goals_over_2_5": 0.0707,
+                            "target_home_win": 0.2123,
+                            "target_total_corners_over_10_5": 0.383,
+                            "target_total_corners_over_7_5": 0.7415,
+                            "target_total_corners_over_8_5": 0.6079,
+                            "target_total_corners_over_9_5": 0.4976,
+                            "target_total_goals_over_0_5": 0.9143,
+                            "target_total_goals_over_1_5": 0.7928,
+                            "target_total_goals_over_2_5": 0.5336,
+                            "target_total_goals_over_3_5": 0.2772
+                        }
+                    };
+                    
+                    // Создаем несколько примеров матчей
+                    allMatches = [
+                        sampleMatch,
+                        {
+                            ...sampleMatch,
+                            league: "Premier League",
+                            date: "2025-08-21",
+                            time: "20:30",
+                            home_name: "Manchester United",
+                            away_name: "Liverpool",
+                            probs: {
+                                ...sampleMatch.probs,
+                                target_home_win: 0.4523,
+                                target_draw: 0.2891,
+                                target_away_win: 0.2586
+                            }
+                        },
+                        {
+                            ...sampleMatch,
+                            league: "La Liga",
+                            date: "2025-08-22",
+                            time: "21:00",
+                            home_name: "Real Madrid",
+                            away_name: "Barcelona",
+                            probs: {
+                                ...sampleMatch.probs,
+                                target_home_win: 0.5234,
+                                target_draw: 0.2456,
+                                target_away_win: 0.2310
+                            }
+                        }
+                    ];
+                    
+                    resolve();
+                }, 500);
+            });
+        }
+        
+        // Функция отрисовки матчей
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            
+            if (allMatches.length === 0) {
+                container.innerHTML = '<div class="no-data">Нет данных для отображения. Загрузите данные из S3.</div>';
+                return;
+            }
+            
+            // Группируем матчи по лигам
+            const matchesByLeague = {};
+            allMatches.forEach(match => {
+                if (!matchesByLeague[match.league]) {
+                    matchesByLeague[match.league] = [];
+                }
+                matchesByLeague[match.league].push(match);
+            });
+            
+            // Сортируем матчи внутри каждой лиги по дате и времени
+            Object.keys(matchesByLeague).forEach(league => {
+                matchesByLeague[league].sort((a, b) => {
+                    const dateA = new Date(a.date + ' ' + a.time);
+                    const dateB = new Date(b.date + ' ' + b.time);
+                    return dateA - dateB;
+                });
+            });
+            
+            // Создаем HTML
+            let html = '';
+            
+            Object.keys(matchesByLeague).forEach(league => {
+                const matches = matchesByLeague[league];
+                
+                html += `
+                    <div class="league-section">
+                        <div class="league-header">
+                            <span>${league}</span>
+                            <span class="match-count">${matches.length} матч(ей)</span>
+                        </div>
+                        <table>
+                            ${getTableHeaders()}
+                            <tbody>
+                                ${matches.map(match => getMatchRow(match)).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Функция для получения заголовков таблицы
+        function getTableHeaders() {
+            let headers = '<thead><tr><th>Дата/Время</th><th>Матч</th>';
+            
+            switch(currentFilter) {
+                case '1x2':
+                    headers += '<th>1 (Победа хозяев)</th><th>X (Ничья)</th><th>2 (Победа гостей)</th>';
+                    break;
+                case 'goals':
+                    headers += `
+                        <th>Тотал 0.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 1.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 2.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 0.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 1.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 0.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 1.5</th><th>Б</th><th>М</th>
+                    `;
+                    break;
+                case 'corners':
+                    headers += `
+                        <th>Тотал 7.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 8.5</th><th>Б</th><th>М</th>
+                        <th>Тотал 9.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 3.5</th><th>Б</th><th>М</th>
+                        <th>ИТ1 4.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 3.5</th><th>Б</th><th>М</th>
+                        <th>ИТ2 4.5</th><th>Б</th><th>М</th>
+                    `;
+                    break;
+            }
+            
+            headers += '</tr></thead>';
+            return headers;
+        }
+        
+        // Функция для получения строки матча
+        function getMatchRow(match) {
+            let row = `
+                <tr>
+                    <td class="date-time">${formatDateTime(match.date, match.time)}</td>
+                    <td>
+                        <div class="match-info">
+                            <span class="team-name">${match.home_name}</span>
+                            <span class="vs">vs</span>
+                            <span class="team-name">${match.away_name}</span>
+                        </div>
+                    </td>
+            `;
+            
+            switch(currentFilter) {
+                case '1x2':
+                    const homeWin = match.probs.target_home_win || 0;
+                    const draw = match.probs.target_draw || 0;
+                    const awayWin = match.probs.target_away_win || 0;
+                    
+                    row += `
+                        <td class="prob-cell ${getProbClass(homeWin)}">${formatProb(homeWin)}</td>
+                        <td class="prob-cell ${getProbClass(draw)}">${formatProb(draw)}</td>
+                        <td class="prob-cell ${getProbClass(awayWin)}">${formatProb(awayWin)}</td>
+                    `;
+                    break;
+                    
+                case 'goals':
+                    const goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
+                    const goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
+                    const goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
+                    const homeGoalsOver05 = match.probs.target_home_goals_over_0_5 || 0;
+                    const homeGoalsOver15 = match.probs.target_home_goals_over_1_5 || 0;
+                    const awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
+                    const awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
+                    
+                    row += `
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
+                        <td class="prob-cell ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
+                        <td class="prob-cell ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">2.5</td>
+                        <td class="prob-cell ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
+                        <td class="prob-cell ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
+                        <td class="prob-cell ${getProbClass(homeGoalsOver15)}">${formatProb(homeGoalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver15))}">${formatProb(calculateUnder(homeGoalsOver15))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
+                        <td class="prob-cell ${getProbClass(awayGoalsOver05)}">${formatProb(awayGoalsOver05)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver05))}">${formatProb(calculateUnder(awayGoalsOver05))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
+                        <td class="prob-cell ${getProbClass(awayGoalsOver15)}">${formatProb(awayGoalsOver15)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver15))}">${formatProb(calculateUnder(awayGoalsOver15))}</td>
+                    `;
+                    break;
+                    
+                case 'corners':
+                    const cornersOver75 = match.probs.target_total_corners_over_7_5 || 0;
+                    const cornersOver85 = match.probs.target_total_corners_over_8_5 || 0;
+                    const cornersOver95 = match.probs.target_total_corners_over_9_5 || 0;
+                    const homeCornersOver35 = match.probs.target_home_corners_over_3_5 || 0;
+                    const homeCornersOver45 = match.probs.target_home_corners_over_4_5 || 0;
+                    const awayCornersOver35 = match.probs.target_away_corners_over_3_5 || 0;
+                    const awayCornersOver45 = match.probs.target_away_corners_over_4_5 || 0;
+                    
+                    row += `
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">7.5</td>
+                        <td class="prob-cell ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">8.5</td>
+                        <td class="prob-cell ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">9.5</td>
+                        <td class="prob-cell ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
+                        <td class="prob-cell ${getProbClass(homeCornersOver35)}">${formatProb(homeCornersOver35)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver35))}">${formatProb(calculateUnder(homeCornersOver35))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
+                        <td class="prob-cell ${getProbClass(homeCornersOver45)}">${formatProb(homeCornersOver45)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver45))}">${formatProb(calculateUnder(homeCornersOver45))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
+                        <td class="prob-cell ${getProbClass(awayCornersOver35)}">${formatProb(awayCornersOver35)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver35))}">${formatProb(calculateUnder(awayCornersOver35))}</td>
+                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
+                        <td class="prob-cell ${getProbClass(awayCornersOver45)}">${formatProb(awayCornersOver45)}</td>
+                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver45))}">${formatProb(calculateUnder(awayCornersOver45))}</td>
+                    `;
+                    break;
+            }
+            
+            row += '</tr>';
+            return row;
+        }
+        
+        // Функция форматирования даты и времени
+        function formatDateTime(date, time) {
+            const d = new Date(date + ' ' + time);
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            return d.toLocaleString('ru-RU', options);
+        }
+        
+        // Загрузка при старте (для демо)
+        window.onload = function() {
+            // Автоматически загружаем демо-данные
+            loadMatches();
+        };
+    </script>
 </body>
 </html>
