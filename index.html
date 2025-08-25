@@ -320,83 +320,203 @@
             renderMatches();
         }
         
-        // Функция для загрузки данных (заглушка для демо)
+        // Функция для получения следующих N дней в формате YYYY-MM-DD
+        function getNextDays(days = 7) {
+            const dates = [];
+            const today = new Date();
+            
+            for (let i = 0; i < days; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                dates.push(date.toISOString().split('T')[0]); // Формат YYYY-MM-DD
+            }
+            
+            return dates;
+        }
+        
+        // Функция для получения списка файлов в папке S3
+        async function getS3FileList(bucketUrl, folderPath) {
+            try {
+                const response = await fetch(`${bucketUrl}/${folderPath}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/xml'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Извлекаем имена файлов из XML
+                const contents = xmlDoc.getElementsByTagName('Contents');
+                const files = [];
+                
+                for (let i = 0; i < contents.length; i++) {
+                    const keyElement = contents[i].getElementsByTagName('Key')[0];
+                    if (keyElement) {
+                        const key = keyElement.textContent;
+                        if (key.endsWith('.json')) {
+                            files.push(key);
+                        }
+                    }
+                }
+                
+                return files;
+            } catch (error) {
+                console.error('Error fetching S3 file list:', error);
+                return [];
+            }
+        }
+        
+        // Функция для загрузки JSON файла из S3
+        async function fetchJsonFromS3(bucketUrl, filePath) {
+            try {
+                const response = await fetch(`${bucketUrl}/${filePath}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${filePath}:`, error);
+                return null;
+            }
+        }
+        
+        // Основная функция для загрузки данных из S3
         async function loadMatches() {
             const loader = document.getElementById('loader');
             loader.style.display = 'block';
             
-            // Здесь будет загрузка из S3
-            // Для демонстрации используем пример данных
-            setTimeout(() => {
-                // Пример данных из вашего JSON
-                const sampleMatch = {
-                    "league": "Serie A",
-                    "date": "2025-08-20",
-                    "time": "19:00",
-                    "home_name": "Juventude",
-                    "away_name": "Vasco da Gama",
-                    "probs": {
-                        "target_away_corners_over_3_5": 0.7293,
-                        "target_away_corners_over_4_5": 0.6167,
-                        "target_away_corners_over_5_5": 0.4544,
-                        "target_away_goals_over_0_5": 0.8358,
-                        "target_away_goals_over_1_5": 0.5338,
-                        "target_away_goals_over_2_5": 0.2367,
-                        "target_away_win": 0.5462,
-                        "target_draw": 0.2601,
-                        "target_home_corners_over_3_5": 0.5997,
-                        "target_home_corners_over_4_5": 0.4437,
-                        "target_home_goals_over_0_5": 0.6664,
-                        "target_home_goals_over_1_5": 0.2897,
-                        "target_home_goals_over_2_5": 0.0707,
-                        "target_home_win": 0.2123,
-                        "target_total_corners_over_10_5": 0.383,
-                        "target_total_corners_over_7_5": 0.7415,
-                        "target_total_corners_over_8_5": 0.6079,
-                        "target_total_corners_over_9_5": 0.4976,
-                        "target_total_goals_over_0_5": 0.9143,
-                        "target_total_goals_over_1_5": 0.7928,
-                        "target_total_goals_over_2_5": 0.5336,
-                        "target_total_goals_over_3_5": 0.2772
-                    }
-                };
+            try {
+                const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
+                const dates = getNextDays(7);
                 
-                // Создаем несколько примеров матчей
-                allMatches = [
-                    sampleMatch,
-                    {
-                        ...sampleMatch,
-                        league: "Premier League",
-                        date: "2025-08-21",
-                        time: "20:30",
-                        home_name: "Manchester United",
-                        away_name: "Liverpool",
-                        probs: {
-                            ...sampleMatch.probs,
-                            target_home_win: 0.4523,
-                            target_draw: 0.2891,
-                            target_away_win: 0.2586
-                        }
-                    },
-                    {
-                        ...sampleMatch,
-                        league: "La Liga",
-                        date: "2025-08-22",
-                        time: "21:00",
-                        home_name: "Real Madrid",
-                        away_name: "Barcelona",
-                        probs: {
-                            ...sampleMatch.probs,
-                            target_home_win: 0.5234,
-                            target_draw: 0.2456,
-                            target_away_win: 0.2310
+                console.log('Loading matches for dates:', dates);
+                
+                allMatches = [];
+                
+                // Загружаем данные для каждой даты
+                for (const date of dates) {
+                    const folderPath = `head-to-head/${date}`;
+                    
+                    console.log(`Checking folder: ${folderPath}`);
+                    
+                    // Получаем список файлов для этой даты
+                    const files = await getS3FileList(bucketUrl, folderPath);
+                    
+                    console.log(`Found ${files.length} files for ${date}`);
+                    
+                    // Загружаем каждый JSON файл
+                    for (const file of files) {
+                        const matchData = await fetchJsonFromS3(bucketUrl, file);
+                        
+                        if (matchData && matchData.probs) {
+                            // Проверяем, что у матча есть необходимые поля
+                            if (matchData.league && matchData.home_name && matchData.away_name) {
+                                allMatches.push(matchData);
+                            }
                         }
                     }
-                ];
+                }
                 
-                loader.style.display = 'none';
-                renderMatches();
-            }, 1500);
+                console.log(`Loaded ${allMatches.length} matches total`);
+                
+                // Если нет данных, показываем демо-данные
+                if (allMatches.length === 0) {
+                    console.log('No S3 data found, using demo data');
+                    await loadDemoData();
+                }
+                
+            } catch (error) {
+                console.error('Error loading S3 data:', error);
+                console.log('Fallback to demo data');
+                await loadDemoData();
+            }
+            
+            loader.style.display = 'none';
+            renderMatches();
+        }
+        
+        // Функция для загрузки демо-данных (fallback)
+        async function loadDemoData() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // Пример данных из вашего JSON
+                    const sampleMatch = {
+                        "league": "Serie A",
+                        "date": "2025-08-20",
+                        "time": "19:00",
+                        "home_name": "Juventude",
+                        "away_name": "Vasco da Gama",
+                        "probs": {
+                            "target_away_corners_over_3_5": 0.7293,
+                            "target_away_corners_over_4_5": 0.6167,
+                            "target_away_corners_over_5_5": 0.4544,
+                            "target_away_goals_over_0_5": 0.8358,
+                            "target_away_goals_over_1_5": 0.5338,
+                            "target_away_goals_over_2_5": 0.2367,
+                            "target_away_win": 0.5462,
+                            "target_draw": 0.2601,
+                            "target_home_corners_over_3_5": 0.5997,
+                            "target_home_corners_over_4_5": 0.4437,
+                            "target_home_goals_over_0_5": 0.6664,
+                            "target_home_goals_over_1_5": 0.2897,
+                            "target_home_goals_over_2_5": 0.0707,
+                            "target_home_win": 0.2123,
+                            "target_total_corners_over_10_5": 0.383,
+                            "target_total_corners_over_7_5": 0.7415,
+                            "target_total_corners_over_8_5": 0.6079,
+                            "target_total_corners_over_9_5": 0.4976,
+                            "target_total_goals_over_0_5": 0.9143,
+                            "target_total_goals_over_1_5": 0.7928,
+                            "target_total_goals_over_2_5": 0.5336,
+                            "target_total_goals_over_3_5": 0.2772
+                        }
+                    };
+                    
+                    // Создаем несколько примеров матчей
+                    allMatches = [
+                        sampleMatch,
+                        {
+                            ...sampleMatch,
+                            league: "Premier League",
+                            date: "2025-08-21",
+                            time: "20:30",
+                            home_name: "Manchester United",
+                            away_name: "Liverpool",
+                            probs: {
+                                ...sampleMatch.probs,
+                                target_home_win: 0.4523,
+                                target_draw: 0.2891,
+                                target_away_win: 0.2586
+                            }
+                        },
+                        {
+                            ...sampleMatch,
+                            league: "La Liga",
+                            date: "2025-08-22",
+                            time: "21:00",
+                            home_name: "Real Madrid",
+                            away_name: "Barcelona",
+                            probs: {
+                                ...sampleMatch.probs,
+                                target_home_win: 0.5234,
+                                target_draw: 0.2456,
+                                target_away_win: 0.2310
+                            }
+                        }
+                    ];
+                    
+                    resolve();
+                }, 500);
+            });
         }
         
         // Функция отрисовки матчей
