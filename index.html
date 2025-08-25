@@ -479,27 +479,8 @@
                 return foundMatches;
             }
             
-            // Способ 3: Fallback - пробуем известные файлы
-            console.log(`🔄 Fallback to known patterns for ${date}`);
-            const knownPatterns = [
-                `${folderPath}/matches.json`,
-                `${folderPath}/index.json`,
-                `${folderPath}/data.json`
-            ];
-            
-            for (const pattern of knownPatterns) {
-                const data = await tryFetchFile(bucketUrl, pattern);
-                if (data) {
-                    if (Array.isArray(data)) {
-                        return data;
-                    }
-                    if (data.probs && data.league) {
-                        return [data];
-                    }
-                }
-            }
-            
-            console.log(`❌ No files found for ${date}`);
+            // Если список файлов получить не удалось, просто возвращаем пустой массив
+            console.log(`❌ No file listing available for ${date}`);
             return [];
         }
         
