@@ -3,8 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Футбольная статистика - ML/AI коэффициенты</title>
+    <title>Football Stats AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-bg: #0a0a0b;
+            --secondary-bg: #111113;
+            --surface: #1a1a1d;
+            --surface-elevated: #232326;
+            --border: #2a2a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b6;
+            --text-tertiary: #6b6b70;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,79 +40,100 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            color: #e0e0e0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
         }
 
         h1 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
-        /* Фильтры */
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Filters */
         .filters {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .filter-buttons {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 0.5rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 16px;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface-elevated);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
         }
 
-        /* Загрузчик */
+        /* Loader */
         .loader {
             text-align: center;
-            padding: 50px;
+            padding: 4rem;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--accent-primary);
             border-radius: 50%;
-            border-top: 4px solid #667eea;
-            width: 50px;
-            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
@@ -92,180 +141,415 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Настройки S3 */
-        .settings {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .settings input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .settings input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Таблицы матчей */
+        /* League sections */
         .league-section {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            margin-bottom: 30px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         .league-header {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
-            padding: 15px 20px;
-            font-size: 1.3em;
-            font-weight: bold;
+            background: var(--surface-elevated);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .league-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         .match-count {
-            font-size: 0.8em;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background: var(--border);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         th {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
+            background: var(--surface-elevated);
+            padding: 1rem 0.75rem;
             text-align: left;
             font-weight: 600;
-            font-size: 0.9em;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        th:first-child {
+            padding-left: 1.5rem;
+        }
+
+        th:last-child {
+            padding-right: 1.5rem;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid rgba(42, 42, 46, 0.5);
+            vertical-align: middle;
         }
 
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
+        td:first-child {
+            padding-left: 1.5rem;
         }
 
+        td:last-child {
+            padding-right: 1.5rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Match info */
         .match-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
+            min-width: 200px;
         }
 
         .team-name {
             font-weight: 500;
+            color: var(--text-primary);
         }
 
         .vs {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9em;
-        }
-
-        .prob-cell {
-            text-align: center;
-            font-weight: 500;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .prob-high {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
-            color: #81c784;
-        }
-
-        .prob-medium {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.1));
-            color: #ffd54f;
-        }
-
-        .prob-low {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1));
-            color: #ff8a80;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+            font-weight: 400;
         }
 
         .date-time {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            white-space: nowrap;
         }
 
+        /* Probability cells */
+        .prob-cell {
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            min-width: 64px;
+            position: relative;
+        }
+
+        .odds-value {
+            display: inline-block;
+            padding: 0.375rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .prob-excellent {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-secondary);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .prob-good {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .prob-fair {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .prob-poor {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Separator columns */
+        .total-separator {
+            background: rgba(255, 255, 255, 0.02);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-align: center;
+            color: var(--text-tertiary);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        /* No data state */
         .no-data {
             text-align: center;
-            padding: 50px;
-            color: rgba(255, 255, 255, 0.5);
+            padding: 4rem;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
         }
 
-        /* Адаптивность */
+        /* Enhanced animations and transitions */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        .league-section {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .league-section:nth-child(2) { animation-delay: 0.1s; }
+        .league-section:nth-child(3) { animation-delay: 0.2s; }
+        .league-section:nth-child(4) { animation-delay: 0.3s; }
+        .league-section:nth-child(5) { animation-delay: 0.4s; }
+
+        tbody tr {
+            animation: slideInLeft 0.4s ease-out;
+        }
+
+        tbody tr:nth-child(even) {
+            animation-delay: 0.05s;
+        }
+
+        .odds-value:hover {
+            transform: translateY(-1px);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .filter-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .filter-btn:hover::before {
+            left: 100%;
+        }
+
+        .header {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .filters {
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        .spinner {
+            position: relative;
+        }
+
+        .spinner::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--accent-secondary);
+            animation: spin 2s linear infinite reverse;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            th:first-child, td:first-child {
+                padding-left: 1rem;
+            }
+            
+            th:last-child, td:last-child {
+                padding-right: 1rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 1.8em;
+                padding: 1rem;
             }
 
             .filter-buttons {
                 flex-direction: column;
+                align-items: stretch;
             }
 
             .filter-btn {
-                width: 100%;
+                justify-content: center;
             }
 
-            table {
-                font-size: 0.85em;
+            .league-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .match-count {
+                align-self: flex-end;
             }
 
             th, td {
-                padding: 8px 5px;
+                padding: 0.5rem 0.25rem;
+                font-size: 0.75rem;
+            }
+
+            th:first-child, td:first-child {
+                padding-left: 0.75rem;
+            }
+
+            th:last-child, td:last-child {
+                padding-right: 0.75rem;
             }
 
             .match-info {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 5px;
+                gap: 0.25rem;
+                min-width: 120px;
+            }
+
+            .team-name {
+                font-size: 0.875rem;
+            }
+
+            .vs {
+                display: none;
+            }
+
+            .prob-cell {
+                font-size: 0.75rem;
+                min-width: 48px;
+            }
+
+            .odds-value {
+                padding: 0.25rem 0.375rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.75rem;
+            }
+
+            .filters {
+                padding: 1rem;
+            }
+
+            .league-section {
+                border-radius: var(--radius-md);
+            }
+
+            th, td {
+                padding: 0.375rem 0.125rem;
+                font-size: 0.6875rem;
+            }
+
+            th:first-child, td:first-child {
+                padding-left: 0.5rem;
+            }
+
+            th:last-child, td:last-child {
+                padding-right: 0.5rem;
+            }
+
+            .prob-cell {
+                min-width: 40px;
+            }
+
+            .odds-value {
+                padding: 0.1875rem 0.25rem;
+                font-size: 0.6875rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚽ Футбольная статистика ML/AI</h1>
+        <div class="header">
+            <h1>Football Stats AI</h1>
+            <p class="subtitle">ML-powered betting odds predictions</p>
+        </div>
         
         <!-- Фильтры -->
         <div class="filters">
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="1x2" onclick="setFilter('1x2')">
-                    1X2 (Исход матча)
+                    <span>⚽</span> Match Result
                 </button>
                 <button class="filter-btn" data-filter="goals" onclick="setFilter('goals')">
-                    Тотал голов
+                    <span>🥅</span> Goals Total
                 </button>
                 <button class="filter-btn" data-filter="corners" onclick="setFilter('corners')">
-                    Тотал угловых
+                    <span>📐</span> Corners Total
                 </button>
             </div>
         </div>
@@ -273,10 +557,10 @@
         <!-- Загрузчик -->
         <div id="loader" class="loader" style="display: none;">
             <div class="spinner"></div>
-            <p style="margin-top: 20px;">Загрузка данных...</p>
+            <p>Loading matches...</p>
         </div>
 
-        <!-- Контейнер для таблиц -->
+        <!-- Matches container -->
         <div id="matches-container"></div>
     </div>
 
@@ -296,12 +580,13 @@
             return (1 / prob).toFixed(2);
         }
         
-        // Функция для определения класса цвета в зависимости от коэффициента
+        // Enhanced probability class determination with better value ranges
         function getProbClass(prob) {
             const coef = 1 / prob;
-            if (coef <= 1.5) return 'prob-high';  // Низкий коэффициент = высокая вероятность
-            if (coef <= 2.5) return 'prob-medium'; // Средний коэффициент
-            return 'prob-low';                     // Высокий коэффициент = низкая вероятность
+            if (coef <= 1.4) return 'prob-excellent';  // Excellent odds (very high probability)
+            if (coef <= 2.0) return 'prob-good';       // Good odds (high probability)
+            if (coef <= 3.5) return 'prob-fair';       // Fair odds (medium probability)
+            return 'prob-poor';                         // Poor odds (low probability)
         }
         
         // Функция установки фильтра
@@ -616,7 +901,7 @@
             const container = document.getElementById('matches-container');
             
             if (allMatches.length === 0) {
-                container.innerHTML = '<div class="no-data">Нет данных для отображения. Загрузите данные из S3.</div>';
+                container.innerHTML = '<div class="no-data">No data available. Please check your S3 configuration.</div>';
                 return;
             }
             
@@ -647,15 +932,17 @@
                 html += `
                     <div class="league-section">
                         <div class="league-header">
-                            <span>${league}</span>
-                            <span class="match-count">${matches.length} матч(ей)</span>
+                            <span class="league-name">${league}</span>
+                            <span class="match-count">${matches.length} matches</span>
                         </div>
-                        <table>
-                            ${getTableHeaders()}
-                            <tbody>
-                                ${matches.map(match => getMatchRow(match)).join('')}
-                            </tbody>
-                        </table>
+                        <div class="table-container">
+                            <table>
+                                ${getTableHeaders()}
+                                <tbody>
+                                    ${matches.map(match => getMatchRow(match)).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
             });
@@ -663,34 +950,34 @@
             container.innerHTML = html;
         }
         
-        // Функция для получения заголовков таблицы
+        // Function to get table headers
         function getTableHeaders() {
-            let headers = '<thead><tr><th>Дата/Время</th><th>Матч</th>';
+            let headers = '<thead><tr><th>Date/Time</th><th>Match</th>';
             
             switch(currentFilter) {
                 case '1x2':
-                    headers += '<th>1 (Победа хозяев)</th><th>X (Ничья)</th><th>2 (Победа гостей)</th>';
+                    headers += '<th>Home Win</th><th>Draw</th><th>Away Win</th>';
                     break;
                 case 'goals':
                     headers += `
-                        <th>Тотал 0.5</th><th>Б</th><th>М</th>
-                        <th>Тотал 1.5</th><th>Б</th><th>М</th>
-                        <th>Тотал 2.5</th><th>Б</th><th>М</th>
-                        <th>ИТ1 0.5</th><th>Б</th><th>М</th>
-                        <th>ИТ1 1.5</th><th>Б</th><th>М</th>
-                        <th>ИТ2 0.5</th><th>Б</th><th>М</th>
-                        <th>ИТ2 1.5</th><th>Б</th><th>М</th>
+                        <th>Total 0.5</th><th>O</th><th>U</th>
+                        <th>Total 1.5</th><th>O</th><th>U</th>
+                        <th>Total 2.5</th><th>O</th><th>U</th>
+                        <th>Home 0.5</th><th>O</th><th>U</th>
+                        <th>Home 1.5</th><th>O</th><th>U</th>
+                        <th>Away 0.5</th><th>O</th><th>U</th>
+                        <th>Away 1.5</th><th>O</th><th>U</th>
                     `;
                     break;
                 case 'corners':
                     headers += `
-                        <th>Тотал 7.5</th><th>Б</th><th>М</th>
-                        <th>Тотал 8.5</th><th>Б</th><th>М</th>
-                        <th>Тотал 9.5</th><th>Б</th><th>М</th>
-                        <th>ИТ1 3.5</th><th>Б</th><th>М</th>
-                        <th>ИТ1 4.5</th><th>Б</th><th>М</th>
-                        <th>ИТ2 3.5</th><th>Б</th><th>М</th>
-                        <th>ИТ2 4.5</th><th>Б</th><th>М</th>
+                        <th>Total 7.5</th><th>O</th><th>U</th>
+                        <th>Total 8.5</th><th>O</th><th>U</th>
+                        <th>Total 9.5</th><th>O</th><th>U</th>
+                        <th>Home 3.5</th><th>O</th><th>U</th>
+                        <th>Home 4.5</th><th>O</th><th>U</th>
+                        <th>Away 3.5</th><th>O</th><th>U</th>
+                        <th>Away 4.5</th><th>O</th><th>U</th>
                     `;
                     break;
             }
@@ -720,9 +1007,9 @@
                     const awayWin = match.probs.target_away_win || 0;
                     
                     row += `
-                        <td class="prob-cell ${getProbClass(homeWin)}">${formatProb(homeWin)}</td>
-                        <td class="prob-cell ${getProbClass(draw)}">${formatProb(draw)}</td>
-                        <td class="prob-cell ${getProbClass(awayWin)}">${formatProb(awayWin)}</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeWin)}">${formatProb(homeWin)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(draw)}">${formatProb(draw)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayWin)}">${formatProb(awayWin)}</span></td>
                     `;
                     break;
                     
@@ -736,27 +1023,27 @@
                     const awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
                     
                     row += `
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
-                        <td class="prob-cell ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
-                        <td class="prob-cell ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">2.5</td>
-                        <td class="prob-cell ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
-                        <td class="prob-cell ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
-                        <td class="prob-cell ${getProbClass(homeGoalsOver15)}">${formatProb(homeGoalsOver15)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(homeGoalsOver15))}">${formatProb(calculateUnder(homeGoalsOver15))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">0.5</td>
-                        <td class="prob-cell ${getProbClass(awayGoalsOver05)}">${formatProb(awayGoalsOver05)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver05))}">${formatProb(calculateUnder(awayGoalsOver05))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">1.5</td>
-                        <td class="prob-cell ${getProbClass(awayGoalsOver15)}">${formatProb(awayGoalsOver15)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(awayGoalsOver15))}">${formatProb(calculateUnder(awayGoalsOver15))}</td>
+                        <td class="total-separator">0.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</span></td>
+                        <td class="total-separator">1.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</span></td>
+                        <td class="total-separator">2.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</span></td>
+                        <td class="total-separator">0.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</span></td>
+                        <td class="total-separator">1.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver15)}">${formatProb(homeGoalsOver15)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver15))}">${formatProb(calculateUnder(homeGoalsOver15))}</span></td>
+                        <td class="total-separator">0.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver05)}">${formatProb(awayGoalsOver05)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver05))}">${formatProb(calculateUnder(awayGoalsOver05))}</span></td>
+                        <td class="total-separator">1.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver15)}">${formatProb(awayGoalsOver15)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver15))}">${formatProb(calculateUnder(awayGoalsOver15))}</span></td>
                     `;
                     break;
                     
@@ -770,27 +1057,27 @@
                     const awayCornersOver45 = match.probs.target_away_corners_over_4_5 || 0;
                     
                     row += `
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">7.5</td>
-                        <td class="prob-cell ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">8.5</td>
-                        <td class="prob-cell ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">9.5</td>
-                        <td class="prob-cell ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
-                        <td class="prob-cell ${getProbClass(homeCornersOver35)}">${formatProb(homeCornersOver35)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver35))}">${formatProb(calculateUnder(homeCornersOver35))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
-                        <td class="prob-cell ${getProbClass(homeCornersOver45)}">${formatProb(homeCornersOver45)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(homeCornersOver45))}">${formatProb(calculateUnder(homeCornersOver45))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">3.5</td>
-                        <td class="prob-cell ${getProbClass(awayCornersOver35)}">${formatProb(awayCornersOver35)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver35))}">${formatProb(calculateUnder(awayCornersOver35))}</td>
-                        <td style="background: rgba(255,255,255,0.05); font-weight: bold; text-align: center;">4.5</td>
-                        <td class="prob-cell ${getProbClass(awayCornersOver45)}">${formatProb(awayCornersOver45)}</td>
-                        <td class="prob-cell ${getProbClass(calculateUnder(awayCornersOver45))}">${formatProb(calculateUnder(awayCornersOver45))}</td>
+                        <td class="total-separator">7.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</span></td>
+                        <td class="total-separator">8.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</span></td>
+                        <td class="total-separator">9.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</span></td>
+                        <td class="total-separator">3.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver35)}">${formatProb(homeCornersOver35)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver35))}">${formatProb(calculateUnder(homeCornersOver35))}</span></td>
+                        <td class="total-separator">4.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver45)}">${formatProb(homeCornersOver45)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver45))}">${formatProb(calculateUnder(homeCornersOver45))}</span></td>
+                        <td class="total-separator">3.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver35)}">${formatProb(awayCornersOver35)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver35))}">${formatProb(calculateUnder(awayCornersOver35))}</span></td>
+                        <td class="total-separator">4.5</td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver45)}">${formatProb(awayCornersOver45)}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver45))}">${formatProb(calculateUnder(awayCornersOver45))}</span></td>
                     `;
                     break;
             }
