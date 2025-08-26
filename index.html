@@ -397,6 +397,190 @@
             animation: fadeIn 0.8s ease-out 0.2s both;
         }
 
+        /* Info panel styles */
+        .info-toggle {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-toggle:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
+        }
+
+        .info-panel {
+            margin-top: 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .info-content {
+            padding: 2rem;
+            max-width: none;
+        }
+
+        .info-content h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .info-content h4 {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-section ol {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .info-section ol li {
+            margin-bottom: 0.5rem;
+        }
+
+        .example-box {
+            background: var(--surface-elevated);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--border);
+        }
+
+        .good-bet {
+            border-left-color: var(--accent-secondary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .bad-bet {
+            border-left-color: var(--accent-danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .example-box div {
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .example-box .result {
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        .color-guide {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .color-demo {
+            display: inline-block;
+            padding: 0.375rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.875rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .color-item span:last-child {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .filters-guide {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .filters-guide div {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            padding: 0.5rem 0;
+        }
+
+        .disclaimer {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .disclaimer p {
+            color: var(--accent-warning);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Responsive adjustments for info panel */
+        @media (max-width: 768px) {
+            .info-content {
+                padding: 1.5rem;
+            }
+            
+            .color-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .example-box {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-content {
+                padding: 1rem;
+            }
+            
+            .info-content h3 {
+                font-size: 1.25rem;
+            }
+            
+            .info-content h4 {
+                font-size: 1rem;
+            }
+        }
+
         .spinner {
             position: relative;
         }
@@ -537,6 +721,81 @@
         <div class="header">
             <h1>Football Stats AI</h1>
             <p class="subtitle">ML-powered betting odds predictions</p>
+            
+            <!-- Кнопка показать/скрыть инструкцию -->
+            <button class="info-toggle" onclick="toggleInfoPanel()">
+                <span>ℹ️</span> Как пользоваться
+            </button>
+            
+            <!-- Информационная панель -->
+            <div id="info-panel" class="info-panel" style="display: none;">
+                <div class="info-content">
+                    <h3>Как использовать AI-коэффициенты</h3>
+                    
+                    <div class="info-section">
+                        <p><strong>Основная идея:</strong> Наши коэффициенты - это "справедливая цена" события, рассчитанная искусственным интеллектом на основе анализа статистики и данных.</p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Принцип работы:</h4>
+                        <ol>
+                            <li><strong>Сравнивайте наши коэффициенты с букмекерскими</strong></li>
+                            <li><strong>Ищите события где коэффициент букмекера ВЫШЕ нашего</strong></li>
+                            <li><strong>Чем больше разница - тем выгоднее ставка</strong></li>
+                        </ol>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Пример:</h4>
+                        <div class="example-box good-bet">
+                            <div>Наш коэффициент на победу команды: <strong>2.10</strong></div>
+                            <div>Коэффициент букмекера: <strong>2.40</strong></div>
+                            <div class="result">✅ <strong>Выгодная ставка!</strong> (букмекер переоценил вероятность)</div>
+                        </div>
+                        
+                        <div class="example-box bad-bet">
+                            <div>Наш коэффициент: <strong>2.10</strong></div>
+                            <div>Коэффициент букмекера: <strong>1.90</strong></div>
+                            <div class="result">❌ <strong>Невыгодная ставка</strong> (букмекер недооценил риск)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Цветовая кодировка:</h4>
+                        <div class="color-guide">
+                            <div class="color-item">
+                                <span class="color-demo prob-excellent">1.25</span>
+                                <span><strong>Зеленый (≤1.40)</strong> - высокая вероятность по нашей модели</span>
+                            </div>
+                            <div class="color-item">
+                                <span class="color-demo prob-good">1.75</span>
+                                <span><strong>Синий (1.41-2.00)</strong> - хорошая вероятность</span>
+                            </div>
+                            <div class="color-item">
+                                <span class="color-demo prob-fair">2.50</span>
+                                <span><strong>Желтый (2.01-3.50)</strong> - средняя вероятность</span>
+                            </div>
+                            <div class="color-item">
+                                <span class="color-demo prob-poor">5.00</span>
+                                <span><strong>Красный (>3.50)</strong> - низкая вероятность</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Фильтры:</h4>
+                        <div class="filters-guide">
+                            <div><strong>⚽ Match Result:</strong> исходы матча (победа дома / ничья / победа гостей)</div>
+                            <div><strong>🥅 Goals Total:</strong> тотал голов (больше/меньше определенного количества)</div>
+                            <div><strong>📐 Corners Total:</strong> тотал угловых (больше/меньше определенного количества)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section disclaimer">
+                        <p><strong>⚠️ Помните:</strong> Прогнозы носят информационный характер. Играйте ответственно!</p>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Фильтры -->
@@ -1098,6 +1357,20 @@
             return d.toLocaleString('ru-RU', options);
         }
         
+        // Функция для показа/скрытия информационной панели
+        function toggleInfoPanel() {
+            const panel = document.getElementById('info-panel');
+            const button = document.querySelector('.info-toggle');
+            
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                button.innerHTML = '<span>ℹ️</span> Скрыть инструкцию';
+            } else {
+                panel.style.display = 'none';
+                button.innerHTML = '<span>ℹ️</span> Как пользоваться';
+            }
+        }
+
         // Загрузка при старте (для демо)
         window.onload = function() {
             // Автоматически загружаем демо-данные
