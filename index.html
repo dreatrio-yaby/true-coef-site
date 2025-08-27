@@ -881,6 +881,14 @@
         
         <!-- Фильтры -->
         <div class="filters">
+            <!-- Фильтр по датам -->
+            <div class="date-filter" style="margin-bottom: 1rem;">
+                <div class="filter-buttons" id="date-filter-buttons">
+                    <!-- Кнопки дат будут добавлены динамически -->
+                </div>
+            </div>
+            
+            <!-- Фильтр по типам ставок -->
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="1x2" onclick="setFilter('1x2')">
                     1X2
@@ -908,6 +916,8 @@
         // Глобальные переменные
         let allMatches = [];
         let currentFilter = '1x2';
+        let currentDateFilter = new Date().toISOString().split('T')[0]; // Сегодняшняя дата в формате YYYY-MM-DD
+        let availableDates = [];
         
         // Функция для расчета вероятности "меньше"
         function calculateUnder(overProb) {
@@ -943,6 +953,61 @@
             
             // Перерисовываем таблицы
             renderMatches();
+        }
+        
+        // Функция установки фильтра по дате
+        function setDateFilter(date) {
+            currentDateFilter = date;
+            
+            // Обновляем активную кнопку даты
+            document.querySelectorAll('.date-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.date === date) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Перерисовываем таблицы
+            renderMatches();
+        }
+        
+        // Функция для форматирования даты в DD-MM-YYYY
+        function formatDateForDisplay(dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            return `${day}-${month}-${year}`;
+        }
+        
+        // Функция для рендеринга кнопок фильтра дат
+        function renderDateFilterButtons() {
+            const container = document.getElementById('date-filter-buttons');
+            
+            if (availableDates.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            // Сортируем даты и берем первые 7
+            const sortedDates = [...availableDates].sort().slice(0, 7);
+            
+            // Если текущая выбранная дата не входит в доступные, выбираем первую доступную
+            if (!sortedDates.includes(currentDateFilter)) {
+                currentDateFilter = sortedDates[0] || new Date().toISOString().split('T')[0];
+            }
+            
+            let buttonsHtml = '';
+            sortedDates.forEach(date => {
+                const isActive = date === currentDateFilter ? 'active' : '';
+                const displayDate = formatDateForDisplay(date);
+                buttonsHtml += `
+                    <button class="filter-btn date-filter-btn ${isActive}" 
+                            data-date="${date}" 
+                            onclick="setDateFilter('${date}')">
+                        ${displayDate}
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = buttonsHtml;
         }
         
         // Функция для получения следующих N дней в формате YYYY-MM-DD
@@ -1110,6 +1175,22 @@
         }
         
         
+        // Функция для извлечения доступных дат из загруженных матчей
+        function extractAvailableDates() {
+            const uniqueDates = new Set();
+            
+            allMatches.forEach(match => {
+                if (match.date) {
+                    uniqueDates.add(match.date);
+                }
+            });
+            
+            availableDates = Array.from(uniqueDates);
+            
+            // Рендерим кнопки фильтра дат
+            renderDateFilterButtons();
+        }
+        
         // Основная функция для загрузки данных из S3
         async function loadMatches() {
             const loader = document.getElementById('loader');
@@ -1151,10 +1232,15 @@
                     await loadDemoData();
                 }
                 
+                // Извлекаем доступные даты из загруженных матчей
+                extractAvailableDates();
+                
             } catch (error) {
                 console.error('Error loading S3 data:', error);
                 console.log('Fallback to demo data');
                 await loadDemoData();
+                // Извлекаем доступные даты из демо-данных
+                extractAvailableDates();
             }
             
             loader.style.display = 'none';
@@ -1245,9 +1331,19 @@
                 return;
             }
             
-            // Группируем матчи по лигам
+            // Фильтруем матчи по выбранной дате
+            const filteredMatches = allMatches.filter(match => {
+                return match.date === currentDateFilter;
+            });
+            
+            if (filteredMatches.length === 0) {
+                container.innerHTML = `<div class="no-data">No matches available for ${formatDateForDisplay(currentDateFilter)}.</div>`;
+                return;
+            }
+            
+            // Группируем отфильтрованные матчи по лигам
             const matchesByLeague = {};
-            allMatches.forEach(match => {
+            filteredMatches.forEach(match => {
                 if (!matchesByLeague[match.league]) {
                     matchesByLeague[match.league] = [];
                 }
