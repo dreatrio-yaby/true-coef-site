@@ -188,6 +188,27 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        /* Column width standardization */
+        th:nth-child(1), td:nth-child(1) {
+            width: 100px; /* Date/Time column */
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 200px; /* Match column */
+        }
+
+        /* Standard probability columns */
+        th:nth-child(n+3), td:nth-child(n+3) {
+            width: 80px; /* All probability columns */
+        }
+
+        /* Separator columns for totals */
+        th.total-separator, td.total-separator {
+            width: 60px;
+            text-align: center;
         }
 
         th {
@@ -203,6 +224,9 @@
             position: sticky;
             top: 0;
             z-index: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         th:first-child {
@@ -217,6 +241,9 @@
             padding: 1rem 0.75rem;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         td:first-child {
@@ -624,6 +651,23 @@
             th:last-child, td:last-child {
                 padding-right: 1rem;
             }
+
+            /* Responsive column widths for tablets */
+            th:nth-child(1), td:nth-child(1) {
+                width: 90px;
+            }
+
+            th:nth-child(2), td:nth-child(2) {
+                width: 180px;
+            }
+
+            th:nth-child(n+3), td:nth-child(n+3) {
+                width: 70px;
+            }
+
+            th.total-separator, td.total-separator {
+                width: 50px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -663,11 +707,27 @@
                 padding-right: 0.75rem;
             }
 
+            /* Mobile column widths */
+            th:nth-child(1), td:nth-child(1) {
+                width: 80px;
+            }
+
+            th:nth-child(2), td:nth-child(2) {
+                width: 140px;
+            }
+
+            th:nth-child(n+3), td:nth-child(n+3) {
+                width: 60px;
+            }
+
+            th.total-separator, td.total-separator {
+                width: 45px;
+            }
+
             .match-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.25rem;
-                min-width: 120px;
             }
 
             .team-name {
@@ -680,7 +740,6 @@
 
             .prob-cell {
                 font-size: 0.75rem;
-                min-width: 48px;
             }
 
             .odds-value {
@@ -714,8 +773,21 @@
                 padding-right: 0.5rem;
             }
 
-            .prob-cell {
-                min-width: 40px;
+            /* Small mobile column widths */
+            th:nth-child(1), td:nth-child(1) {
+                width: 70px;
+            }
+
+            th:nth-child(2), td:nth-child(2) {
+                width: 120px;
+            }
+
+            th:nth-child(n+3), td:nth-child(n+3) {
+                width: 50px;
+            }
+
+            th.total-separator, td.total-separator {
+                width: 40px;
             }
 
             .odds-value {
