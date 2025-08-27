@@ -794,9 +794,9 @@
                     <div class="info-section">
                         <h4>Фильтры:</h4>
                         <div class="filters-guide">
-                            <div><strong>⚽ Match Result:</strong> исходы матча (победа дома / ничья / победа гостей)</div>
-                            <div><strong>🥅 Goals Total:</strong> тотал голов (больше/меньше определенного количества)</div>
-                            <div><strong>📐 Corners Total:</strong> тотал угловых (больше/меньше определенного количества)</div>
+                            <div><strong>⚽ 1X2:</strong> исходы матча (победа дома / ничья / победа гостей)</div>
+                            <div><strong>🥅 Тоталы голов:</strong> тотал голов (больше/меньше определенного количества)</div>
+                            <div><strong>📐 Тоталы угловых:</strong> тотал угловых (больше/меньше определенного количества)</div>
                         </div>
                     </div>
                     
@@ -811,13 +811,13 @@
         <div class="filters">
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="1x2" onclick="setFilter('1x2')">
-                    <span>⚽</span> Match Result
+                    <span>⚽</span> 1X2
                 </button>
                 <button class="filter-btn" data-filter="goals" onclick="setFilter('goals')">
-                    <span>🥅</span> Goals Total
+                    <span>🥅</span> Тоталы голов
                 </button>
                 <button class="filter-btn" data-filter="corners" onclick="setFilter('corners')">
-                    <span>📐</span> Corners Total
+                    <span>📐</span> Тоталы угловых
                 </button>
             </div>
         </div>
@@ -1228,24 +1228,24 @@
                     break;
                 case 'goals':
                     headers += `
-                        <th>Total 0.5</th><th>O</th><th>U</th>
-                        <th>Total 1.5</th><th>O</th><th>U</th>
-                        <th>Total 2.5</th><th>O</th><th>U</th>
-                        <th>Home 0.5</th><th>O</th><th>U</th>
-                        <th>Home 1.5</th><th>O</th><th>U</th>
-                        <th>Away 0.5</th><th>O</th><th>U</th>
-                        <th>Away 1.5</th><th>O</th><th>U</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
                     `;
                     break;
                 case 'corners':
                     headers += `
-                        <th>Total 7.5</th><th>O</th><th>U</th>
-                        <th>Total 8.5</th><th>O</th><th>U</th>
-                        <th>Total 9.5</th><th>O</th><th>U</th>
-                        <th>Home 3.5</th><th>O</th><th>U</th>
-                        <th>Home 4.5</th><th>O</th><th>U</th>
-                        <th>Away 3.5</th><th>O</th><th>U</th>
-                        <th>Away 4.5</th><th>O</th><th>U</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
                     `;
                     break;
             }
