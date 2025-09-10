@@ -200,9 +200,9 @@
             width: 200px; /* Match column */
         }
 
-        /* Standard probability columns */
+        /* Standard probability columns - wider for bookmaker odds */
         th:nth-child(n+3), td:nth-child(n+3) {
-            width: 80px; /* All probability columns */
+            width: 120px; /* All probability columns with bookmaker info */
         }
 
         /* Separator columns for totals */
@@ -326,6 +326,25 @@
             background: rgba(220, 53, 69, 0.1);
             color: #842029;
             border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Стили для букмекерских коэффициентов */
+        .bookmaker-odds {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        
+        .best-odds {
+            background: rgba(25, 135, 84, 0.2);
+            padding: 0.125rem 0.25rem;
+            border-radius: 3px;
+            border: 1px solid rgba(25, 135, 84, 0.4);
+        }
+        
+        .bookmaker-name {
+            font-size: 0.6rem;
+            opacity: 0.8;
         }
 
         /* Separator columns */
@@ -475,7 +494,7 @@
             }
 
             th:nth-child(n+3), td:nth-child(n+3) {
-                width: 70px;
+                width: 100px;
             }
 
             th.total-separator, td.total-separator {
@@ -530,7 +549,7 @@
             }
 
             th:nth-child(n+3), td:nth-child(n+3) {
-                width: 60px;
+                width: 80px;
             }
 
             th.total-separator, td.total-separator {
@@ -596,7 +615,7 @@
             }
 
             th:nth-child(n+3), td:nth-child(n+3) {
-                width: 50px;
+                width: 70px;
             }
 
             th.total-separator, td.total-separator {
@@ -624,6 +643,13 @@
             <div class="date-filter" style="margin-bottom: 1rem;">
                 <div class="filter-buttons" id="date-filter-buttons">
                     <!-- Кнопки дат будут добавлены динамически -->
+                </div>
+            </div>
+            
+            <!-- Фильтр по букмекерам -->
+            <div class="bookmaker-filter" style="margin-bottom: 1rem;">
+                <div class="filter-buttons" id="bookmaker-filter-buttons">
+                    <!-- Кнопки букмекеров будут добавлены динамически -->
                 </div>
             </div>
             
@@ -657,6 +683,8 @@
         let currentFilter = '1x2';
         let currentDateFilter = new Date().toISOString().split('T')[0]; // Сегодняшняя дата в формате YYYY-MM-DD
         let availableDates = [];
+        let selectedBookmaker = null; // null означает показать все букмекеры
+        let availableBookmakers = [];
         
         // Функция для расчета вероятности "меньше"
         function calculateUnder(overProb) {
@@ -667,6 +695,52 @@
         function formatProb(prob) {
             if (prob === 0) return '∞';
             return (1 / prob).toFixed(2);
+        }
+        
+        // Функция для получения лучших коэффициентов с фильтром по букмекеру
+        function getBestOddsForBet(match, betPath) {
+            if (!match.bookmaker_odds) {
+                return null;
+            }
+            
+            const pathParts = betPath.split('.');
+            let current = match.bookmaker_odds;
+            
+            for (const part of pathParts) {
+                if (current && current[part]) {
+                    current = current[part];
+                } else {
+                    return null;
+                }
+            }
+            
+            if (!current || !current.bookmaker_odds || !Array.isArray(current.bookmaker_odds)) {
+                return null;
+            }
+            
+            let filteredOdds = current.bookmaker_odds;
+            
+            // Фильтруем по выбранному букмекеру
+            if (selectedBookmaker) {
+                filteredOdds = filteredOdds.filter(odds => odds.bookmaker_name === selectedBookmaker);
+            }
+            
+            if (filteredOdds.length === 0) {
+                return null;
+            }
+            
+            // Находим лучший коэффициент (максимальный)
+            let bestOdds = filteredOdds[0];
+            for (const odds of filteredOdds) {
+                if (parseFloat(odds.value) > parseFloat(bestOdds.value)) {
+                    bestOdds = odds;
+                }
+            }
+            
+            return {
+                best: bestOdds,
+                all: filteredOdds
+            };
         }
         
         // Enhanced probability class determination with better value ranges
@@ -742,6 +816,35 @@
                             data-date="${date}" 
                             onclick="setDateFilter('${date}')">
                         ${displayDate}
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = buttonsHtml;
+        }
+        
+        // Функция для рендеринга кнопок фильтра букмекеров
+        function renderBookmakerFilterButtons() {
+            const container = document.getElementById('bookmaker-filter-buttons');
+            
+            if (availableBookmakers.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let buttonsHtml = `
+                <button class="filter-btn bookmaker-filter-btn ${selectedBookmaker === null ? 'active' : ''}" 
+                        onclick="setBookmakerFilter(null)">
+                    Все букмекеры
+                </button>
+            `;
+            
+            availableBookmakers.forEach(bookmaker => {
+                const isActive = selectedBookmaker === bookmaker ? 'active' : '';
+                buttonsHtml += `
+                    <button class="filter-btn bookmaker-filter-btn ${isActive}" 
+                            onclick="setBookmakerFilter('${bookmaker}')">
+                        ${bookmaker}
                     </button>
                 `;
             });
@@ -930,6 +1033,53 @@
             renderDateFilterButtons();
         }
         
+        // Функция для извлечения доступных букмекеров из загруженных матчей
+        function extractAvailableBookmakers() {
+            const uniqueBookmakers = new Set();
+            
+            allMatches.forEach(match => {
+                if (match.bookmaker_odds && typeof match.bookmaker_odds === 'object') {
+                    Object.values(match.bookmaker_odds).forEach(betType => {
+                        if (betType && typeof betType === 'object') {
+                            Object.values(betType).forEach(option => {
+                                if (option && option.bookmaker_odds && Array.isArray(option.bookmaker_odds)) {
+                                    option.bookmaker_odds.forEach(odds => {
+                                        if (odds && odds.bookmaker_name) {
+                                            uniqueBookmakers.add(odds.bookmaker_name);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+            availableBookmakers = Array.from(uniqueBookmakers).sort();
+            
+            // Рендерим кнопки фильтра букмекеров
+            renderBookmakerFilterButtons();
+        }
+        
+        // Функция установки фильтра по букмекеру
+        function setBookmakerFilter(bookmaker) {
+            selectedBookmaker = bookmaker;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.bookmaker-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (bookmaker === null) {
+                document.querySelector('.bookmaker-filter-btn[onclick="setBookmakerFilter(null)"]').classList.add('active');
+            } else {
+                document.querySelector(`.bookmaker-filter-btn[onclick="setBookmakerFilter('${bookmaker}')"]`).classList.add('active');
+            }
+            
+            // Перерисовываем таблицы
+            renderMatches();
+        }
+        
         // Основная функция для загрузки данных из S3
         async function loadMatches() {
             const loader = document.getElementById('loader');
@@ -937,49 +1087,31 @@
             
             try {
                 const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
-                const dates = getNextDays(7);
+                const dataUrl = `${bucketUrl}/website-data/combined_matches.json`;
                 
-                console.log('Loading matches for dates:', dates);
+                console.log('Loading matches from:', dataUrl);
                 
-                allMatches = [];
-                
-                // Загружаем данные для каждой даты
-                for (const date of dates) {
-                    console.log(`📅 Checking date: ${date}`);
-                    
-                    // Пробуем загрузить файлы матчей для этой даты
-                    const matchesFromDate = await tryLoadMatchFiles(bucketUrl, date);
-                    
-                    console.log(`Found ${matchesFromDate.length} matches for ${date}`);
-                    
-                    // Добавляем найденные матчи
-                    matchesFromDate.forEach(matchData => {
-                        if (matchData && matchData.probs) {
-                            // Проверяем, что у матча есть необходимые поля
-                            if (matchData.league && matchData.home_name && matchData.away_name) {
-                                allMatches.push(matchData);
-                            }
-                        }
-                    });
+                const response = await fetch(dataUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log(`Loaded ${allMatches.length} matches total`);
+                const data = await response.json();
+                console.log(`Loaded ${data.matches.length} matches from combined_matches.json`);
                 
-                // Если нет данных, показываем демо-данные
-                if (allMatches.length === 0) {
-                    console.log('No S3 data found, using demo data');
-                    await loadDemoData();
-                }
+                allMatches = data.matches;
                 
-                // Извлекаем доступные даты из загруженных матчей
+                // Извлекаем доступные даты и букмекеров из загруженных матчей
                 extractAvailableDates();
+                extractAvailableBookmakers();
                 
             } catch (error) {
-                console.error('Error loading S3 data:', error);
+                console.error('Error loading combined_matches.json:', error);
                 console.log('Fallback to demo data');
                 await loadDemoData();
                 // Извлекаем доступные даты из демо-данных
                 extractAvailableDates();
+                extractAvailableBookmakers();
             }
             
             loader.style.display = 'none';
@@ -1131,7 +1263,11 @@
             
             switch(currentFilter) {
                 case '1x2':
-                    headers += '<th>Home Win</th><th>Draw</th><th>Away Win</th>';
+                    if (selectedBookmaker) {
+                        headers += `<th>Home Win<br><small>(${selectedBookmaker})</small></th><th>Draw<br><small>(${selectedBookmaker})</small></th><th>Away Win<br><small>(${selectedBookmaker})</small></th>`;
+                    } else {
+                        headers += '<th>Home Win<br><small>(ML/Best)</small></th><th>Draw<br><small>(ML/Best)</small></th><th>Away Win<br><small>(ML/Best)</small></th>';
+                    }
                     break;
                 case 'goals':
                     headers += `
@@ -1181,10 +1317,30 @@
                     const draw = match.probs.target_draw || 0;
                     const awayWin = match.probs.target_away_win || 0;
                     
+                    // Получаем букмекерские коэффициенты
+                    const homeOdds = getBestOddsForBet(match, 'match_result.home_win');
+                    const drawOdds = getBestOddsForBet(match, 'match_result.draw');
+                    const awayOdds = getBestOddsForBet(match, 'match_result.away_win');
+                    
                     row += `
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeWin)}">${formatProb(homeWin)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(draw)}">${formatProb(draw)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayWin)}">${formatProb(awayWin)}</span></td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(homeWin)}">
+                                ${formatProb(homeWin)}
+                                ${homeOdds ? `<br><small style="color: #0d6efd;">${homeOdds.best.value} (${homeOdds.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(draw)}">
+                                ${formatProb(draw)}
+                                ${drawOdds ? `<br><small style="color: #0d6efd;">${drawOdds.best.value} (${drawOdds.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(awayWin)}">
+                                ${formatProb(awayWin)}
+                                ${awayOdds ? `<br><small style="color: #0d6efd;">${awayOdds.best.value} (${awayOdds.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
                     `;
                     break;
                     
