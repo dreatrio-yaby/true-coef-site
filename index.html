@@ -703,22 +703,32 @@
                 return null;
             }
             
-            const pathParts = betPath.split('.');
-            let current = match.bookmaker_odds;
+            let oddsArray = null;
             
-            for (const part of pathParts) {
-                if (current && current[part]) {
-                    current = current[part];
-                } else {
-                    return null;
+            // Обрабатываем разные пути к данным
+            if (betPath.startsWith('1x2.')) {
+                const outcome = betPath.split('.')[1]; // P1, X, P2
+                if (match.bookmaker_odds['1x2'] && match.bookmaker_odds['1x2'][outcome]) {
+                    oddsArray = match.bookmaker_odds['1x2'][outcome];
+                }
+            } else if (betPath.startsWith('totals.')) {
+                const parts = betPath.split('.'); // totals.0.5.over
+                const total = parts[1]; // "0.5"
+                const direction = parts[2]; // "over" or "under"
+                
+                if (match.bookmaker_odds.totals && 
+                    match.bookmaker_odds.totals[total] && 
+                    match.bookmaker_odds.totals[total][direction] &&
+                    match.bookmaker_odds.totals[total][direction].bookmaker_odds) {
+                    oddsArray = match.bookmaker_odds.totals[total][direction].bookmaker_odds;
                 }
             }
             
-            if (!current || !current.bookmaker_odds || !Array.isArray(current.bookmaker_odds)) {
+            if (!oddsArray || !Array.isArray(oddsArray) || oddsArray.length === 0) {
                 return null;
             }
             
-            let filteredOdds = current.bookmaker_odds;
+            let filteredOdds = oddsArray;
             
             // Фильтруем по выбранному букмекеру
             if (selectedBookmaker) {
@@ -1039,19 +1049,35 @@
             
             allMatches.forEach(match => {
                 if (match.bookmaker_odds && typeof match.bookmaker_odds === 'object') {
-                    Object.values(match.bookmaker_odds).forEach(betType => {
-                        if (betType && typeof betType === 'object') {
-                            Object.values(betType).forEach(option => {
-                                if (option && option.bookmaker_odds && Array.isArray(option.bookmaker_odds)) {
-                                    option.bookmaker_odds.forEach(odds => {
-                                        if (odds && odds.bookmaker_name) {
-                                            uniqueBookmakers.add(odds.bookmaker_name);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
+                    // Обрабатываем 1x2
+                    if (match.bookmaker_odds['1x2']) {
+                        ['P1', 'X', 'P2'].forEach(outcome => {
+                            if (match.bookmaker_odds['1x2'][outcome] && Array.isArray(match.bookmaker_odds['1x2'][outcome])) {
+                                match.bookmaker_odds['1x2'][outcome].forEach(odds => {
+                                    if (odds && odds.bookmaker_name) {
+                                        uniqueBookmakers.add(odds.bookmaker_name);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Обрабатываем тоталы
+                    if (match.bookmaker_odds.totals) {
+                        Object.values(match.bookmaker_odds.totals).forEach(total => {
+                            if (total && typeof total === 'object') {
+                                ['over', 'under'].forEach(direction => {
+                                    if (total[direction] && total[direction].bookmaker_odds && Array.isArray(total[direction].bookmaker_odds)) {
+                                        total[direction].bookmaker_odds.forEach(odds => {
+                                            if (odds && odds.bookmaker_name) {
+                                                uniqueBookmakers.add(odds.bookmaker_name);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });
             
@@ -1318,9 +1344,9 @@
                     const awayWin = match.probs.target_away_win || 0;
                     
                     // Получаем букмекерские коэффициенты
-                    const homeOdds = getBestOddsForBet(match, 'match_result.home_win');
-                    const drawOdds = getBestOddsForBet(match, 'match_result.draw');
-                    const awayOdds = getBestOddsForBet(match, 'match_result.away_win');
+                    const homeOdds = getBestOddsForBet(match, '1x2.P1');
+                    const drawOdds = getBestOddsForBet(match, '1x2.X');
+                    const awayOdds = getBestOddsForBet(match, '1x2.P2');
                     
                     row += `
                         <td class="prob-cell">
@@ -1353,16 +1379,54 @@
                     const awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
                     const awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
                     
+                    // Получаем букмекерские коэффициенты для тоталов
+                    const total05Over = getBestOddsForBet(match, 'totals.0.5.over');
+                    const total05Under = getBestOddsForBet(match, 'totals.0.5.under');
+                    const total15Over = getBestOddsForBet(match, 'totals.1.5.over');
+                    const total15Under = getBestOddsForBet(match, 'totals.1.5.under');
+                    const total25Over = getBestOddsForBet(match, 'totals.2.5.over');
+                    const total25Under = getBestOddsForBet(match, 'totals.2.5.under');
+                    
                     row += `
                         <td class="total-separator">0.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver05)}">${formatProb(goalsOver05)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver05))}">${formatProb(calculateUnder(goalsOver05))}</span></td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(goalsOver05)}">
+                                ${formatProb(goalsOver05)}
+                                ${total05Over ? `<br><small style="color: #0d6efd;">${total05Over.best.value} (${total05Over.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver05))}">
+                                ${formatProb(calculateUnder(goalsOver05))}
+                                ${total05Under ? `<br><small style="color: #0d6efd;">${total05Under.best.value} (${total05Under.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
                         <td class="total-separator">1.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver15)}">${formatProb(goalsOver15)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver15))}">${formatProb(calculateUnder(goalsOver15))}</span></td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(goalsOver15)}">
+                                ${formatProb(goalsOver15)}
+                                ${total15Over ? `<br><small style="color: #0d6efd;">${total15Over.best.value} (${total15Over.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver15))}">
+                                ${formatProb(calculateUnder(goalsOver15))}
+                                ${total15Under ? `<br><small style="color: #0d6efd;">${total15Under.best.value} (${total15Under.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
                         <td class="total-separator">2.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(goalsOver25)}">${formatProb(goalsOver25)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(goalsOver25))}">${formatProb(calculateUnder(goalsOver25))}</span></td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(goalsOver25)}">
+                                ${formatProb(goalsOver25)}
+                                ${total25Over ? `<br><small style="color: #0d6efd;">${total25Over.best.value} (${total25Over.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver25))}">
+                                ${formatProb(calculateUnder(goalsOver25))}
+                                ${total25Under ? `<br><small style="color: #0d6efd;">${total25Under.best.value} (${total25Under.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
                         <td class="total-separator">0.5</td>
                         <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</span></td>
                         <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</span></td>
