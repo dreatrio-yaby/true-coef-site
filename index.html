@@ -301,31 +301,82 @@
             display: inline-block;
             padding: 0.375rem 0.5rem;
             border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Добавляем индикатор выгодности */
+        .prob-excellent .odds-value::after {
+            content: '🎯';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        
+        .prob-good .odds-value::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+            opacity: 0.6;
         }
 
+        /* Profitability-based CSS classes */
         .prob-excellent {
-            background: rgba(25, 135, 84, 0.1);
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.15), rgba(0, 200, 100, 0.1));
             color: #0f5132;
-            border: 1px solid rgba(25, 135, 84, 0.3);
+            border: 1px solid rgba(25, 135, 84, 0.4);
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
         }
 
         .prob-good {
-            background: rgba(13, 110, 253, 0.1);
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.12), rgba(0, 150, 255, 0.08));
             color: #084298;
-            border: 1px solid rgba(13, 110, 253, 0.3);
+            border: 1px solid rgba(13, 110, 253, 0.35);
+            box-shadow: 0 1px 3px rgba(13, 110, 253, 0.15);
         }
 
         .prob-fair {
-            background: rgba(253, 126, 20, 0.1);
+            background: linear-gradient(135deg, rgba(253, 126, 20, 0.12), rgba(255, 150, 50, 0.08));
             color: #ad560d;
-            border: 1px solid rgba(253, 126, 20, 0.3);
+            border: 1px solid rgba(253, 126, 20, 0.35);
+            box-shadow: 0 1px 3px rgba(253, 126, 20, 0.15);
         }
 
         .prob-poor {
-            background: rgba(220, 53, 69, 0.1);
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.12), rgba(255, 80, 100, 0.08));
             color: #842029;
-            border: 1px solid rgba(220, 53, 69, 0.3);
+            border: 1px solid rgba(220, 53, 69, 0.35);
+            box-shadow: 0 1px 3px rgba(220, 53, 69, 0.15);
+        }
+        
+        /* Hover effects for profitability cells */
+        .prob-excellent:hover {
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.25), rgba(0, 200, 100, 0.2));
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
+        }
+        
+        .prob-good:hover {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.22), rgba(0, 150, 255, 0.18));
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 3px 6px rgba(13, 110, 253, 0.25);
+        }
+        
+        .prob-fair:hover {
+            background: linear-gradient(135deg, rgba(253, 126, 20, 0.22), rgba(255, 150, 50, 0.18));
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 3px 6px rgba(253, 126, 20, 0.25);
+        }
+        
+        .prob-poor:hover {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.22), rgba(255, 80, 100, 0.18));
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 3px 6px rgba(220, 53, 69, 0.25);
         }
         
         /* Стили для букмекерских коэффициентов */
@@ -415,9 +466,12 @@
             animation-delay: 0.05s;
         }
 
+        .odds-value {
+            transition: all 0.3s ease;
+        }
+        
         .odds-value:hover {
             transform: translateY(-1px);
-            animation: pulse 1s ease-in-out infinite;
         }
 
         .filter-btn {
@@ -772,7 +826,21 @@
             };
         }
         
-        // Enhanced probability class determination with better value ranges
+        // Enhanced profitability class determination based on bookmaker odds vs ML
+        function getProfitabilityClass(mlCoef, bookmakerCoef) {
+            if (!mlCoef || !bookmakerCoef || mlCoef <= 0 || bookmakerCoef <= 0) {
+                return 'prob-poor';
+            }
+            
+            const profitRatio = bookmakerCoef / mlCoef;
+            
+            if (profitRatio >= 1.15) return 'prob-excellent';  // Bookmaker odds 15%+ higher than ML
+            if (profitRatio >= 1.08) return 'prob-good';       // Bookmaker odds 8-14% higher than ML
+            if (profitRatio >= 1.02) return 'prob-fair';       // Bookmaker odds 2-7% higher than ML
+            return 'prob-poor';                                 // Bookmaker odds lower or equal to ML
+        }
+        
+        // Fallback probability class determination for when no bookmaker odds available
         function getProbClass(prob) {
             const coef = 1 / prob;
             if (coef <= 1.4) return 'prob-excellent';  // Excellent odds (very high probability)
@@ -1433,21 +1501,26 @@
                     const drawMLValue = match.events && match.events['1x2'] && match.events['1x2'].X ? match.events['1x2'].X.ml : null;
                     const awayMLValue = match.events && match.events['1x2'] && match.events['1x2'].P2 ? match.events['1x2'].P2.ml : null;
                     
+                    // Определяем CSS классы на основе выгодности
+                    const homeClass = homeOdds ? getProfitabilityClass(homeMLValue, parseFloat(homeOdds.best.value)) : getProbClass(homeWin);
+                    const drawClass = drawOdds ? getProfitabilityClass(drawMLValue, parseFloat(drawOdds.best.value)) : getProbClass(draw);
+                    const awayClass = awayOdds ? getProfitabilityClass(awayMLValue, parseFloat(awayOdds.best.value)) : getProbClass(awayWin);
+                    
                     row += `
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(homeWin)}">
+                            <span class="odds-value ${homeClass}">
                                 ${homeMLValue ? homeMLValue.toFixed(2) : formatProb(homeWin)}
                                 ${homeOdds ? `<br><small style="color: #0d6efd;">${homeOdds.best.value} (${homeOdds.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(draw)}">
+                            <span class="odds-value ${drawClass}">
                                 ${drawMLValue ? drawMLValue.toFixed(2) : formatProb(draw)}
                                 ${drawOdds ? `<br><small style="color: #0d6efd;">${drawOdds.best.value} (${drawOdds.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(awayWin)}">
+                            <span class="odds-value ${awayClass}">
                                 ${awayMLValue ? awayMLValue.toFixed(2) : formatProb(awayWin)}
                                 ${awayOdds ? `<br><small style="color: #0d6efd;">${awayOdds.best.value} (${awayOdds.best.bookmaker_name})</small>` : ''}
                             </span>
@@ -1501,42 +1574,50 @@
                     const ml25Over = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].over ? match.events.totals['2.5'].over.ml : null;
                     const ml25Under = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].under ? match.events.totals['2.5'].under.ml : null;
 
+                    // Определяем CSS классы на основе выгодности для тоталов
+                    const total05OverClass = total05Over ? getProfitabilityClass(ml05Over, parseFloat(total05Over.best.value)) : getProbClass(goalsOver05);
+                    const total05UnderClass = total05Under ? getProfitabilityClass(ml05Under, parseFloat(total05Under.best.value)) : getProbClass(calculateUnder(goalsOver05));
+                    const total15OverClass = total15Over ? getProfitabilityClass(ml15Over, parseFloat(total15Over.best.value)) : getProbClass(goalsOver15);
+                    const total15UnderClass = total15Under ? getProfitabilityClass(ml15Under, parseFloat(total15Under.best.value)) : getProbClass(calculateUnder(goalsOver15));
+                    const total25OverClass = total25Over ? getProfitabilityClass(ml25Over, parseFloat(total25Over.best.value)) : getProbClass(goalsOver25);
+                    const total25UnderClass = total25Under ? getProfitabilityClass(ml25Under, parseFloat(total25Under.best.value)) : getProbClass(calculateUnder(goalsOver25));
+                    
                     row += `
                         <td class="total-separator">0.5</td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(goalsOver05)}">
+                            <span class="odds-value ${total05OverClass}">
                                 ${ml05Over ? ml05Over.toFixed(2) : formatProb(goalsOver05)}
                                 ${total05Over ? `<br><small style="color: #0d6efd;">${total05Over.best.value} (${total05Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver05))}">
+                            <span class="odds-value ${total05UnderClass}">
                                 ${ml05Under ? ml05Under.toFixed(2) : formatProb(calculateUnder(goalsOver05))}
                                 ${total05Under ? `<br><small style="color: #0d6efd;">${total05Under.best.value} (${total05Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="total-separator">1.5</td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(goalsOver15)}">
+                            <span class="odds-value ${total15OverClass}">
                                 ${ml15Over ? ml15Over.toFixed(2) : formatProb(goalsOver15)}
                                 ${total15Over ? `<br><small style="color: #0d6efd;">${total15Over.best.value} (${total15Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver15))}">
+                            <span class="odds-value ${total15UnderClass}">
                                 ${ml15Under ? ml15Under.toFixed(2) : formatProb(calculateUnder(goalsOver15))}
                                 ${total15Under ? `<br><small style="color: #0d6efd;">${total15Under.best.value} (${total15Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="total-separator">2.5</td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(goalsOver25)}">
+                            <span class="odds-value ${total25OverClass}">
                                 ${ml25Over ? ml25Over.toFixed(2) : formatProb(goalsOver25)}
                                 ${total25Over ? `<br><small style="color: #0d6efd;">${total25Over.best.value} (${total25Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
-                            <span class="odds-value ${getProbClass(calculateUnder(goalsOver25))}">
+                            <span class="odds-value ${total25UnderClass}">
                                 ${ml25Under ? ml25Under.toFixed(2) : formatProb(calculateUnder(goalsOver25))}
                                 ${total25Under ? `<br><small style="color: #0d6efd;">${total25Under.best.value} (${total25Under.best.bookmaker_name})</small>` : ''}
                             </span>
@@ -1588,10 +1669,18 @@
                     const corners75Over = match.events && match.events.corners && match.events.corners.total && match.events.corners.total['7_5'] && match.events.corners.total['7_5'].over ? match.events.corners.total['7_5'].over.ml : null;
                     const corners75Under = match.events && match.events.corners && match.events.corners.total && match.events.corners.total['7_5'] && match.events.corners.total['7_5'].under ? match.events.corners.total['7_5'].under.ml : null;
                     
+                    // Получаем букмекерские коэффициенты для углов
+                    const corner75Over = getBestOddsForBet(match, 'corners.7_5.over');
+                    const corner75Under = getBestOddsForBet(match, 'corners.7_5.under');
+                    
+                    // Определяем CSS классы на основе выгодности для углов
+                    const corner75OverClass = corner75Over ? getProfitabilityClass(corners75Over, parseFloat(corner75Over.best.value)) : getProbClass(cornersOver75);
+                    const corner75UnderClass = corner75Under ? getProfitabilityClass(corners75Under, parseFloat(corner75Under.best.value)) : getProbClass(calculateUnder(cornersOver75));
+                    
                     row += `
                         <td class="total-separator">7.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver75)}">${corners75Over ? corners75Over.toFixed(2) : (cornersOver75 > 0 ? formatProb(cornersOver75) : '-')}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver75))}">${corners75Under ? corners75Under.toFixed(2) : (cornersOver75 > 0 ? formatProb(calculateUnder(cornersOver75)) : '-')}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${corner75OverClass}">${corners75Over ? corners75Over.toFixed(2) : (cornersOver75 > 0 ? formatProb(cornersOver75) : '-')}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${corner75UnderClass}">${corners75Under ? corners75Under.toFixed(2) : (cornersOver75 > 0 ? formatProb(calculateUnder(cornersOver75)) : '-')}</span></td>
                         <td class="total-separator">8.5</td>
                         <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver85)}">${cornersOver85 > 0 ? formatProb(cornersOver85) : '-'}</span></td>
                         <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver85))}">${cornersOver85 > 0 ? formatProb(calculateUnder(cornersOver85)) : '-'}</span></td>
