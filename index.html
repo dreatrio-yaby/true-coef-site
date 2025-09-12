@@ -699,28 +699,47 @@
         
         // Функция для получения лучших коэффициентов с фильтром по букмекеру
         function getBestOddsForBet(match, betPath) {
-            if (!match.bookmaker_odds) {
-                return null;
-            }
-            
             let oddsArray = null;
             
-            // Обрабатываем разные пути к данным
-            if (betPath.startsWith('1x2.')) {
-                const outcome = betPath.split('.')[1]; // P1, X, P2
-                if (match.bookmaker_odds['1x2'] && match.bookmaker_odds['1x2'][outcome]) {
-                    oddsArray = match.bookmaker_odds['1x2'][outcome];
+            // Проверяем новый формат (events)
+            if (match.events) {
+                if (betPath.startsWith('1x2.')) {
+                    const outcome = betPath.split('.')[1]; // P1, X, P2
+                    if (match.events['1x2'] && match.events['1x2'][outcome] && match.events['1x2'][outcome].bookmaker_odds) {
+                        oddsArray = match.events['1x2'][outcome].bookmaker_odds;
+                    }
+                } else if (betPath.startsWith('totals.')) {
+                    const parts = betPath.split('.'); // totals.0.5.over
+                    const total = parts[1].replace('_', '.'); // "0_5" -> "0.5"
+                    const direction = parts[2]; // "over" or "under"
+                    
+                    if (match.events.totals && 
+                        match.events.totals[total] && 
+                        match.events.totals[total][direction] &&
+                        match.events.totals[total][direction].bookmaker_odds) {
+                        oddsArray = match.events.totals[total][direction].bookmaker_odds;
+                    }
                 }
-            } else if (betPath.startsWith('totals.')) {
-                const parts = betPath.split('.'); // totals.0.5.over
-                const total = parts[1]; // "0.5"
-                const direction = parts[2]; // "over" or "under"
-                
-                if (match.bookmaker_odds.totals && 
-                    match.bookmaker_odds.totals[total] && 
-                    match.bookmaker_odds.totals[total][direction] &&
-                    match.bookmaker_odds.totals[total][direction].bookmaker_odds) {
-                    oddsArray = match.bookmaker_odds.totals[total][direction].bookmaker_odds;
+            }
+            
+            // Fallback для старого формата
+            if (!oddsArray && match.bookmaker_odds) {
+                if (betPath.startsWith('1x2.')) {
+                    const outcome = betPath.split('.')[1]; // P1, X, P2
+                    if (match.bookmaker_odds['1x2'] && match.bookmaker_odds['1x2'][outcome]) {
+                        oddsArray = match.bookmaker_odds['1x2'][outcome];
+                    }
+                } else if (betPath.startsWith('totals.')) {
+                    const parts = betPath.split('.'); // totals.0.5.over
+                    const total = parts[1]; // "0.5"
+                    const direction = parts[2]; // "over" or "under"
+                    
+                    if (match.bookmaker_odds.totals && 
+                        match.bookmaker_odds.totals[total] && 
+                        match.bookmaker_odds.totals[total][direction] &&
+                        match.bookmaker_odds.totals[total][direction].bookmaker_odds) {
+                        oddsArray = match.bookmaker_odds.totals[total][direction].bookmaker_odds;
+                    }
                 }
             }
             
@@ -1032,7 +1051,10 @@
             const uniqueDates = new Set();
             
             allMatches.forEach(match => {
-                if (match.date) {
+                if (match.match_basic && match.match_basic.date) {
+                    uniqueDates.add(match.match_basic.date);
+                } else if (match.date) {
+                    // Fallback for old format
                     uniqueDates.add(match.date);
                 }
             });
@@ -1048,12 +1070,12 @@
             const uniqueBookmakers = new Set();
             
             allMatches.forEach(match => {
-                if (match.bookmaker_odds && typeof match.bookmaker_odds === 'object') {
+                if (match.events && typeof match.events === 'object') {
                     // Обрабатываем 1x2
-                    if (match.bookmaker_odds['1x2']) {
+                    if (match.events['1x2']) {
                         ['P1', 'X', 'P2'].forEach(outcome => {
-                            if (match.bookmaker_odds['1x2'][outcome] && Array.isArray(match.bookmaker_odds['1x2'][outcome])) {
-                                match.bookmaker_odds['1x2'][outcome].forEach(odds => {
+                            if (match.events['1x2'][outcome] && match.events['1x2'][outcome].bookmaker_odds) {
+                                match.events['1x2'][outcome].bookmaker_odds.forEach(odds => {
                                     if (odds && odds.bookmaker_name) {
                                         uniqueBookmakers.add(odds.bookmaker_name);
                                     }
@@ -1063,8 +1085,8 @@
                     }
                     
                     // Обрабатываем тоталы
-                    if (match.bookmaker_odds.totals) {
-                        Object.values(match.bookmaker_odds.totals).forEach(total => {
+                    if (match.events.totals) {
+                        Object.values(match.events.totals).forEach(total => {
                             if (total && typeof total === 'object') {
                                 ['over', 'under'].forEach(direction => {
                                     if (total[direction] && total[direction].bookmaker_odds && Array.isArray(total[direction].bookmaker_odds)) {
@@ -1073,6 +1095,21 @@
                                                 uniqueBookmakers.add(odds.bookmaker_name);
                                             }
                                         });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                // Fallback for old format
+                if (match.bookmaker_odds && typeof match.bookmaker_odds === 'object') {
+                    if (match.bookmaker_odds['1x2']) {
+                        ['P1', 'X', 'P2'].forEach(outcome => {
+                            if (match.bookmaker_odds['1x2'][outcome] && Array.isArray(match.bookmaker_odds['1x2'][outcome])) {
+                                match.bookmaker_odds['1x2'][outcome].forEach(odds => {
+                                    if (odds && odds.bookmaker_name) {
+                                        uniqueBookmakers.add(odds.bookmaker_name);
                                     }
                                 });
                             }
@@ -1113,29 +1150,48 @@
             
             try {
                 const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
-                const dataUrl = `${bucketUrl}/website-data/combined_matches.json`;
+                const folderPath = 'merged-matches';
                 
-                console.log('Loading matches from:', dataUrl);
+                // Пытаемся получить список файлов через S3 API
+                let fileList = await getS3FileList(bucketUrl, folderPath + '/');
                 
-                const response = await fetch(dataUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!fileList || fileList.length === 0) {
+                    // Пытаемся прямое обращение к конкретному файлу из примера
+                    const sampleFile = `${folderPath}/00c41b75-f5b64cb1_2960557.json`;
+                    console.log(`Trying sample file: ${sampleFile}`);
+                    
+                    const sampleData = await tryFetchFile(bucketUrl, sampleFile);
+                    if (sampleData) {
+                        allMatches = [sampleData];
+                        console.log('Loaded sample match data');
+                    } else {
+                        throw new Error('No data found');
+                    }
+                } else {
+                    // Загружаем все найденные файлы
+                    console.log(`Found ${fileList.length} files, loading...`);
+                    
+                    const promises = fileList.slice(0, 50).map(async (filePath) => {
+                        return await tryFetchFile(bucketUrl, filePath);
+                    });
+                    
+                    const results = await Promise.all(promises);
+                    const validMatches = results.filter(data => 
+                        data && data.match_basic && data.events
+                    );
+                    
+                    allMatches = validMatches;
+                    console.log(`Loaded ${validMatches.length} matches from S3`);
                 }
-                
-                const data = await response.json();
-                console.log(`Loaded ${data.matches.length} matches from combined_matches.json`);
-                
-                allMatches = data.matches;
                 
                 // Извлекаем доступные даты и букмекеров из загруженных матчей
                 extractAvailableDates();
                 extractAvailableBookmakers();
                 
             } catch (error) {
-                console.error('Error loading combined_matches.json:', error);
+                console.error('Error loading from S3:', error);
                 console.log('Fallback to demo data');
                 await loadDemoData();
-                // Извлекаем доступные даты из демо-данных
                 extractAvailableDates();
                 extractAvailableBookmakers();
             }
@@ -1230,7 +1286,8 @@
             
             // Фильтруем матчи по выбранной дате
             const filteredMatches = allMatches.filter(match => {
-                return match.date === currentDateFilter;
+                const matchDate = match.match_basic ? match.match_basic.date : match.date;
+                return matchDate === currentDateFilter;
             });
             
             if (filteredMatches.length === 0) {
@@ -1241,17 +1298,18 @@
             // Группируем отфильтрованные матчи по лигам
             const matchesByLeague = {};
             filteredMatches.forEach(match => {
-                if (!matchesByLeague[match.league]) {
-                    matchesByLeague[match.league] = [];
+                const league = match.match_basic ? match.match_basic.league : match.league;
+                if (!matchesByLeague[league]) {
+                    matchesByLeague[league] = [];
                 }
-                matchesByLeague[match.league].push(match);
+                matchesByLeague[league].push(match);
             });
             
             // Сортируем матчи внутри каждой лиги по дате и времени
             Object.keys(matchesByLeague).forEach(league => {
                 matchesByLeague[league].sort((a, b) => {
-                    const dateA = new Date(a.date + ' ' + a.time);
-                    const dateB = new Date(b.date + ' ' + b.time);
+                    const dateA = new Date((a.match_basic ? a.match_basic.date : a.date) + ' ' + (a.match_basic ? a.match_basic.time : a.time));
+                    const dateB = new Date((b.match_basic ? b.match_basic.date : b.date) + ' ' + (b.match_basic ? b.match_basic.time : b.time));
                     return dateA - dateB;
                 });
             });
@@ -1325,45 +1383,72 @@
         
         // Функция для получения строки матча
         function getMatchRow(match) {
+            const matchDate = match.match_basic ? match.match_basic.date : match.date;
+            const matchTime = match.match_basic ? match.match_basic.time : match.time;
+            const homeName = match.match_basic ? match.match_basic.home_team.fbref_name : match.home_name;
+            const awayName = match.match_basic ? match.match_basic.away_team.fbref_name : match.away_name;
+            
             let row = `
                 <tr>
-                    <td class="date-time">${formatDateTime(match.date, match.time)}</td>
+                    <td class="date-time">${formatDateTime(matchDate, matchTime)}</td>
                     <td>
                         <div class="match-info">
-                            <span class="team-name">${match.home_name}</span>
+                            <span class="team-name">${homeName}</span>
                             <span class="vs">vs</span>
-                            <span class="team-name">${match.away_name}</span>
+                            <span class="team-name">${awayName}</span>
                         </div>
                     </td>
             `;
             
             switch(currentFilter) {
                 case '1x2':
-                    const homeWin = match.probs.target_home_win || 0;
-                    const draw = match.probs.target_draw || 0;
-                    const awayWin = match.probs.target_away_win || 0;
+                    // Получаем вероятности из старого формата или вычисляем из ML коэффициентов
+                    let homeWin, draw, awayWin;
+                    
+                    if (match.probs) {
+                        // Старый формат с probs
+                        homeWin = match.probs.target_home_win || 0;
+                        draw = match.probs.target_draw || 0;
+                        awayWin = match.probs.target_away_win || 0;
+                    } else if (match.events && match.events['1x2']) {
+                        // Новый формат - вычисляем вероятности из ML коэффициентов
+                        const homeML = match.events['1x2'].P1 ? match.events['1x2'].P1.ml : 0;
+                        const drawML = match.events['1x2'].X ? match.events['1x2'].X.ml : 0;
+                        const awayML = match.events['1x2'].P2 ? match.events['1x2'].P2.ml : 0;
+                        
+                        homeWin = homeML > 0 ? 1 / homeML : 0;
+                        draw = drawML > 0 ? 1 / drawML : 0;
+                        awayWin = awayML > 0 ? 1 / awayML : 0;
+                    } else {
+                        homeWin = draw = awayWin = 0;
+                    }
                     
                     // Получаем букмекерские коэффициенты
                     const homeOdds = getBestOddsForBet(match, '1x2.P1');
                     const drawOdds = getBestOddsForBet(match, '1x2.X');
                     const awayOdds = getBestOddsForBet(match, '1x2.P2');
                     
+                    // Показываем ML коэффициенты если есть
+                    const homeMLValue = match.events && match.events['1x2'] && match.events['1x2'].P1 ? match.events['1x2'].P1.ml : null;
+                    const drawMLValue = match.events && match.events['1x2'] && match.events['1x2'].X ? match.events['1x2'].X.ml : null;
+                    const awayMLValue = match.events && match.events['1x2'] && match.events['1x2'].P2 ? match.events['1x2'].P2.ml : null;
+                    
                     row += `
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(homeWin)}">
-                                ${formatProb(homeWin)}
+                                ${homeMLValue ? homeMLValue.toFixed(2) : formatProb(homeWin)}
                                 ${homeOdds ? `<br><small style="color: #0d6efd;">${homeOdds.best.value} (${homeOdds.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(draw)}">
-                                ${formatProb(draw)}
+                                ${drawMLValue ? drawMLValue.toFixed(2) : formatProb(draw)}
                                 ${drawOdds ? `<br><small style="color: #0d6efd;">${drawOdds.best.value} (${drawOdds.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(awayWin)}">
-                                ${formatProb(awayWin)}
+                                ${awayMLValue ? awayMLValue.toFixed(2) : formatProb(awayWin)}
                                 ${awayOdds ? `<br><small style="color: #0d6efd;">${awayOdds.best.value} (${awayOdds.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
@@ -1371,13 +1456,34 @@
                     break;
                     
                 case 'goals':
-                    const goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
-                    const goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
-                    const goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
-                    const homeGoalsOver05 = match.probs.target_home_goals_over_0_5 || 0;
-                    const homeGoalsOver15 = match.probs.target_home_goals_over_1_5 || 0;
-                    const awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
-                    const awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
+                    // Получаем данные из старого или нового формата
+                    let goalsOver05, goalsOver15, goalsOver25, homeGoalsOver05, homeGoalsOver15, awayGoalsOver05, awayGoalsOver15;
+                    
+                    if (match.probs) {
+                        // Старый формат
+                        goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
+                        goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
+                        goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
+                        homeGoalsOver05 = match.probs.target_home_goals_over_0_5 || 0;
+                        homeGoalsOver15 = match.probs.target_home_goals_over_1_5 || 0;
+                        awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
+                        awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
+                    } else if (match.events && match.events.totals) {
+                        // Новый формат - вычисляем из ML коэффициентов
+                        const totals = match.events.totals;
+                        goalsOver05 = totals['0.5'] && totals['0.5'].over ? 1 / totals['0.5'].over.ml : 0;
+                        goalsOver15 = totals['1.5'] && totals['1.5'].over ? 1 / totals['1.5'].over.ml : 0;
+                        goalsOver25 = totals['2.5'] && totals['2.5'].over ? 1 / totals['2.5'].over.ml : 0;
+                        
+                        // Для команд используем team_goals если есть
+                        const teamGoals = match.events.team_goals || {};
+                        homeGoalsOver05 = teamGoals.home && teamGoals.home['0.5'] && teamGoals.home['0.5'].over ? 1 / teamGoals.home['0.5'].over.ml : 0;
+                        homeGoalsOver15 = teamGoals.home && teamGoals.home['1.5'] && teamGoals.home['1.5'].over ? 1 / teamGoals.home['1.5'].over.ml : 0;
+                        awayGoalsOver05 = teamGoals.away && teamGoals.away['0.5'] && teamGoals.away['0.5'].over ? 1 / teamGoals.away['0.5'].over.ml : 0;
+                        awayGoalsOver15 = teamGoals.away && teamGoals.away['1.5'] && teamGoals.away['1.5'].over ? 1 / teamGoals.away['1.5'].over.ml : 0;
+                    } else {
+                        goalsOver05 = goalsOver15 = goalsOver25 = homeGoalsOver05 = homeGoalsOver15 = awayGoalsOver05 = awayGoalsOver15 = 0;
+                    }
                     
                     // Получаем букмекерские коэффициенты для тоталов
                     const total05Over = getBestOddsForBet(match, 'totals.0.5.over');
@@ -1387,92 +1493,123 @@
                     const total25Over = getBestOddsForBet(match, 'totals.2.5.over');
                     const total25Under = getBestOddsForBet(match, 'totals.2.5.under');
                     
+                    // Получаем ML значения для отображения
+                    const ml05Over = match.events && match.events.totals && match.events.totals['0.5'] && match.events.totals['0.5'].over ? match.events.totals['0.5'].over.ml : null;
+                    const ml05Under = match.events && match.events.totals && match.events.totals['0.5'] && match.events.totals['0.5'].under ? match.events.totals['0.5'].under.ml : null;
+                    const ml15Over = match.events && match.events.totals && match.events.totals['1.5'] && match.events.totals['1.5'].over ? match.events.totals['1.5'].over.ml : null;
+                    const ml15Under = match.events && match.events.totals && match.events.totals['1.5'] && match.events.totals['1.5'].under ? match.events.totals['1.5'].under.ml : null;
+                    const ml25Over = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].over ? match.events.totals['2.5'].over.ml : null;
+                    const ml25Under = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].under ? match.events.totals['2.5'].under.ml : null;
+
                     row += `
                         <td class="total-separator">0.5</td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(goalsOver05)}">
-                                ${formatProb(goalsOver05)}
+                                ${ml05Over ? ml05Over.toFixed(2) : formatProb(goalsOver05)}
                                 ${total05Over ? `<br><small style="color: #0d6efd;">${total05Over.best.value} (${total05Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(calculateUnder(goalsOver05))}">
-                                ${formatProb(calculateUnder(goalsOver05))}
+                                ${ml05Under ? ml05Under.toFixed(2) : formatProb(calculateUnder(goalsOver05))}
                                 ${total05Under ? `<br><small style="color: #0d6efd;">${total05Under.best.value} (${total05Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="total-separator">1.5</td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(goalsOver15)}">
-                                ${formatProb(goalsOver15)}
+                                ${ml15Over ? ml15Over.toFixed(2) : formatProb(goalsOver15)}
                                 ${total15Over ? `<br><small style="color: #0d6efd;">${total15Over.best.value} (${total15Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(calculateUnder(goalsOver15))}">
-                                ${formatProb(calculateUnder(goalsOver15))}
+                                ${ml15Under ? ml15Under.toFixed(2) : formatProb(calculateUnder(goalsOver15))}
                                 ${total15Under ? `<br><small style="color: #0d6efd;">${total15Under.best.value} (${total15Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="total-separator">2.5</td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(goalsOver25)}">
-                                ${formatProb(goalsOver25)}
+                                ${ml25Over ? ml25Over.toFixed(2) : formatProb(goalsOver25)}
                                 ${total25Over ? `<br><small style="color: #0d6efd;">${total25Over.best.value} (${total25Over.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="prob-cell">
                             <span class="odds-value ${getProbClass(calculateUnder(goalsOver25))}">
-                                ${formatProb(calculateUnder(goalsOver25))}
+                                ${ml25Under ? ml25Under.toFixed(2) : formatProb(calculateUnder(goalsOver25))}
                                 ${total25Under ? `<br><small style="color: #0d6efd;">${total25Under.best.value} (${total25Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
                         <td class="total-separator">0.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver05)}">${formatProb(homeGoalsOver05)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver05))}">${formatProb(calculateUnder(homeGoalsOver05))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver05)}">${homeGoalsOver05 > 0 ? formatProb(homeGoalsOver05) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver05))}">${homeGoalsOver05 > 0 ? formatProb(calculateUnder(homeGoalsOver05)) : '-'}</span></td>
                         <td class="total-separator">1.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver15)}">${formatProb(homeGoalsOver15)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver15))}">${formatProb(calculateUnder(homeGoalsOver15))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver15)}">${homeGoalsOver15 > 0 ? formatProb(homeGoalsOver15) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver15))}">${homeGoalsOver15 > 0 ? formatProb(calculateUnder(homeGoalsOver15)) : '-'}</span></td>
                         <td class="total-separator">0.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver05)}">${formatProb(awayGoalsOver05)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver05))}">${formatProb(calculateUnder(awayGoalsOver05))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver05)}">${awayGoalsOver05 > 0 ? formatProb(awayGoalsOver05) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver05))}">${awayGoalsOver05 > 0 ? formatProb(calculateUnder(awayGoalsOver05)) : '-'}</span></td>
                         <td class="total-separator">1.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver15)}">${formatProb(awayGoalsOver15)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver15))}">${formatProb(calculateUnder(awayGoalsOver15))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver15)}">${awayGoalsOver15 > 0 ? formatProb(awayGoalsOver15) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver15))}">${awayGoalsOver15 > 0 ? formatProb(calculateUnder(awayGoalsOver15)) : '-'}</span></td>
                     `;
                     break;
                     
                 case 'corners':
-                    const cornersOver75 = match.probs.target_total_corners_over_7_5 || 0;
-                    const cornersOver85 = match.probs.target_total_corners_over_8_5 || 0;
-                    const cornersOver95 = match.probs.target_total_corners_over_9_5 || 0;
-                    const homeCornersOver35 = match.probs.target_home_corners_over_3_5 || 0;
-                    const homeCornersOver45 = match.probs.target_home_corners_over_4_5 || 0;
-                    const awayCornersOver35 = match.probs.target_away_corners_over_3_5 || 0;
-                    const awayCornersOver45 = match.probs.target_away_corners_over_4_5 || 0;
+                    let cornersOver75, cornersOver85, cornersOver95, homeCornersOver35, homeCornersOver45, awayCornersOver35, awayCornersOver45;
+                    
+                    if (match.probs) {
+                        // Старый формат
+                        cornersOver75 = match.probs.target_total_corners_over_7_5 || 0;
+                        cornersOver85 = match.probs.target_total_corners_over_8_5 || 0;
+                        cornersOver95 = match.probs.target_total_corners_over_9_5 || 0;
+                        homeCornersOver35 = match.probs.target_home_corners_over_3_5 || 0;
+                        homeCornersOver45 = match.probs.target_home_corners_over_4_5 || 0;
+                        awayCornersOver35 = match.probs.target_away_corners_over_3_5 || 0;
+                        awayCornersOver45 = match.probs.target_away_corners_over_4_5 || 0;
+                    } else if (match.events && match.events.corners) {
+                        // Новый формат - вычисляем из ML коэффициентов
+                        const corners = match.events.corners;
+                        
+                        cornersOver75 = corners.total && corners.total['7_5'] && corners.total['7_5'].over ? 1 / corners.total['7_5'].over.ml : 0;
+                        cornersOver85 = corners.total && corners.total['8_5'] && corners.total['8_5'].over ? 1 / corners.total['8_5'].over.ml : 0;
+                        cornersOver95 = corners.total && corners.total['9_5'] && corners.total['9_5'].over ? 1 / corners.total['9_5'].over.ml : 0;
+                        
+                        homeCornersOver35 = corners.home && corners.home['3_5'] && corners.home['3_5'].over ? 1 / corners.home['3_5'].over.ml : 0;
+                        homeCornersOver45 = corners.home && corners.home['4_5'] && corners.home['4_5'].over ? 1 / corners.home['4_5'].over.ml : 0;
+                        awayCornersOver35 = corners.away && corners.away['3_5'] && corners.away['3_5'].over ? 1 / corners.away['3_5'].over.ml : 0;
+                        awayCornersOver45 = corners.away && corners.away['4_5'] && corners.away['4_5'].over ? 1 / corners.away['4_5'].over.ml : 0;
+                    } else {
+                        cornersOver75 = cornersOver85 = cornersOver95 = homeCornersOver35 = homeCornersOver45 = awayCornersOver35 = awayCornersOver45 = 0;
+                    }
+                    
+                    // Получаем ML значения для углов
+                    const corners75Over = match.events && match.events.corners && match.events.corners.total && match.events.corners.total['7_5'] && match.events.corners.total['7_5'].over ? match.events.corners.total['7_5'].over.ml : null;
+                    const corners75Under = match.events && match.events.corners && match.events.corners.total && match.events.corners.total['7_5'] && match.events.corners.total['7_5'].under ? match.events.corners.total['7_5'].under.ml : null;
                     
                     row += `
                         <td class="total-separator">7.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver75)}">${formatProb(cornersOver75)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver75))}">${formatProb(calculateUnder(cornersOver75))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver75)}">${corners75Over ? corners75Over.toFixed(2) : (cornersOver75 > 0 ? formatProb(cornersOver75) : '-')}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver75))}">${corners75Under ? corners75Under.toFixed(2) : (cornersOver75 > 0 ? formatProb(calculateUnder(cornersOver75)) : '-')}</span></td>
                         <td class="total-separator">8.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver85)}">${formatProb(cornersOver85)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver85))}">${formatProb(calculateUnder(cornersOver85))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver85)}">${cornersOver85 > 0 ? formatProb(cornersOver85) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver85))}">${cornersOver85 > 0 ? formatProb(calculateUnder(cornersOver85)) : '-'}</span></td>
                         <td class="total-separator">9.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver95)}">${formatProb(cornersOver95)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver95))}">${formatProb(calculateUnder(cornersOver95))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(cornersOver95)}">${cornersOver95 > 0 ? formatProb(cornersOver95) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(cornersOver95))}">${cornersOver95 > 0 ? formatProb(calculateUnder(cornersOver95)) : '-'}</span></td>
                         <td class="total-separator">3.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver35)}">${formatProb(homeCornersOver35)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver35))}">${formatProb(calculateUnder(homeCornersOver35))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver35)}">${homeCornersOver35 > 0 ? formatProb(homeCornersOver35) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver35))}">${homeCornersOver35 > 0 ? formatProb(calculateUnder(homeCornersOver35)) : '-'}</span></td>
                         <td class="total-separator">4.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver45)}">${formatProb(homeCornersOver45)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver45))}">${formatProb(calculateUnder(homeCornersOver45))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeCornersOver45)}">${homeCornersOver45 > 0 ? formatProb(homeCornersOver45) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeCornersOver45))}">${homeCornersOver45 > 0 ? formatProb(calculateUnder(homeCornersOver45)) : '-'}</span></td>
                         <td class="total-separator">3.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver35)}">${formatProb(awayCornersOver35)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver35))}">${formatProb(calculateUnder(awayCornersOver35))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver35)}">${awayCornersOver35 > 0 ? formatProb(awayCornersOver35) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver35))}">${awayCornersOver35 > 0 ? formatProb(calculateUnder(awayCornersOver35)) : '-'}</span></td>
                         <td class="total-separator">4.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver45)}">${formatProb(awayCornersOver45)}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver45))}">${formatProb(calculateUnder(awayCornersOver45))}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayCornersOver45)}">${awayCornersOver45 > 0 ? formatProb(awayCornersOver45) : '-'}</span></td>
+                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayCornersOver45))}">${awayCornersOver45 > 0 ? formatProb(calculateUnder(awayCornersOver45)) : '-'}</span></td>
                     `;
                     break;
             }
