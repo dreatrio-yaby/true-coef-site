@@ -878,38 +878,6 @@
             return `${day}-${month}-${year}`;
         }
         
-        // Функция для рендеринга кнопок фильтра дат
-        function renderDateFilterButtons() {
-            const container = document.getElementById('date-filter-buttons');
-            
-            if (availableDates.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            // Сортируем даты и берем первые 7
-            const sortedDates = [...availableDates].sort().slice(0, 7);
-            
-            // Если текущая выбранная дата не входит в доступные, выбираем первую доступную
-            if (!sortedDates.includes(currentDateFilter)) {
-                currentDateFilter = sortedDates[0] || new Date().toISOString().split('T')[0];
-            }
-            
-            let buttonsHtml = '';
-            sortedDates.forEach(date => {
-                const isActive = date === currentDateFilter ? 'active' : '';
-                const displayDate = formatDateForDisplay(date);
-                buttonsHtml += `
-                    <button class="filter-btn date-filter-btn ${isActive}" 
-                            data-date="${date}" 
-                            onclick="setDateFilter('${date}')">
-                        ${displayDate}
-                    </button>
-                `;
-            });
-            
-            container.innerHTML = buttonsHtml;
-        }
         
         // Функция для рендеринга кнопок фильтра букмекеров
         function renderBookmakerFilterButtons() {
@@ -1108,7 +1076,7 @@
         // Функция для извлечения доступных дат из загруженных матчей
         function extractAvailableDates() {
             const uniqueDates = new Set();
-            
+
             allMatches.forEach(match => {
                 if (match.match_basic && match.match_basic.date) {
                     uniqueDates.add(match.match_basic.date);
@@ -1117,11 +1085,8 @@
                     uniqueDates.add(match.date);
                 }
             });
-            
+
             availableDates = Array.from(uniqueDates);
-            
-            // Рендерим кнопки фильтра дат
-            renderDateFilterButtons();
         }
         
         // Функция для извлечения доступных букмекеров из загруженных матчей
