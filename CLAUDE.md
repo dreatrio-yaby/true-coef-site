@@ -17,7 +17,7 @@ The project consists of a single `index.html` file that contains:
 ### Key Components
 
 1. **S3 Configuration Interface**: Input fields for bucket URL and file patterns
-2. **Filter System**: Toggle buttons for different bet types (1X2, Goals, Corners)
+2. **Filter System**: Toggle buttons for different bet types (1X2, General Goals Totals)
 3. **Data Visualization**: League-grouped tables showing match predictions with color-coded probabilities
 4. **Responsive Design**: Mobile-friendly layout with adaptive table structure
 
@@ -26,17 +26,60 @@ The project consists of a single `index.html` file that contains:
 The application expects JSON data with the following structure:
 ```json
 {
-  "league": "Serie A",
-  "date": "2025-08-20",
-  "time": "19:00", 
-  "home_name": "Team A",
-  "away_name": "Team B",
-  "probs": {
-    "target_home_win": 0.4523,
-    "target_draw": 0.2891,
-    "target_away_win": 0.2586,
-    "target_total_goals_over_0_5": 0.9143,
-    // ... other probability predictions
+  "match_id": "18bb7c10-e4a775cb_2937041",
+  "mapping_info": {
+    "confidence": "high",
+    "match_reason": "exact_teams; same_date; league_match",
+    "merged_at": "2025-09-12T15:45:03.589246"
+  },
+  "match_basic": {
+    "date": "2025-09-13",
+    "time": "12:30",
+    "league": "Premier League",
+    "home_team": {
+      "fbref_id": "18bb7c10",
+      "fbref_name": "Arsenal",
+      "odds_name": "Арсенал"
+    },
+    "away_team": {
+      "fbref_id": "e4a775cb",
+      "fbref_name": "Nottingham Forest",
+      "odds_name": "Ноттингем Форест"
+    }
+  },
+  "events": {
+    "1x2": {
+      "P1": {
+        "ml": 1.66,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 4,
+            "bookmaker_name": "Фонбет",
+            "value": 1.37,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 7,
+          "bookmaker_name": "БЕТСИТИ",
+          "value": 1.4
+        }
+      }
+    },
+    "totals": {
+      "0.5": {
+        "over": {
+          "ml": 1.08,
+          "bookmaker_odds": [...],
+          "better_odds": {...}
+        },
+        "under": {
+          "ml": 13.19,
+          "bookmaker_odds": [...],
+          "better_odds": {...}
+        }
+      }
+    }
   }
 }
 ```
@@ -47,18 +90,29 @@ The application expects JSON data with the following structure:
 - `index.html` - Complete application (HTML + CSS + JavaScript)
 
 ### Key Functions
-- `loadMatches()` - Loads data from S3 (currently using demo data)
-- `setFilter(filter)` - Switches between bet type views
-- `renderMatches()` - Renders match tables grouped by league
-- `formatProb(prob)` - Formats probabilities as percentages
-- `getProbClass(prob)` - Returns CSS class based on probability value
+- `loadMatches()` - Loads data from S3 or local sample_match.json file
+- `setFilter(filter)` - Switches between bet type views (1x2, goals)
+- `renderMatches()` - Renders match tables grouped by league, shows only matches from today onwards
+- `getBestOddsForBet(match, betPath)` - Gets best bookmaker odds for specific bet
+- `getProfitabilityClass(mlCoef, bookmakerCoef)` - Returns CSS class based on profitability comparison
+- `extractAvailableDates()` - Extracts available match dates from loaded data
+- `extractAvailableBookmakers()` - Extracts available bookmakers from loaded data
 
 ### Styling Classes
-- `.prob-high` - Green gradient for probabilities ≥ 70%
-- `.prob-medium` - Yellow gradient for probabilities 40-69%
-- `.prob-low` - Red gradient for probabilities < 40%
+- `.prob-excellent` - Green gradient for highly profitable bets (bookmaker odds 15%+ higher than ML)
+- `.prob-good` - Blue gradient for good bets (bookmaker odds 8-14% higher than ML)
+- `.prob-fair` - Orange gradient for fair bets (bookmaker odds 2-7% higher than ML)
+- `.prob-poor` - Red gradient for poor bets (bookmaker odds lower or equal to ML)
 
-### Adding New Features
-- New bet types: Add filter button and update `getTableHeaders()` and `getMatchRow()` functions
-- S3 integration: Implement actual S3 data fetching in `loadMatches()` function
-- New probability metrics: Extend the `probs` object structure and rendering logic
+### Current Features
+- **Date Filtering**: Shows only matches from today onwards
+- **Bookmaker Integration**: Displays ML coefficients alongside best bookmaker odds
+- **Profitability Analysis**: Color-codes bets based on profit potential
+- **Bet Types**: Supports 1X2 and General Goals Totals (0.5, 1.5, 2.5, 3.5)
+- **S3 Integration**: Attempts to load from S3, falls back to local sample_match.json
+
+### Data Processing
+- Supports both legacy format (with `probs` object) and new format (with `events` structure)
+- Automatically calculates probabilities from ML coefficients when `probs` not available
+- Filters matches by date to show only current and future games
+- Groups matches by league and sorts by date/time

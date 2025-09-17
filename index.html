@@ -713,10 +713,7 @@
                     1X2
                 </button>
                 <button class="filter-btn" data-filter="goals" onclick="setFilter('goals')">
-                    Тоталы голов
-                </button>
-                <button class="filter-btn" data-filter="corners" onclick="setFilter('corners')">
-                    Тоталы угловых
+                    Общие тоталы голов
                 </button>
             </div>
         </div>
@@ -1215,47 +1212,50 @@
         async function loadMatches() {
             const loader = document.getElementById('loader');
             loader.style.display = 'block';
-            
+
             try {
                 const bucketUrl = 'https://storage.yandexcloud.net/screen-shared';
                 const folderPath = 'merged-matches';
-                
+
                 // Пытаемся получить список файлов через S3 API
                 let fileList = await getS3FileList(bucketUrl, folderPath + '/');
-                
+
                 if (!fileList || fileList.length === 0) {
-                    // Пытаемся прямое обращение к конкретному файлу из примера
-                    const sampleFile = `${folderPath}/00c41b75-f5b64cb1_2960557.json`;
-                    console.log(`Trying sample file: ${sampleFile}`);
-                    
-                    const sampleData = await tryFetchFile(bucketUrl, sampleFile);
-                    if (sampleData) {
-                        allMatches = [sampleData];
-                        console.log('Loaded sample match data');
-                    } else {
+                    // Загружаем демо-файл из проекта
+                    try {
+                        const response = await fetch('./sample_match.json');
+                        if (response.ok) {
+                            const sampleData = await response.json();
+                            allMatches = [sampleData];
+                            console.log('Loaded sample match data from local file');
+                        } else {
+                            throw new Error('Sample file not found');
+                        }
+                    } catch (err) {
+                        console.log('Local sample file not available, using fallback demo data');
                         throw new Error('No data found');
                     }
                 } else {
                     // Загружаем все найденные файлы
                     console.log(`Found ${fileList.length} files, loading...`);
-                    
+
                     const promises = fileList.slice(0, 50).map(async (filePath) => {
                         return await tryFetchFile(bucketUrl, filePath);
                     });
-                    
+
                     const results = await Promise.all(promises);
-                    const validMatches = results.filter(data => 
+                    const validMatches = results.filter(data =>
                         data && data.match_basic && data.events
                     );
-                    
+
                     allMatches = validMatches;
                     console.log(`Loaded ${validMatches.length} matches from S3`);
                 }
-                
+
                 // Извлекаем доступные даты и букмекеров из загруженных матчей
                 extractAvailableDates();
                 extractAvailableBookmakers();
-                
+
             } catch (error) {
                 console.error('Error loading from S3:', error);
                 console.log('Fallback to demo data');
@@ -1263,7 +1263,7 @@
                 extractAvailableDates();
                 extractAvailableBookmakers();
             }
-            
+
             loader.style.display = 'none';
             renderMatches();
         }
@@ -1272,72 +1272,443 @@
         async function loadDemoData() {
             return new Promise(resolve => {
                 setTimeout(() => {
-                    // Пример данных из вашего JSON
-                    const sampleMatch = {
-                        "league": "Serie A",
-                        "date": "2025-08-20",
-                        "time": "19:00",
-                        "home_name": "Juventude",
-                        "away_name": "Vasco da Gama",
-                        "probs": {
-                            "target_away_corners_over_3_5": 0.7293,
-                            "target_away_corners_over_4_5": 0.6167,
-                            "target_away_corners_over_5_5": 0.4544,
-                            "target_away_goals_over_0_5": 0.8358,
-                            "target_away_goals_over_1_5": 0.5338,
-                            "target_away_goals_over_2_5": 0.2367,
-                            "target_away_win": 0.5462,
-                            "target_draw": 0.2601,
-                            "target_home_corners_over_3_5": 0.5997,
-                            "target_home_corners_over_4_5": 0.4437,
-                            "target_home_goals_over_0_5": 0.6664,
-                            "target_home_goals_over_1_5": 0.2897,
-                            "target_home_goals_over_2_5": 0.0707,
-                            "target_home_win": 0.2123,
-                            "target_total_corners_over_10_5": 0.383,
-                            "target_total_corners_over_7_5": 0.7415,
-                            "target_total_corners_over_8_5": 0.6079,
-                            "target_total_corners_over_9_5": 0.4976,
-                            "target_total_goals_over_0_5": 0.9143,
-                            "target_total_goals_over_1_5": 0.7928,
-                            "target_total_goals_over_2_5": 0.5336,
-                            "target_total_goals_over_3_5": 0.2772
-                        }
-                    };
-                    
-                    // Создаем несколько примеров матчей
+                    // Получаем текущую дату и следующие дни для демо-данных
+                    const today = new Date();
+                    const todayStr = today.toISOString().split('T')[0];
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(today.getDate() + 1);
+                    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+                    // Создаем демо-матчи с новой структурой данных
                     allMatches = [
-                        sampleMatch,
                         {
-                            ...sampleMatch,
-                            league: "Premier League",
-                            date: "2025-08-21",
-                            time: "20:30",
-                            home_name: "Manchester United",
-                            away_name: "Liverpool",
-                            probs: {
-                                ...sampleMatch.probs,
-                                target_home_win: 0.4523,
-                                target_draw: 0.2891,
-                                target_away_win: 0.2586
+                            "match_id": "demo_match_1",
+                            "mapping_info": {
+                                "confidence": "high",
+                                "match_reason": "demo_data",
+                                "merged_at": new Date().toISOString()
+                            },
+                            "match_basic": {
+                                "date": todayStr,
+                                "time": "15:00",
+                                "league": "Premier League",
+                                "home_team": {
+                                    "fbref_id": "demo1",
+                                    "fbref_name": "Arsenal",
+                                    "odds_name": "Арсенал"
+                                },
+                                "away_team": {
+                                    "fbref_id": "demo2",
+                                    "fbref_name": "Chelsea",
+                                    "odds_name": "Челси"
+                                }
+                            },
+                            "events": {
+                                "1x2": {
+                                    "P1": {
+                                        "ml": 2.1,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 2.25,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 4,
+                                            "bookmaker_name": "Фонбет",
+                                            "value": 2.25
+                                        }
+                                    },
+                                    "X": {
+                                        "ml": 3.4,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 3.6,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 4,
+                                            "bookmaker_name": "Фонбет",
+                                            "value": 3.6
+                                        }
+                                    },
+                                    "P2": {
+                                        "ml": 3.2,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 3.4,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 4,
+                                            "bookmaker_name": "Фонбет",
+                                            "value": 3.4
+                                        }
+                                    }
+                                },
+                                "totals": {
+                                    "0.5": {
+                                        "over": {
+                                            "ml": 1.08,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 1.12,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 1.12
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 8.5,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 9.0,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 9.0
+                                            }
+                                        }
+                                    },
+                                    "1.5": {
+                                        "over": {
+                                            "ml": 1.25,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 1.30,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 1.30
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 3.8,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 4.0,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 4.0
+                                            }
+                                        }
+                                    },
+                                    "2.5": {
+                                        "over": {
+                                            "ml": 1.75,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 1.85,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 1.85
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 2.1,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 2.2,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 2.2
+                                            }
+                                        }
+                                    },
+                                    "3.5": {
+                                        "over": {
+                                            "ml": 3.6,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 3.8,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 3.8
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 1.35,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 4,
+                                                    "bookmaker_name": "Фонбет",
+                                                    "value": 1.40,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 4,
+                                                "bookmaker_name": "Фонбет",
+                                                "value": 1.40
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         },
                         {
-                            ...sampleMatch,
-                            league: "La Liga",
-                            date: "2025-08-22",
-                            time: "21:00",
-                            home_name: "Real Madrid",
-                            away_name: "Barcelona",
-                            probs: {
-                                ...sampleMatch.probs,
-                                target_home_win: 0.5234,
-                                target_draw: 0.2456,
-                                target_away_win: 0.2310
+                            "match_id": "demo_match_2",
+                            "mapping_info": {
+                                "confidence": "high",
+                                "match_reason": "demo_data",
+                                "merged_at": new Date().toISOString()
+                            },
+                            "match_basic": {
+                                "date": tomorrowStr,
+                                "time": "17:30",
+                                "league": "La Liga",
+                                "home_team": {
+                                    "fbref_id": "demo3",
+                                    "fbref_name": "Real Madrid",
+                                    "odds_name": "Реал Мадрид"
+                                },
+                                "away_team": {
+                                    "fbref_id": "demo4",
+                                    "fbref_name": "Barcelona",
+                                    "odds_name": "Барселона"
+                                }
+                            },
+                            "events": {
+                                "1x2": {
+                                    "P1": {
+                                        "ml": 1.9,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 2.0,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 2,
+                                            "bookmaker_name": "Винлайн",
+                                            "value": 2.0
+                                        }
+                                    },
+                                    "X": {
+                                        "ml": 3.8,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 4.0,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 2,
+                                            "bookmaker_name": "Винлайн",
+                                            "value": 4.0
+                                        }
+                                    },
+                                    "P2": {
+                                        "ml": 3.5,
+                                        "bookmaker_odds": [
+                                            {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 3.7,
+                                                "is_better": true
+                                            }
+                                        ],
+                                        "better_odds": {
+                                            "bookmaker_id": 2,
+                                            "bookmaker_name": "Винлайн",
+                                            "value": 3.7
+                                        }
+                                    }
+                                },
+                                "totals": {
+                                    "0.5": {
+                                        "over": {
+                                            "ml": 1.05,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 1.08,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 1.08
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 12.0,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 13.0,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 13.0
+                                            }
+                                        }
+                                    },
+                                    "1.5": {
+                                        "over": {
+                                            "ml": 1.30,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 1.35,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 1.35
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 3.5,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 3.7,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 3.7
+                                            }
+                                        }
+                                    },
+                                    "2.5": {
+                                        "over": {
+                                            "ml": 1.90,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 2.0,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 2.0
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 1.95,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 2.05,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 2.05
+                                            }
+                                        }
+                                    },
+                                    "3.5": {
+                                        "over": {
+                                            "ml": 4.2,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 4.4,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 4.4
+                                            }
+                                        },
+                                        "under": {
+                                            "ml": 1.28,
+                                            "bookmaker_odds": [
+                                                {
+                                                    "bookmaker_id": 2,
+                                                    "bookmaker_name": "Винлайн",
+                                                    "value": 1.32,
+                                                    "is_better": true
+                                                }
+                                            ],
+                                            "better_odds": {
+                                                "bookmaker_id": 2,
+                                                "bookmaker_name": "Винлайн",
+                                                "value": 1.32
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     ];
-                    
+
                     resolve();
                 }, 500);
             });
@@ -1352,10 +1723,11 @@
                 return;
             }
             
-            // Фильтруем матчи по выбранной дате
+            // Фильтруем матчи по дате (показываем только с сегодняшнего дня)
+            const today = new Date().toISOString().split('T')[0];
             const filteredMatches = allMatches.filter(match => {
                 const matchDate = match.match_basic ? match.match_basic.date : match.date;
-                return matchDate === currentDateFilter;
+                return matchDate >= today;
             });
             
             if (filteredMatches.length === 0) {
@@ -1423,13 +1795,10 @@
                     break;
                 case 'goals':
                     headers += `
-                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Total</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Home</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
-                        <th class="total-separator">Away</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">0.5</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">1.5</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">2.5</th><th>Over</th><th>Under</th>
+                        <th class="total-separator">3.5</th><th>Over</th><th>Under</th>
                     `;
                     break;
                 case 'corners':
@@ -1530,42 +1899,35 @@
                     
                 case 'goals':
                     // Получаем данные из старого или нового формата
-                    let goalsOver05, goalsOver15, goalsOver25, homeGoalsOver05, homeGoalsOver15, awayGoalsOver05, awayGoalsOver15;
-                    
+                    let goalsOver05, goalsOver15, goalsOver25, goalsOver35;
+
                     if (match.probs) {
                         // Старый формат
                         goalsOver05 = match.probs.target_total_goals_over_0_5 || 0;
                         goalsOver15 = match.probs.target_total_goals_over_1_5 || 0;
                         goalsOver25 = match.probs.target_total_goals_over_2_5 || 0;
-                        homeGoalsOver05 = match.probs.target_home_goals_over_0_5 || 0;
-                        homeGoalsOver15 = match.probs.target_home_goals_over_1_5 || 0;
-                        awayGoalsOver05 = match.probs.target_away_goals_over_0_5 || 0;
-                        awayGoalsOver15 = match.probs.target_away_goals_over_1_5 || 0;
+                        goalsOver35 = match.probs.target_total_goals_over_3_5 || 0;
                     } else if (match.events && match.events.totals) {
                         // Новый формат - вычисляем из ML коэффициентов
                         const totals = match.events.totals;
                         goalsOver05 = totals['0.5'] && totals['0.5'].over ? 1 / totals['0.5'].over.ml : 0;
                         goalsOver15 = totals['1.5'] && totals['1.5'].over ? 1 / totals['1.5'].over.ml : 0;
                         goalsOver25 = totals['2.5'] && totals['2.5'].over ? 1 / totals['2.5'].over.ml : 0;
-                        
-                        // Для команд используем team_goals если есть
-                        const teamGoals = match.events.team_goals || {};
-                        homeGoalsOver05 = teamGoals.home && teamGoals.home['0.5'] && teamGoals.home['0.5'].over ? 1 / teamGoals.home['0.5'].over.ml : 0;
-                        homeGoalsOver15 = teamGoals.home && teamGoals.home['1.5'] && teamGoals.home['1.5'].over ? 1 / teamGoals.home['1.5'].over.ml : 0;
-                        awayGoalsOver05 = teamGoals.away && teamGoals.away['0.5'] && teamGoals.away['0.5'].over ? 1 / teamGoals.away['0.5'].over.ml : 0;
-                        awayGoalsOver15 = teamGoals.away && teamGoals.away['1.5'] && teamGoals.away['1.5'].over ? 1 / teamGoals.away['1.5'].over.ml : 0;
+                        goalsOver35 = totals['3.5'] && totals['3.5'].over ? 1 / totals['3.5'].over.ml : 0;
                     } else {
-                        goalsOver05 = goalsOver15 = goalsOver25 = homeGoalsOver05 = homeGoalsOver15 = awayGoalsOver05 = awayGoalsOver15 = 0;
+                        goalsOver05 = goalsOver15 = goalsOver25 = goalsOver35 = 0;
                     }
-                    
+
                     // Получаем букмекерские коэффициенты для тоталов
-                    const total05Over = getBestOddsForBet(match, 'totals.0.5.over');
-                    const total05Under = getBestOddsForBet(match, 'totals.0.5.under');
-                    const total15Over = getBestOddsForBet(match, 'totals.1.5.over');
-                    const total15Under = getBestOddsForBet(match, 'totals.1.5.under');
-                    const total25Over = getBestOddsForBet(match, 'totals.2.5.over');
-                    const total25Under = getBestOddsForBet(match, 'totals.2.5.under');
-                    
+                    const total05Over = getBestOddsForBet(match, 'totals.0_5.over');
+                    const total05Under = getBestOddsForBet(match, 'totals.0_5.under');
+                    const total15Over = getBestOddsForBet(match, 'totals.1_5.over');
+                    const total15Under = getBestOddsForBet(match, 'totals.1_5.under');
+                    const total25Over = getBestOddsForBet(match, 'totals.2_5.over');
+                    const total25Under = getBestOddsForBet(match, 'totals.2_5.under');
+                    const total35Over = getBestOddsForBet(match, 'totals.3_5.over');
+                    const total35Under = getBestOddsForBet(match, 'totals.3_5.under');
+
                     // Получаем ML значения для отображения
                     const ml05Over = match.events && match.events.totals && match.events.totals['0.5'] && match.events.totals['0.5'].over ? match.events.totals['0.5'].over.ml : null;
                     const ml05Under = match.events && match.events.totals && match.events.totals['0.5'] && match.events.totals['0.5'].under ? match.events.totals['0.5'].under.ml : null;
@@ -1573,6 +1935,8 @@
                     const ml15Under = match.events && match.events.totals && match.events.totals['1.5'] && match.events.totals['1.5'].under ? match.events.totals['1.5'].under.ml : null;
                     const ml25Over = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].over ? match.events.totals['2.5'].over.ml : null;
                     const ml25Under = match.events && match.events.totals && match.events.totals['2.5'] && match.events.totals['2.5'].under ? match.events.totals['2.5'].under.ml : null;
+                    const ml35Over = match.events && match.events.totals && match.events.totals['3.5'] && match.events.totals['3.5'].over ? match.events.totals['3.5'].over.ml : null;
+                    const ml35Under = match.events && match.events.totals && match.events.totals['3.5'] && match.events.totals['3.5'].under ? match.events.totals['3.5'].under.ml : null;
 
                     // Определяем CSS классы на основе выгодности для тоталов
                     const total05OverClass = total05Over ? getProfitabilityClass(ml05Over, parseFloat(total05Over.best.value)) : getProbClass(goalsOver05);
@@ -1581,7 +1945,9 @@
                     const total15UnderClass = total15Under ? getProfitabilityClass(ml15Under, parseFloat(total15Under.best.value)) : getProbClass(calculateUnder(goalsOver15));
                     const total25OverClass = total25Over ? getProfitabilityClass(ml25Over, parseFloat(total25Over.best.value)) : getProbClass(goalsOver25);
                     const total25UnderClass = total25Under ? getProfitabilityClass(ml25Under, parseFloat(total25Under.best.value)) : getProbClass(calculateUnder(goalsOver25));
-                    
+                    const total35OverClass = total35Over ? getProfitabilityClass(ml35Over, parseFloat(total35Over.best.value)) : getProbClass(goalsOver35);
+                    const total35UnderClass = total35Under ? getProfitabilityClass(ml35Under, parseFloat(total35Under.best.value)) : getProbClass(calculateUnder(goalsOver35));
+
                     row += `
                         <td class="total-separator">0.5</td>
                         <td class="prob-cell">
@@ -1622,18 +1988,19 @@
                                 ${total25Under ? `<br><small style="color: #0d6efd;">${total25Under.best.value} (${total25Under.best.bookmaker_name})</small>` : ''}
                             </span>
                         </td>
-                        <td class="total-separator">0.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver05)}">${homeGoalsOver05 > 0 ? formatProb(homeGoalsOver05) : '-'}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver05))}">${homeGoalsOver05 > 0 ? formatProb(calculateUnder(homeGoalsOver05)) : '-'}</span></td>
-                        <td class="total-separator">1.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(homeGoalsOver15)}">${homeGoalsOver15 > 0 ? formatProb(homeGoalsOver15) : '-'}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(homeGoalsOver15))}">${homeGoalsOver15 > 0 ? formatProb(calculateUnder(homeGoalsOver15)) : '-'}</span></td>
-                        <td class="total-separator">0.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver05)}">${awayGoalsOver05 > 0 ? formatProb(awayGoalsOver05) : '-'}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver05))}">${awayGoalsOver05 > 0 ? formatProb(calculateUnder(awayGoalsOver05)) : '-'}</span></td>
-                        <td class="total-separator">1.5</td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(awayGoalsOver15)}">${awayGoalsOver15 > 0 ? formatProb(awayGoalsOver15) : '-'}</span></td>
-                        <td class="prob-cell"><span class="odds-value ${getProbClass(calculateUnder(awayGoalsOver15))}">${awayGoalsOver15 > 0 ? formatProb(calculateUnder(awayGoalsOver15)) : '-'}</span></td>
+                        <td class="total-separator">3.5</td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${total35OverClass}">
+                                ${ml35Over ? ml35Over.toFixed(2) : formatProb(goalsOver35)}
+                                ${total35Over ? `<br><small style="color: #0d6efd;">${total35Over.best.value} (${total35Over.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
+                        <td class="prob-cell">
+                            <span class="odds-value ${total35UnderClass}">
+                                ${ml35Under ? ml35Under.toFixed(2) : formatProb(calculateUnder(goalsOver35))}
+                                ${total35Under ? `<br><small style="color: #0d6efd;">${total35Under.best.value} (${total35Under.best.bookmaker_name})</small>` : ''}
+                            </span>
+                        </td>
                     `;
                     break;
                     
