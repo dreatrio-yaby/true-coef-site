@@ -4,115 +4,145 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a single-page web application for displaying football statistics with ML/AI-generated betting coefficients. The application is built as a standalone HTML file with embedded CSS and JavaScript, designed to load and display match data from S3 storage.
+This is a modern web application for displaying football statistics with ML/AI-generated betting coefficients. The application is built with Next.js 14, TypeScript, and modern React patterns, designed to load and display match data from S3 storage with an optimized user experience for finding profitable betting opportunities.
 
 ## Architecture
 
-The project consists of a single `index.html` file that contains:
+The project is built with modern web technologies:
 
-- **HTML Structure**: Basic page layout with containers for settings, filters, and match data tables
-- **CSS Styling**: Modern glass-morphism design with gradients, responsive layout, and animations
-- **JavaScript Logic**: Client-side functionality for data loading, filtering, and table rendering
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript for type safety
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: Zustand with persistence
+- **Data Fetching**: TanStack Query (React Query) for caching
+- **Tables**: TanStack Table for advanced sorting and filtering
+- **Deployment**: Optimized for Vercel
+
+### Project Structure
+
+```
+src/
+├── app/                     # Next.js App Router
+│   ├── api/                 # API routes for data fetching
+│   ├── globals.css          # Global styles with Tailwind
+│   ├── layout.tsx           # Root layout with providers
+│   ├── page.tsx             # Main home page
+│   └── providers.tsx        # React Query provider setup
+├── components/              # React components
+│   ├── ui/                  # shadcn/ui base components (Button, Card, Badge)
+│   ├── FilterPanel.tsx      # Betting filters and controls
+│   ├── MatchesTable.tsx     # Main data table with TanStack Table
+│   └── OddsCell.tsx         # Individual odds display component
+├── hooks/                   # Custom React hooks
+│   └── useMatches.ts        # Data fetching hook with React Query
+├── lib/                     # Utilities and configuration
+│   ├── data-fetcher.ts      # S3 and API data loading logic
+│   ├── types.ts             # TypeScript type definitions
+│   └── utils.ts             # Helper functions and utilities
+└── stores/                  # State management
+    └── matches-store.ts     # Zustand store for app state
+```
 
 ### Key Components
 
-1. **S3 Configuration Interface**: Input fields for bucket URL and file patterns
-2. **Filter System**: Toggle buttons for different bet types (1X2, General Goals Totals)
-3. **Data Visualization**: League-grouped tables showing match predictions with color-coded probabilities
-4. **Responsive Design**: Mobile-friendly layout with adaptive table structure
+1. **FilterPanel**: Modern filter interface with bookmaker selection and bet type switching
+2. **MatchesTable**: Advanced table with sorting, league grouping, and responsive design
+3. **OddsCell**: Smart odds display showing ML vs bookmaker coefficients with profitability indicators
+4. **API Routes**: Server-side data fetching with fallback mechanisms
 
 ### Data Structure
 
-The application expects JSON data with the following structure:
-```json
-{
-  "match_id": "18bb7c10-e4a775cb_2937041",
-  "mapping_info": {
-    "confidence": "high",
-    "match_reason": "exact_teams; same_date; league_match",
-    "merged_at": "2025-09-12T15:45:03.589246"
-  },
-  "match_basic": {
-    "date": "2025-09-13",
-    "time": "12:30",
-    "league": "Premier League",
-    "home_team": {
-      "fbref_id": "18bb7c10",
-      "fbref_name": "Arsenal",
-      "odds_name": "Арсенал"
-    },
-    "away_team": {
-      "fbref_id": "e4a775cb",
-      "fbref_name": "Nottingham Forest",
-      "odds_name": "Ноттингем Форест"
+The application expects JSON data with this structure:
+
+```typescript
+interface Match {
+  match_id: string
+  mapping_info: {
+    confidence: string
+    match_reason: string
+    merged_at: string
+  }
+  match_basic: {
+    date: string
+    time: string
+    league: string
+    home_team: {
+      fbref_id: string
+      fbref_name: string
+      odds_name: string
     }
-  },
-  "events": {
+    away_team: {
+      fbref_id: string
+      fbref_name: string
+      odds_name: string
+    }
+  }
+  events: {
     "1x2": {
-      "P1": {
-        "ml": 1.66,
-        "bookmaker_odds": [
-          {
-            "bookmaker_id": 4,
-            "bookmaker_name": "Фонбет",
-            "value": 1.37,
-            "is_better": false
-          }
-        ],
-        "better_odds": {
-          "bookmaker_id": 7,
-          "bookmaker_name": "БЕТСИТИ",
-          "value": 1.4
-        }
-      }
-    },
-    "totals": {
-      "0.5": {
-        "over": {
-          "ml": 1.08,
-          "bookmaker_odds": [...],
-          "better_odds": {...}
-        },
-        "under": {
-          "ml": 13.19,
-          "bookmaker_odds": [...],
-          "better_odds": {...}
-        }
+      P1: BetOutcome
+      X: BetOutcome
+      P2: BetOutcome
+    }
+    totals: {
+      [key: string]: {
+        over: BetOutcome
+        under: BetOutcome
       }
     }
   }
+}
+
+interface BetOutcome {
+  ml: number
+  bookmaker_odds: BookmakerOdds[]
+  better_odds?: BookmakerOdds
 }
 ```
 
 ## Development
 
-### File Structure
-- `index.html` - Complete application (HTML + CSS + JavaScript)
+### Modern Development Workflow
 
-### Key Functions
-- `loadMatches()` - Loads data from S3 or local sample_match.json file
-- `setFilter(filter)` - Switches between bet type views (1x2, goals)
-- `renderMatches()` - Renders match tables grouped by league, shows only matches from today onwards
-- `getBestOddsForBet(match, betPath)` - Gets best bookmaker odds for specific bet
-- `getProfitabilityClass(mlCoef, bookmakerCoef)` - Returns CSS class based on profitability comparison
-- `extractAvailableDates()` - Extracts available match dates from loaded data
-- `extractAvailableBookmakers()` - Extracts available bookmakers from loaded data
+- **Type Safety**: Full TypeScript coverage with strict mode
+- **Component System**: shadcn/ui components for consistency
+- **State Management**: Zustand for client state, React Query for server state
+- **Styling**: Tailwind CSS with custom profitability classes
+- **Performance**: Server Components, automatic code splitting, optimized caching
 
-### Styling Classes
-- `.prob-excellent` - Green gradient for highly profitable bets (bookmaker odds 15%+ higher than ML)
-- `.prob-good` - Blue gradient for good bets (bookmaker odds 8-14% higher than ML)
-- `.prob-fair` - Orange gradient for fair bets (bookmaker odds 2-7% higher than ML)
-- `.prob-poor` - Red gradient for poor bets (bookmaker odds lower or equal to ML)
+### Key Features
 
-### Current Features
-- **Date Filtering**: Shows only matches from today onwards
-- **Bookmaker Integration**: Displays ML coefficients alongside best bookmaker odds
-- **Profitability Analysis**: Color-codes bets based on profit potential
-- **Bet Types**: Supports 1X2 and General Goals Totals (0.5, 1.5, 2.5, 3.5)
-- **S3 Integration**: Attempts to load from S3, falls back to local sample_match.json
+- **Smart Profitability Analysis**: Real-time comparison of ML vs bookmaker odds
+- **Advanced Filtering**: Filter by bookmakers, bet types, and profitability levels
+- **Responsive Design**: Mobile-first approach with adaptive table layouts
+- **Data Caching**: Intelligent caching with React Query for optimal performance
+- **Fallback System**: Graceful degradation from S3 → API → demo data
 
-### Data Processing
-- Supports both legacy format (with `probs` object) and new format (with `events` structure)
-- Automatically calculates probabilities from ML coefficients when `probs` not available
-- Filters matches by date to show only current and future games
-- Groups matches by league and sorts by date/time
+### Profitability Classes
+
+- **Excellent** (🎯): 15%+ better odds - `odds-excellent` class
+- **Good** (✅): 8-14% better odds - `odds-good` class
+- **Fair** (⚖️): 2-7% better odds - `odds-fair` class
+- **Poor** (❌): ≤0% better odds - `odds-poor` class
+
+### API Endpoints
+
+- `/api/matches` - Load matches with pagination support
+- `/api/sample-data` - Fallback demo data endpoint
+
+### Commands
+
+- `npm run dev` - Development server
+- `npm run build` - Production build
+- `npm run start` - Production server
+- `npm run lint` - ESLint checks
+- `npm run type-check` - TypeScript validation
+
+### Deployment
+
+Optimized for Vercel with:
+- Automatic deployments on git push
+- Environment variable management
+- Edge function optimization
+- Global CDN distribution
+
+The application automatically handles S3 data loading with multiple fallback mechanisms for reliability.
