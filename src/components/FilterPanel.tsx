@@ -58,18 +58,16 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
           <h3 className="text-xs font-medium mb-2 text-gray-700">
             Показывать выгодные ставки, вероятность которых выше {probabilityFromOdds(filters.maxOddsThreshold || 2.5)}% (&lt;{(filters.maxOddsThreshold || 2.5).toFixed(1)})
           </h3>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500">90% (&lt;1.1)</span>
+          <div className="flex items-center justify-center">
             <input
               type="range"
-              min="1.1"
-              max="5.0"
-              step="0.1"
+              min="1.5"
+              max="4.5"
+              step="0.5"
               value={filters.maxOddsThreshold || 2.5}
               onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-48 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
-            <span className="text-xs text-gray-500">20% (&lt;5.0)</span>
           </div>
         </div>
 
