@@ -3,6 +3,8 @@
 import { useMatches } from '@/hooks/useMatches'
 import { FilterPanel } from '@/components/FilterPanel'
 import { MatchesTable } from '@/components/MatchesTable'
+import { BetTypeSidebar } from '@/components/BetTypeSidebar'
+import { BookmakerSidebar } from '@/components/BookmakerSidebar'
 import { getAvailableBookmakers } from '@/lib/utils'
 import { useMemo } from 'react'
 import { Loader2 } from 'lucide-react'
@@ -48,20 +50,38 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-3">
-          Football Stats AI
-        </h1>
+      <header className="bg-card border-b border-border p-4 shadow-sm">
+        <div className="container mx-auto max-w-7xl">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent text-center">
+            Football Stats AI
+          </h1>
+        </div>
       </header>
 
-      {/* Filter Panel */}
-      <FilterPanel availableBookmakers={availableBookmakers} />
+      {/* Main Layout with Sidebars */}
+      <div className="flex">
+        {/* Left Sidebar - Bet Types */}
+        <div className="hidden md:block">
+          <BetTypeSidebar />
+        </div>
 
-      {/* Matches Table */}
-      <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+        {/* Center Content */}
+        <div className="flex-1 p-6">
+          <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+        </div>
 
+        {/* Right Sidebar - Bookmakers */}
+        <div className="hidden md:block">
+          <BookmakerSidebar availableBookmakers={availableBookmakers} />
+        </div>
+      </div>
+
+      {/* Mobile Filter Panel */}
+      <div className="block md:hidden p-4">
+        <FilterPanel availableBookmakers={availableBookmakers} />
+      </div>
     </div>
   )
 }

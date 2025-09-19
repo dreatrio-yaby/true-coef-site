@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a modern web application for displaying football statistics with ML/AI-generated betting coefficients. The application is built with Next.js 14, TypeScript, and modern React patterns, designed to load and display match data from S3 storage with an optimized user experience for finding profitable betting opportunities.
+This is a modern Russian-language web application for displaying football statistics with ML/AI-generated betting coefficients. The application analyzes football matches and compares ML-generated odds with bookmaker odds to identify profitable betting opportunities. Built with Next.js 14, TypeScript, and modern React patterns, it loads match data from Yandex Cloud S3 storage with fallback mechanisms for reliability.
 
 ## Architecture
 
@@ -117,12 +117,16 @@ interface BetOutcome {
 - **Data Caching**: Intelligent caching with React Query for optimal performance
 - **Fallback System**: Graceful degradation from S3 → API → demo data
 
-### Profitability Classes
+### Profitability Analysis
 
-- **Excellent** (🎯): 15%+ better odds - `odds-excellent` class
-- **Good** (✅): 8-14% better odds - `odds-good` class
-- **Fair** (⚖️): 2-7% better odds - `odds-fair` class
-- **Poor** (❌): ≤0% better odds - `odds-poor` class
+The app uses sophisticated logic to determine profitability by comparing ML coefficients with bookmaker odds:
+
+- **Excellent** (🎯): 15%+ better odds - Bookmaker odds significantly higher than ML
+- **Good** (✅): 8-14% better odds - Good value opportunities
+- **Fair** (⚖️): 2-7% better odds - Reasonable value
+- **Poor** (❌): ≤1% better odds - No value or negative expected value
+
+**Important**: Only shows as profitable if ML coefficient is lower than bookmaker (indicating higher confidence) AND ML coefficient is reasonable (≤ 2.5) to avoid overly risky bets.
 
 ### API Endpoints
 

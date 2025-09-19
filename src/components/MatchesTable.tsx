@@ -108,11 +108,8 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         columnHelper.display({
           id: 'home_win',
           header: () => (
-            <div className="text-center">
-              <div>Победа дома</div>
-              <small className="text-[10px] opacity-75">
-                {filters.selectedBookmaker ? `(${filters.selectedBookmaker})` : '(ML/Выгодный)'}
-              </small>
+            <div className="text-center min-w-[110px]">
+              <div className="font-bold text-sm">Победа дома</div>
             </div>
           ),
           cell: ({ row }) => {
@@ -124,16 +121,13 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 120,
+          size: 130,
         }),
         columnHelper.display({
           id: 'draw',
           header: () => (
-            <div className="text-center">
-              <div>Ничья</div>
-              <small className="text-[10px] opacity-75">
-                {filters.selectedBookmaker ? `(${filters.selectedBookmaker})` : '(ML/Выгодный)'}
-              </small>
+            <div className="text-center min-w-[110px]">
+              <div className="font-bold text-sm">Ничья</div>
             </div>
           ),
           cell: ({ row }) => {
@@ -145,16 +139,13 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 120,
+          size: 130,
         }),
         columnHelper.display({
           id: 'away_win',
           header: () => (
-            <div className="text-center">
-              <div>Победа гостей</div>
-              <small className="text-[10px] opacity-75">
-                {filters.selectedBookmaker ? `(${filters.selectedBookmaker})` : '(ML/Выгодный)'}
-              </small>
+            <div className="text-center min-w-[110px]">
+              <div className="font-bold text-sm">Победа гостей</div>
             </div>
           ),
           cell: ({ row }) => {
@@ -166,22 +157,19 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 120,
+          size: 130,
         }),
       ]
     }
 
     if (filters.betType === 'goals') {
-      const totals = ['0.5', '1.5', '2.5', '3.5']
+      const totals = ['0.5', '1.5', '2.5', '3.5', '4.5', '5.5']
       const totalColumns = totals.map((total) =>
         columnHelper.display({
           id: `total_${total}`,
           header: () => (
-            <div className="text-center">
-              <div className="font-bold">Тотал {total}</div>
-              <div className="text-[10px] opacity-75 mt-1">
-                {filters.selectedBookmaker ? `(${filters.selectedBookmaker})` : '(ML/Выгодный)'}
-              </div>
+            <div className="text-center min-w-[120px]">
+              <div className="font-bold text-sm">Тотал {total}</div>
             </div>
           ),
           cell: ({ row }) => {
@@ -198,15 +186,19 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
 
             return (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-center text-muted-foreground">Больше</div>
-                <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} className="w-full" />
-                <div className="text-xs font-medium text-center text-muted-foreground">Меньше</div>
-                <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} className="w-full" />
+              <div className="space-y-2">
+                <div className="bg-blue-50 dark:bg-blue-950/20 p-2 rounded border">
+                  <div className="text-xs font-semibold text-center text-blue-800 dark:text-blue-300 mb-1">Больше {total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} className="w-full scale-75" />
+                </div>
+                <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded border">
+                  <div className="text-xs font-semibold text-center text-red-800 dark:text-red-300 mb-1">Меньше {total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} className="w-full scale-75" />
+                </div>
               </div>
             )
           },
-          size: 140,
+          size: 130,
         })
       )
 
@@ -252,16 +244,16 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="table-container">
-          <table className="matches-table">
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-muted/50">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      style={{ width: header.getSize() }}
-                      className="text-center"
+                      style={{ minWidth: header.getSize() }}
+                      className="text-center p-3 border-b border-border font-semibold text-sm sticky top-0 bg-muted/80 backdrop-blur-sm"
                     >
                       {header.isPlaceholder
                         ? null
@@ -275,12 +267,17 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+              {table.getRowModel().rows.map((row, index) => (
+                <tr
+                  key={row.id}
+                  className={`border-b border-border/50 hover:bg-muted/30 transition-colors ${
+                    index % 2 === 0 ? 'bg-background' : 'bg-muted/20'
+                  }`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className="text-center"
+                      className="text-center p-2 align-middle"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
