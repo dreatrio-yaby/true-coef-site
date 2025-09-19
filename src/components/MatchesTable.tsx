@@ -18,7 +18,6 @@ import {
   filterMatchesByDate,
 } from '@/lib/utils'
 import { OddsCell } from './OddsCell'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 
 interface MatchesTableProps {
   matches: Match[]
@@ -52,7 +51,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs font-medium whitespace-nowrap">
+          <div className="text-xs text-left px-2 py-1">
             {row.original.match_basic.league}
           </div>
         ),
@@ -73,7 +72,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs font-medium whitespace-nowrap">
+          <div className="text-xs px-2 py-1">
             {formatDateTime(
               row.original.match_basic.date,
               row.original.match_basic.time
@@ -86,13 +85,13 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         id: 'match',
         header: 'Матч',
         cell: ({ row }) => (
-          <div className="space-y-1">
-            <div className="flex flex-col space-y-0.5 min-w-[180px]">
-              <span className="font-medium text-sm">
+          <div className="text-xs text-left px-2 py-1">
+            <div>
+              <span className="font-medium">
                 {row.original.match_basic.home_team.fbref_name}
               </span>
-              <span className="text-xs text-muted-foreground">vs</span>
-              <span className="font-medium text-sm">
+              <span className="text-gray-500 mx-1">-</span>
+              <span className="font-medium">
                 {row.original.match_basic.away_team.fbref_name}
               </span>
             </div>
@@ -108,8 +107,8 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         columnHelper.display({
           id: 'home_win',
           header: () => (
-            <div className="text-center min-w-[110px]">
-              <div className="font-bold text-sm">Победа дома</div>
+            <div className="text-center text-xs font-semibold">
+              П1
             </div>
           ),
           cell: ({ row }) => {
@@ -121,13 +120,13 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 130,
+          size: 80,
         }),
         columnHelper.display({
           id: 'draw',
           header: () => (
-            <div className="text-center min-w-[110px]">
-              <div className="font-bold text-sm">Ничья</div>
+            <div className="text-center text-xs font-semibold">
+              X
             </div>
           ),
           cell: ({ row }) => {
@@ -139,13 +138,13 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 130,
+          size: 80,
         }),
         columnHelper.display({
           id: 'away_win',
           header: () => (
-            <div className="text-center min-w-[110px]">
-              <div className="font-bold text-sm">Победа гостей</div>
+            <div className="text-center text-xs font-semibold">
+              П2
             </div>
           ),
           cell: ({ row }) => {
@@ -157,7 +156,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
           },
-          size: 130,
+          size: 80,
         }),
       ]
     }
@@ -168,8 +167,8 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         columnHelper.display({
           id: `total_${total}`,
           header: () => (
-            <div className="text-center min-w-[120px]">
-              <div className="font-bold text-sm">Тотал {total}</div>
+            <div className="text-center text-xs font-semibold">
+              Т{total}
             </div>
           ),
           cell: ({ row }) => {
@@ -186,19 +185,19 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
 
             return (
-              <div className="space-y-2">
-                <div className="bg-blue-50 dark:bg-blue-950/20 p-2 rounded border">
-                  <div className="text-xs font-semibold text-center text-blue-800 dark:text-blue-300 mb-1">Больше {total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} className="w-full scale-75" />
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} />
                 </div>
-                <div className="bg-red-50 dark:bg-red-950/20 p-2 rounded border">
-                  <div className="text-xs font-semibold text-center text-red-800 dark:text-red-300 mb-1">Меньше {total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} className="w-full scale-75" />
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} />
                 </div>
               </div>
             )
           },
-          size: 130,
+          size: 90,
         })
       )
 
@@ -223,74 +222,69 @@ export function MatchesTable({ matches }: MatchesTableProps) {
 
   if (filteredMatches.length === 0) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center text-muted-foreground py-8">
-            Нет данных для отображения
-          </div>
-        </CardContent>
-      </Card>
+      <div className="text-center text-gray-500 py-8">
+        Нет данных для отображения
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between">
-          <span>Матчи</span>
-          <span className="text-sm font-normal text-muted-foreground bg-muted/50 px-2 py-1 rounded">
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Матчи</span>
+          <span className="text-xs text-gray-500">
             {filteredMatches.length} матчей
           </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead className="bg-muted/50">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      style={{ minWidth: header.getSize() }}
-                      className="text-center p-3 border-b border-border font-semibold text-sm sticky top-0 bg-muted/80 backdrop-blur-sm"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row, index) => (
-                <tr
-                  key={row.id}
-                  className={`border-b border-border/50 hover:bg-muted/30 transition-colors ${
-                    index % 2 === 0 ? 'bg-background' : 'bg-muted/20'
-                  }`}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="text-center p-2 align-middle"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    style={{ minWidth: header.getSize() }}
+                    className="text-center px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row, index) => (
+              <tr
+                key={row.id}
+                className={`border-b border-gray-100 hover:bg-gray-50 ${
+                  index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                }`}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="text-center px-2 py-1 border-r border-gray-100 last:border-r-0"
+                  >
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   )
 }

@@ -2,7 +2,6 @@
 
 import { BookmakerOdds } from '@/lib/types'
 import { formatOdds, getProfitabilityLevel } from '@/lib/utils'
-import { cn } from '@/lib/utils'
 
 interface OddsCellProps {
   mlValue?: number
@@ -19,56 +18,37 @@ export function OddsCell({ mlValue, bookmakerOdds, className }: OddsCellProps) {
     ? Math.round(((Number(bookmakerOdds.value) / mlValue - 1) * 100))
     : 0
 
-  const getProfitabilityStyles = () => {
+  const getProfitabilityColor = () => {
     switch (profitability) {
       case 'excellent':
-        return 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/50 border-green-300 dark:border-green-700 text-green-900 dark:text-green-100'
+        return 'text-green-700 dark:text-green-400 font-bold'
       case 'good':
-        return 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/50 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100'
+        return 'text-blue-700 dark:text-blue-400 font-bold'
       case 'fair':
-        return 'bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/50 border-yellow-300 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100'
+        return 'text-yellow-700 dark:text-yellow-400 font-medium'
       default:
-        return 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300'
+        return 'text-gray-600 dark:text-gray-400'
     }
   }
 
   return (
-    <div
-      className={cn(
-        'inline-flex flex-col items-center justify-center p-3 rounded-lg text-center min-w-[110px] transition-all duration-300 shadow-sm hover:shadow-md',
-        'border-2',
-        getProfitabilityStyles(),
-        className
-      )}
-    >
-      {/* Profit percentage indicator */}
-      {isProfitable && profitPercent > 0 && (
-        <div className="mb-2 px-2 py-1 rounded-full bg-current/10 border border-current/20">
-          <span className="text-xs font-extrabold tracking-tight">
-            +{profitPercent}%
-          </span>
-        </div>
-      )}
-
-      {/* AI coefficient */}
-      <div className="space-y-1 w-full">
-        <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-          ML MODEL
-        </div>
-        <div className="font-black text-lg leading-none">
+    <div className={`text-xs space-y-0.5 ${className}`}>
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] text-gray-500">ML</span>
+        <span className="font-mono">
           {mlValue ? formatOdds(mlValue) : '-'}
-        </div>
+        </span>
       </div>
 
-      {/* Bookmaker coefficient */}
       {bookmakerOdds && (
-        <div className="mt-2 pt-2 space-y-1 w-full border-t border-current/30">
-          <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-            БУКМЕКЕР
-          </div>
-          <div className="font-black text-lg leading-none">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-gray-500">БК</span>
+          <span className={`font-mono ${getProfitabilityColor()}`}>
             {bookmakerOdds.value != null ? formatOdds(Number(bookmakerOdds.value)) : '-'}
-          </div>
+            {isProfitable && profitPercent > 0 && (
+              <span className="ml-1 text-[9px]">+{profitPercent}%</span>
+            )}
+          </span>
         </div>
       )}
     </div>
