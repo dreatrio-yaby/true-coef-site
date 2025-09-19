@@ -54,12 +54,6 @@ export default function HomePage() {
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-3">
           Football Stats AI
         </h1>
-        <p className="text-lg text-muted-foreground font-medium">
-          ML-powered betting odds predictions
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Поиск выгодных ставок с помощью машинного обучения
-        </p>
       </header>
 
       {/* Filter Panel */}
