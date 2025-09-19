@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "./providers"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   )
