@@ -3,11 +3,8 @@
 import { useMatches } from '@/hooks/useMatches'
 import { FilterPanel } from '@/components/FilterPanel'
 import { MatchesTable } from '@/components/MatchesTable'
-import { BetTypeSidebar } from '@/components/BetTypeSidebar'
-import { BookmakerSidebar } from '@/components/BookmakerSidebar'
 import { getAvailableBookmakers } from '@/lib/utils'
 import { useMemo } from 'react'
-import { Loader2 } from 'lucide-react'
 
 export default function HomePage() {
   const { data: matches = [], isLoading, error } = useMatches()
@@ -19,13 +16,9 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="text-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Загрузка матчей...</h2>
-          <p className="text-muted-foreground">
-            Получаем последние данные из S3 хранилища
-          </p>
+      <div className="max-w-6xl mx-auto p-4">
+        <div className="text-center py-8">
+          <div className="text-sm text-gray-500">Загрузка...</div>
         </div>
       </div>
     )
@@ -33,16 +26,14 @@ export default function HomePage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="text-center py-12">
-          <div className="text-destructive mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold mb-2">Ошибка загрузки</h2>
-          <p className="text-muted-foreground mb-4">{error?.message || 'Неизвестная ошибка'}</p>
+      <div className="max-w-6xl mx-auto p-4">
+        <div className="text-center py-8">
+          <div className="text-sm text-red-500 mb-2">Ошибка загрузки</div>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50"
           >
-            Попробовать снова
+            Обновить
           </button>
         </div>
       </div>
@@ -50,37 +41,20 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-card border-b border-border p-4 shadow-sm">
-        <div className="container mx-auto max-w-7xl">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent text-center">
+      <header className="border-b border-gray-200 p-3">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-lg font-mono font-bold text-black">
             Football Stats AI
           </h1>
         </div>
       </header>
 
-      {/* Main Layout with Sidebars */}
-      <div className="flex">
-        {/* Left Sidebar - Bet Types */}
-        <div className="hidden md:block">
-          <BetTypeSidebar />
-        </div>
-
-        {/* Center Content */}
-        <div className="flex-1 p-6">
-          <MatchesTable matches={Array.isArray(matches) ? matches : []} />
-        </div>
-
-        {/* Right Sidebar - Bookmakers */}
-        <div className="hidden md:block">
-          <BookmakerSidebar availableBookmakers={availableBookmakers} />
-        </div>
-      </div>
-
-      {/* Mobile Filter Panel */}
-      <div className="block md:hidden p-4">
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto p-4">
         <FilterPanel availableBookmakers={availableBookmakers} />
+        <MatchesTable matches={Array.isArray(matches) ? matches : []} />
       </div>
     </div>
   )

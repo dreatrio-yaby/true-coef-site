@@ -2,8 +2,6 @@
 
 import { FilterType } from '@/lib/types'
 import { useMatchesStore } from '@/stores/matches-store'
-import { Button } from './ui/button'
-import { Card } from './ui/card'
 
 interface FilterPanelProps {
   availableBookmakers: string[]
@@ -14,34 +12,40 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
 
   const betTypeFilters: { key: FilterType; label: string }[] = [
     { key: '1x2', label: '1X2' },
-    { key: 'goals', label: 'Общие тоталы голов' },
+    { key: 'goals', label: 'Тоталы голов' },
     { key: 'corners', label: 'Угловые' },
   ]
 
   return (
-    <Card className="mb-6">
-      <div className="p-6 space-y-4">
+    <div className="border border-gray-200 rounded mb-4 p-3">
+      <div className="space-y-3">
         {/* Bookmaker Filter */}
         {availableBookmakers.length > 0 && (
           <div>
-            <h3 className="text-sm font-medium mb-3">Букмекеры</h3>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={filters.selectedBookmaker === null ? "default" : "outline"}
-                size="sm"
+            <h3 className="text-xs font-medium mb-2 text-gray-700">Букмекеры</h3>
+            <div className="flex flex-wrap gap-1">
+              <button
+                className={`px-2 py-1 text-xs border rounded ${
+                  filters.selectedBookmaker === null
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
                 onClick={() => updateFilter({ selectedBookmaker: null })}
               >
-                Самый выгодный
-              </Button>
+                Лучший
+              </button>
               {availableBookmakers.map((bookmaker) => (
-                <Button
+                <button
                   key={bookmaker}
-                  variant={filters.selectedBookmaker === bookmaker ? "default" : "outline"}
-                  size="sm"
+                  className={`px-2 py-1 text-xs border rounded ${
+                    filters.selectedBookmaker === bookmaker
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
                   onClick={() => updateFilter({ selectedBookmaker: bookmaker })}
                 >
                   {bookmaker}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
@@ -49,22 +53,24 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
 
         {/* Bet Type Filter */}
         <div>
-          <h3 className="text-sm font-medium mb-3">Типы ставок</h3>
-          <div className="flex flex-wrap gap-2">
+          <h3 className="text-xs font-medium mb-2 text-gray-700">Типы ставок</h3>
+          <div className="flex flex-wrap gap-1">
             {betTypeFilters.map((filter) => (
-              <Button
+              <button
                 key={filter.key}
-                variant={filters.betType === filter.key ? "default" : "outline"}
-                size="sm"
+                className={`px-2 py-1 text-xs border rounded ${
+                  filters.betType === filter.key
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
                 onClick={() => updateFilter({ betType: filter.key })}
               >
                 {filter.label}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
-
       </div>
-    </Card>
+    </div>
   )
 }
