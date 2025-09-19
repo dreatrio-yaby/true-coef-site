@@ -2,6 +2,7 @@
 
 import { BookmakerOdds } from '@/lib/types'
 import { formatOdds, getProfitabilityLevel } from '@/lib/utils'
+import { useMatchesStore } from '@/stores/matches-store'
 
 interface OddsCellProps {
   mlValue?: number
@@ -11,7 +12,8 @@ interface OddsCellProps {
 }
 
 export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName = false }: OddsCellProps) {
-  const profitability = getProfitabilityLevel(mlValue, bookmakerOdds?.value)
+  const { filters } = useMatchesStore()
+  const profitability = getProfitabilityLevel(mlValue, bookmakerOdds?.value, filters.maxOddsThreshold)
   const isProfitable = profitability !== 'poor'
 
   // Calculate profit percentage

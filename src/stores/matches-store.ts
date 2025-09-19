@@ -11,6 +11,7 @@ export const useMatchesStore = create<MatchesStore>()(
         betType: '1x2',
         selectedBookmaker: null,
         dateFilter: new Date().toISOString().split('T')[0],
+        maxOddsThreshold: 2.5,
       },
 
       updateFilter: (filter) =>

@@ -93,6 +93,7 @@ export interface FilterState {
   betType: FilterType
   selectedBookmaker: string | null
   dateFilter: string
+  maxOddsThreshold: number
 }
 
 export interface MatchesStore {

@@ -32,15 +32,18 @@ export function calculateUnderProbability(overProb: number): number {
 
 export function getProfitabilityLevel(
   mlCoef?: number,
-  bookmakerCoef?: number | null
+  bookmakerCoef?: number | null,
+  maxOddsThreshold?: number
 ): ProfitabilityLevel {
   if (!mlCoef || bookmakerCoef == null || mlCoef <= 0 || bookmakerCoef <= 0) {
     return 'poor'
   }
 
+  const threshold = maxOddsThreshold ?? 2.5
+
   // Only show as profitable if ML coefficient is lower than bookmaker (higher probability)
-  // and ML coefficient is not too risky (≤ 2.5)
-  if (mlCoef >= bookmakerCoef || mlCoef > 2.5) {
+  // and ML coefficient is not too risky (≤ threshold)
+  if (mlCoef >= bookmakerCoef || mlCoef > threshold) {
     return 'poor'
   }
 

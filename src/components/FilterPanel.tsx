@@ -16,6 +16,8 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
     { key: 'corners', label: 'Угловые' },
   ]
 
+  const probabilityFromOdds = (odds: number) => Math.round((1 / odds) * 100)
+
   return (
     <div className="border border-gray-200 rounded mb-4 p-3">
       <div className="space-y-3">
@@ -50,6 +52,26 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
             </div>
           </div>
         )}
+
+        {/* Profitability Threshold Filter */}
+        <div>
+          <h3 className="text-xs font-medium mb-2 text-gray-700">
+            Показывать выгодные ставки, вероятность которых выше {probabilityFromOdds(filters.maxOddsThreshold)}% (&lt;{filters.maxOddsThreshold.toFixed(1)})
+          </h3>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500">90% (&lt;1.1)</span>
+            <input
+              type="range"
+              min="1.1"
+              max="5.0"
+              step="0.1"
+              value={filters.maxOddsThreshold}
+              onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
+              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <span className="text-xs text-gray-500">20% (&lt;5.0)</span>
+          </div>
+        </div>
 
         {/* Bet Type Filter */}
         <div>
