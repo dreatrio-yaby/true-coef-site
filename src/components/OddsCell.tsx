@@ -37,7 +37,7 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
   return (
     <div className={`text-xs space-y-0.5 ${className}`}>
       <div className="flex items-center justify-between">
-        <span className="text-[10px] text-gray-500">ML</span>
+        <span className="text-[10px] text-gray-500">AI</span>
         <span className="font-mono">
           {mlValue ? formatOdds(mlValue) : '-'}
         </span>
