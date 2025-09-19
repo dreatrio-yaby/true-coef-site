@@ -15,8 +15,8 @@ export function OddsCell({ mlValue, bookmakerOdds, className }: OddsCellProps) {
   const isProfitable = profitability !== 'poor'
 
   // Calculate profit percentage
-  const profitPercent = mlValue && bookmakerOdds?.value
-    ? Math.round(((bookmakerOdds.value / mlValue - 1) * 100))
+  const profitPercent = mlValue && bookmakerOdds?.value != null
+    ? Math.round(((Number(bookmakerOdds.value) / mlValue - 1) * 100))
     : 0
 
   const getProfitabilityStyles = () => {
@@ -67,7 +67,7 @@ export function OddsCell({ mlValue, bookmakerOdds, className }: OddsCellProps) {
             БУКМЕКЕР
           </div>
           <div className="font-black text-lg leading-none">
-            {formatOdds(bookmakerOdds.value)}
+            {bookmakerOdds.value != null ? formatOdds(Number(bookmakerOdds.value)) : '-'}
           </div>
         </div>
       )}

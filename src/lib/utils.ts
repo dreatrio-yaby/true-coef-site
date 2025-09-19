@@ -32,9 +32,9 @@ export function calculateUnderProbability(overProb: number): number {
 
 export function getProfitabilityLevel(
   mlCoef?: number,
-  bookmakerCoef?: number
+  bookmakerCoef?: number | null
 ): ProfitabilityLevel {
-  if (!mlCoef || !bookmakerCoef || mlCoef <= 0 || bookmakerCoef <= 0) {
+  if (!mlCoef || bookmakerCoef == null || mlCoef <= 0 || bookmakerCoef <= 0) {
     return 'poor'
   }
 
@@ -78,11 +78,11 @@ export function getBestBookmakerOdds(
   if (filteredOdds.length === 0) return null
 
   // Find the best (highest) odds
-  return filteredOdds.reduce((best, current) =>
-    parseFloat(current.value.toString()) > parseFloat(best.value.toString())
-      ? current
-      : best
-  )
+  return filteredOdds.reduce((best, current) => {
+    const currentValue = current.value != null ? parseFloat(current.value.toString()) : 0
+    const bestValue = best.value != null ? parseFloat(best.value.toString()) : 0
+    return currentValue > bestValue ? current : best
+  })
 }
 
 export function getAvailableBookmakers(matches: any[]): string[] {
