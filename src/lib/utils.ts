@@ -128,10 +128,17 @@ export function getAvailableBookmakers(matches: any[]): string[] {
 export function filterMatchesByDate(matches: any[], dateFilter?: string): any[] {
   const today = new Date().toISOString().split('T')[0]
   const targetDate = dateFilter || today
+  const now = new Date()
 
   return matches.filter(match => {
     const matchDate = match.match_basic?.date || match.date
-    return matchDate >= targetDate
+    const matchTime = match.match_basic?.time || match.time
+
+    // Create match datetime
+    const matchDateTime = new Date(`${matchDate} ${matchTime}`)
+
+    // Filter out past matches and only show matches from target date forward
+    return matchDate >= targetDate && matchDateTime > now
   })
 }
 
