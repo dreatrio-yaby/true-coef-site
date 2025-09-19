@@ -58,26 +58,52 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
           <h3 className="text-xs font-medium mb-2 text-gray-700">
             Показывать выгодные ставки, вероятность которых выше <span className="text-sm font-bold">{probabilityFromOdds(filters.maxOddsThreshold || 2.5)}%</span> (&lt;{(filters.maxOddsThreshold || 2.5).toFixed(1)})
           </h3>
-          <div className="flex items-center">
-            <input
-              type="range"
-              min="1.5"
-              max="4.5"
-              step="0.5"
-              value={filters.maxOddsThreshold || 2.5}
-              onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
-              className="w-48 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              list="threshold-ticks"
-            />
-            <datalist id="threshold-ticks">
-              <option value="1.5" />
-              <option value="2.0" />
-              <option value="2.5" />
-              <option value="3.0" />
-              <option value="3.5" />
-              <option value="4.0" />
-              <option value="4.5" />
-            </datalist>
+          <div className="w-48">
+            <div className="relative">
+              <input
+                type="range"
+                min="1.5"
+                max="4.5"
+                step="0.5"
+                value={filters.maxOddsThreshold || 2.5}
+                onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-custom"
+                style={{
+                  background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb 100%)`
+                }}
+              />
+              {/* Tick marks */}
+              <div className="absolute top-0 left-0 w-full h-2 pointer-events-none">
+                {[1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5].map((value, index) => (
+                  <div
+                    key={value}
+                    className="absolute w-0.5 h-4 bg-gray-400 -top-1"
+                    style={{ left: `${(index / 6) * 100}%`, transform: 'translateX(-50%)' }}
+                  />
+                ))}
+              </div>
+            </div>
+            <style jsx>{`
+              .slider-custom::-webkit-slider-thumb {
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #374151;
+                cursor: pointer;
+                border: 2px solid #fff;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              }
+              .slider-custom::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #374151;
+                cursor: pointer;
+                border: 2px solid #fff;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              }
+            `}</style>
           </div>
         </div>
 
