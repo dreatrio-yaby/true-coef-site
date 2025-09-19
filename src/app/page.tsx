@@ -2,6 +2,8 @@
 
 import { useMatches } from '@/hooks/useMatches'
 import { FilterPanel } from '@/components/FilterPanel'
+import { BetTypeSelector } from '@/components/BetTypeSelector'
+import { BookmakerSelector } from '@/components/BookmakerSelector'
 import { MatchesTable } from '@/components/MatchesTable'
 import { getAvailableBookmakers } from '@/lib/utils'
 import { useMemo } from 'react'
@@ -53,8 +55,25 @@ export default function HomePage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto p-4">
-        <FilterPanel availableBookmakers={availableBookmakers} />
-        <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+        <FilterPanel />
+
+        {/* Layout with sidebar filters and table */}
+        <div className="flex gap-4 items-start">
+          {/* Left sidebar - Bet Types */}
+          <div className="flex-shrink-0">
+            <BetTypeSelector />
+          </div>
+
+          {/* Center - Table */}
+          <div className="flex-1">
+            <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+          </div>
+
+          {/* Right sidebar - Bookmakers */}
+          <div className="flex-shrink-0">
+            <BookmakerSelector availableBookmakers={availableBookmakers} />
+          </div>
+        </div>
       </div>
     </div>
   )

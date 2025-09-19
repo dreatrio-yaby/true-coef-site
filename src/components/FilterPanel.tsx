@@ -1,26 +1,9 @@
 'use client'
 
-import { FilterType } from '@/lib/types'
 import { useMatchesStore } from '@/stores/matches-store'
 
-interface FilterPanelProps {
-  availableBookmakers: string[]
-}
-
-export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
+export function FilterPanel() {
   const { filters, updateFilter } = useMatchesStore()
-
-  const betTypeFilters: { key: FilterType; label: string }[] = [
-    { key: '1x2', label: '1X2' },
-    { key: 'goals', label: 'Тоталы голов' },
-    { key: 'corners', label: 'Угловые' },
-  ]
-
-  // Сортируем букмекеров: Самый выгодный, Фонбет, остальные
-  const sortedBookmakers = () => {
-    const others = availableBookmakers.filter(b => b !== 'Фонбет').sort()
-    return availableBookmakers.includes('Фонбет') ? ['Фонбет', ...others] : others
-  }
 
   const probabilityFromOdds = (odds: number) => Math.round((1 / odds) * 100)
 
@@ -66,7 +49,7 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
       </div>
 
       {/* Кнопки отображения */}
-      <div className="mb-4">
+      <div>
         <div className="flex gap-2">
           <button
             className={`px-3 py-2 text-xs border rounded ${
@@ -89,63 +72,6 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
             Отображать только выгодные
           </button>
         </div>
-      </div>
-
-      <div className="flex gap-4">
-        {/* Типы ставок слева */}
-        <div className="flex-shrink-0">
-          <h3 className="text-xs font-medium mb-2 text-gray-700">Типы ставок</h3>
-          <div className="flex flex-col gap-1">
-            {betTypeFilters.map((filter) => (
-              <button
-                key={filter.key}
-                className={`px-3 py-2 text-xs border rounded text-left ${
-                  filters.betType === filter.key
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-                onClick={() => updateFilter({ betType: filter.key })}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Пространство между колонками */}
-        <div className="flex-1" />
-
-        {/* Букмекеры справа */}
-        {availableBookmakers.length > 0 && (
-          <div className="flex-shrink-0">
-            <h3 className="text-xs font-medium mb-2 text-gray-700">Букмекеры</h3>
-            <div className="flex flex-col gap-1">
-              <button
-                className={`px-3 py-2 text-xs border rounded text-left ${
-                  filters.selectedBookmaker === null
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-                onClick={() => updateFilter({ selectedBookmaker: null })}
-              >
-                Самый выгодный
-              </button>
-              {sortedBookmakers().map((bookmaker) => (
-                <button
-                  key={bookmaker}
-                  className={`px-3 py-2 text-xs border rounded text-left ${
-                    filters.selectedBookmaker === bookmaker
-                      ? 'bg-black text-white border-black'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                  onClick={() => updateFilter({ selectedBookmaker: bookmaker })}
-                >
-                  {bookmaker}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
