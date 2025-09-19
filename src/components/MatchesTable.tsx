@@ -118,7 +118,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.P1?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
+            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
           size: 80,
         }),
@@ -136,7 +136,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.X?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
+            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
           size: 80,
         }),
@@ -154,7 +154,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.P2?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} />
+            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
           size: 80,
         }),
@@ -188,11 +188,11 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} />
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} />
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
                 </div>
               </div>
             )

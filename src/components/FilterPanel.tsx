@@ -32,7 +32,7 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
                 }`}
                 onClick={() => updateFilter({ selectedBookmaker: null })}
               >
-                Лучший
+                Самый выгодный
               </button>
               {availableBookmakers.map((bookmaker) => (
                 <button

@@ -7,9 +7,10 @@ interface OddsCellProps {
   mlValue?: number
   bookmakerOdds?: BookmakerOdds | null
   className?: string
+  showBookmakerName?: boolean
 }
 
-export function OddsCell({ mlValue, bookmakerOdds, className }: OddsCellProps) {
+export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName = false }: OddsCellProps) {
   const profitability = getProfitabilityLevel(mlValue, bookmakerOdds?.value)
   const isProfitable = profitability !== 'poor'
 
@@ -42,7 +43,9 @@ export function OddsCell({ mlValue, bookmakerOdds, className }: OddsCellProps) {
 
       {bookmakerOdds && (
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-gray-500">БК</span>
+          <span className="text-[10px] text-gray-500">
+            {showBookmakerName ? bookmakerOdds.bookmaker_name : 'БК'}
+          </span>
           <span className={`font-mono ${getProfitabilityColor()}`}>
             {bookmakerOdds.value != null ? formatOdds(Number(bookmakerOdds.value)) : '-'}
             {isProfitable && profitPercent > 0 && (
