@@ -97,17 +97,26 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
     console.log(`Found ${fileList.length} files, loading...`)
 
     // Load files in batches to avoid overwhelming the browser
-    const promises = fileList.slice(0, 50).map(async (filePath) => {
-      return await fetchFileWithFallback(`${BUCKET_URL}/${filePath}`)
-    })
+    const BATCH_SIZE = 20
+    const allMatches: Match[] = []
 
-    const results = await Promise.all(promises)
-    const validMatches = results.filter((data): data is Match =>
-      data && data.match_basic && data.events
-    )
+    for (let i = 0; i < fileList.length; i += BATCH_SIZE) {
+      const batch = fileList.slice(i, i + BATCH_SIZE)
+      const promises = batch.map(async (filePath) => {
+        return await fetchFileWithFallback(`${BUCKET_URL}/${filePath}`)
+      })
 
-    console.log(`Loaded ${validMatches.length} matches from S3`)
-    return validMatches
+      const results = await Promise.all(promises)
+      const validMatches = results.filter((data): data is Match =>
+        data && data.match_basic && data.events
+      )
+
+      allMatches.push(...validMatches)
+      console.log(`Loaded batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(fileList.length / BATCH_SIZE)}: ${validMatches.length} matches`)
+    }
+
+    console.log(`Loaded ${allMatches.length} total matches from S3`)
+    return allMatches
 
   } catch (error) {
     console.error('Error loading from S3:', error)
