@@ -20,7 +20,7 @@ export function BookmakerSelector({ availableBookmakers }: BookmakerSelectorProp
   }
 
   return (
-    <div className="border border-gray-200 rounded p-3 w-48">
+    <div className="w-44">
       <h3 className="text-xs font-medium mb-2 text-gray-700">Букмекеры</h3>
       <div className="flex flex-col gap-1">
         <button

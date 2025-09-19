@@ -13,7 +13,7 @@ export function BetTypeSelector() {
   ]
 
   return (
-    <div className="border border-gray-200 rounded p-3 w-40">
+    <div className="w-36">
       <h3 className="text-xs font-medium mb-2 text-gray-700">Типы ставок</h3>
       <div className="flex flex-col gap-1">
         {betTypeFilters.map((filter) => (

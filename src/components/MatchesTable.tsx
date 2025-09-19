@@ -70,7 +70,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             {row.original.match_basic.league}
           </div>
         ),
-        size: 120,
+        size: 100,
       }),
       columnHelper.accessor((row) => {
         const date = row.match_basic.date
@@ -94,7 +94,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )}
           </div>
         ),
-        size: 100,
+        size: 80,
       }),
       columnHelper.accessor('match_basic.home_team.fbref_name', {
         id: 'match',
@@ -112,7 +112,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             </div>
           </div>
         ),
-        size: 200,
+        size: 180,
       }),
     ]
 
@@ -212,7 +212,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               </div>
             )
           },
-          size: 90,
+          size: 75,
         })
       )
 
@@ -244,7 +244,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="overflow-hidden">
       <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Матчи</span>

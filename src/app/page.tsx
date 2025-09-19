@@ -54,24 +54,30 @@ export default function HomePage() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-4">
+      <div className="max-w-7xl mx-auto p-4">
         <FilterPanel />
 
-        {/* Layout with sidebar filters and table */}
-        <div className="flex gap-4 items-start">
-          {/* Left sidebar - Bet Types */}
-          <div className="flex-shrink-0">
-            <BetTypeSelector />
-          </div>
+        {/* Layout with unified container */}
+        <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+          <div className="flex">
+            {/* Left sidebar - Bet Types */}
+            <div className="flex-shrink-0 border-r border-gray-200 bg-gray-50/50">
+              <div className="p-3">
+                <BetTypeSelector />
+              </div>
+            </div>
 
-          {/* Center - Table */}
-          <div className="flex-1">
-            <MatchesTable matches={Array.isArray(matches) ? matches : []} />
-          </div>
+            {/* Center - Table */}
+            <div className="flex-1 min-w-0">
+              <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+            </div>
 
-          {/* Right sidebar - Bookmakers */}
-          <div className="flex-shrink-0">
-            <BookmakerSelector availableBookmakers={availableBookmakers} />
+            {/* Right sidebar - Bookmakers */}
+            <div className="flex-shrink-0 border-l border-gray-200 bg-gray-50/50">
+              <div className="p-3">
+                <BookmakerSelector availableBookmakers={availableBookmakers} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
