@@ -56,9 +56,9 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
         {/* Profitability Threshold Filter */}
         <div>
           <h3 className="text-xs font-medium mb-2 text-gray-700">
-            Показывать выгодные ставки, вероятность которых выше {probabilityFromOdds(filters.maxOddsThreshold || 2.5)}% (&lt;{(filters.maxOddsThreshold || 2.5).toFixed(1)})
+            Показывать выгодные ставки, вероятность которых выше <span className="text-sm font-bold">{probabilityFromOdds(filters.maxOddsThreshold || 2.5)}%</span> (&lt;{(filters.maxOddsThreshold || 2.5).toFixed(1)})
           </h3>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center">
             <input
               type="range"
               min="1.5"
@@ -67,7 +67,17 @@ export function FilterPanel({ availableBookmakers }: FilterPanelProps) {
               value={filters.maxOddsThreshold || 2.5}
               onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
               className="w-48 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              list="threshold-ticks"
             />
+            <datalist id="threshold-ticks">
+              <option value="1.5" />
+              <option value="2.0" />
+              <option value="2.5" />
+              <option value="3.0" />
+              <option value="3.5" />
+              <option value="4.0" />
+              <option value="4.5" />
+            </datalist>
           </div>
         </div>
 
