@@ -67,12 +67,12 @@ export function FilterPanel() {
         </div>
       </div>
 
-      {/* Мобильные фильтры */}
-      <div className="block md:hidden mb-4 space-y-3">
-        <div>
-          <label className="text-xs font-medium text-gray-700 block mb-1">
-            Тип ставок
-          </label>
+      {/* Фильтры типов ставок - выпадающий список на мобильных, кнопки на десктопе */}
+      <div className="mb-4">
+        <h4 className="text-xs font-medium text-gray-700 mb-2">Тип ставок:</h4>
+
+        {/* Мобильная версия - выпадающий список */}
+        <div className="block md:hidden">
           <select
             value={filters.betType}
             onChange={(e) => updateFilter({ betType: e.target.value as 'goals' | '1x2' })}
@@ -86,30 +86,8 @@ export function FilterPanel() {
           </select>
         </div>
 
-        <div>
-          <label className="text-xs font-medium text-gray-700 block mb-1">
-            Букмекер
-          </label>
-          <select
-            value={filters.selectedBookmaker || 'Все букмекеры'}
-            onChange={(e) => updateFilter({
-              selectedBookmaker: e.target.value === 'Все букмекеры' ? null : e.target.value
-            })}
-            className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-700"
-          >
-            {bookmakers.map((bookmaker) => (
-              <option key={bookmaker} value={bookmaker}>
-                {bookmaker}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Десктоп фильтры (скрыты на мобильных) */}
-      <div className="hidden md:block mb-4">
-        <div className="flex gap-2 mb-3">
-          <h4 className="text-xs font-medium text-gray-700 mb-1">Тип ставок:</h4>
+        {/* Десктопная версия - кнопки */}
+        <div className="hidden md:flex gap-2">
           {betTypes.map((type) => (
             <button
               key={type.value}
@@ -124,9 +102,31 @@ export function FilterPanel() {
             </button>
           ))}
         </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2">
-          <h4 className="text-xs font-medium text-gray-700 w-full mb-1">Букмекеры:</h4>
+      {/* Фильтры букмекеров - выпадающий список на мобильных, кнопки на десктопе */}
+      <div className="mb-4">
+        <h4 className="text-xs font-medium text-gray-700 mb-2">Букмекеры:</h4>
+
+        {/* Мобильная версия - выпадающий список */}
+        <div className="block md:hidden">
+          <select
+            value={filters.selectedBookmaker || 'Все букмекеры'}
+            onChange={(e) => updateFilter({
+              selectedBookmaker: e.target.value === 'Все букмекеры' ? null : e.target.value
+            })}
+            className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-700"
+          >
+            {bookmakers.map((bookmaker) => (
+              <option key={bookmaker} value={bookmaker}>
+                {bookmaker}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Десктопная версия - кнопки */}
+        <div className="hidden md:flex flex-wrap gap-2">
           {bookmakers.map((bookmaker) => (
             <button
               key={bookmaker}
