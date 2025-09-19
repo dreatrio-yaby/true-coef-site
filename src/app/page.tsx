@@ -54,11 +54,29 @@ export default function HomePage() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="max-w-7xl mx-auto p-2 md:p-4">
         <FilterPanel />
 
-        {/* Layout with unified container */}
-        <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+        {/* Mobile Layout - Stacked */}
+        <div className="md:hidden space-y-4">
+          {/* Mobile Bet Types */}
+          <div className="border border-gray-200 rounded-lg bg-white p-3">
+            <BetTypeSelector />
+          </div>
+
+          {/* Mobile Bookmakers */}
+          <div className="border border-gray-200 rounded-lg bg-white p-3">
+            <BookmakerSelector availableBookmakers={availableBookmakers} />
+          </div>
+
+          {/* Mobile Table */}
+          <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+            <MatchesTable matches={Array.isArray(matches) ? matches : []} />
+          </div>
+        </div>
+
+        {/* Desktop Layout - Side by side */}
+        <div className="hidden md:block border border-gray-200 rounded-lg bg-white overflow-hidden">
           <div className="flex">
             {/* Left sidebar - Bet Types */}
             <div className="flex-shrink-0 border-r border-gray-200 bg-gray-50/50">

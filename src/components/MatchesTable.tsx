@@ -66,11 +66,11 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs text-left px-2 py-1">
+          <div className="text-xs text-left px-1 md:px-2 py-1">
             {row.original.match_basic.league}
           </div>
         ),
-        size: 100,
+        size: 80,
       }),
       columnHelper.accessor((row) => {
         const date = row.match_basic.date
@@ -87,32 +87,33 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs px-2 py-1">
+          <div className="text-xs px-1 md:px-2 py-1">
             {formatDateTime(
               row.original.match_basic.date,
               row.original.match_basic.time
             )}
           </div>
         ),
-        size: 80,
+        size: 70,
       }),
       columnHelper.accessor('match_basic.home_team.fbref_name', {
         id: 'match',
         header: 'Матч',
         cell: ({ row }) => (
-          <div className="text-xs text-left px-2 py-1">
-            <div>
-              <span className="font-medium">
+          <div className="text-xs text-left px-1 md:px-2 py-1">
+            <div className="flex flex-col md:flex-row md:items-center">
+              <span className="font-medium text-[10px] md:text-xs">
                 {row.original.match_basic.home_team.fbref_name}
               </span>
-              <span className="text-gray-500 mx-1">-</span>
-              <span className="font-medium">
+              <span className="text-gray-500 mx-1 hidden md:inline">-</span>
+              <span className="text-gray-500 text-[8px] md:hidden">vs</span>
+              <span className="font-medium text-[10px] md:text-xs">
                 {row.original.match_basic.away_team.fbref_name}
               </span>
             </div>
           </div>
         ),
-        size: 180,
+        size: 120,
       }),
     ]
 
@@ -135,7 +136,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 80,
+          size: 60,
         }),
         columnHelper.display({
           id: 'draw',
@@ -153,7 +154,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 80,
+          size: 60,
         }),
         columnHelper.display({
           id: 'away_win',
@@ -171,7 +172,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 80,
+          size: 60,
         }),
       ]
     }
@@ -212,7 +213,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               </div>
             )
           },
-          size: 75,
+          size: 55,
         })
       )
 
@@ -255,7 +256,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-xs min-w-[800px] md:min-w-0">
           <thead className="bg-gray-50 border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -263,7 +264,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                   <th
                     key={header.id}
                     style={{ minWidth: header.getSize() }}
-                    className="text-center px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0"
+                    className="text-center px-1 md:px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0"
                   >
                     {header.isPlaceholder
                       ? null
@@ -287,7 +288,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="text-center px-2 py-1 border-r border-gray-100 last:border-r-0"
+                    className="text-center px-1 md:px-2 py-1 border-r border-gray-100 last:border-r-0"
                   >
                     {flexRender(
                       cell.column.columnDef.cell,
