@@ -263,7 +263,9 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                   <th
                     key={header.id}
                     style={{ minWidth: header.getSize() }}
-                    className="text-center px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0"
+                    className={`text-center px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0 ${
+                      (header.id === 'league' || header.id === 'datetime') ? 'hidden md:table-cell' : ''
+                    }`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -287,7 +289,9 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="text-center px-2 py-1 border-r border-gray-100 last:border-r-0"
+                    className={`text-center px-2 py-1 border-r border-gray-100 last:border-r-0 ${
+                      (cell.column.id === 'league' || cell.column.id === 'datetime') ? 'hidden md:table-cell' : ''
+                    }`}
                   >
                     {flexRender(
                       cell.column.columnDef.cell,
