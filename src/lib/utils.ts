@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { BookmakerOdds, ProfitabilityLevel } from "./types"
+import { BookmakerOdds, ProfitabilityLevel, Match, FilterType } from "./types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -166,4 +166,48 @@ export function groupMatchesByLeague(matches: any[]): Record<string, any[]> {
   })
 
   return grouped
+}
+
+export function hasMatchProfitableBets(
+  match: Match,
+  betType: FilterType,
+  selectedBookmaker: string | null,
+  maxOddsThreshold: number
+): boolean {
+  if (betType === '1x2') {
+    const outcomes = ['P1', 'X', 'P2'] as const
+    return outcomes.some(outcome => {
+      const betData = match.events['1x2']?.[outcome]
+      if (!betData) return false
+
+      const mlValue = betData.ml
+      const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+      if (!mlValue || !bookmakerOdds) return false
+
+      const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+      return profitability !== 'poor'
+    })
+  }
+
+  if (betType === 'goals') {
+    const totals = Object.entries(match.events.totals || {})
+    return totals.some(([, totalData]) => {
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
+  return false
 }

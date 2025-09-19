@@ -94,6 +94,7 @@ export interface FilterState {
   selectedBookmaker: string | null
   dateFilter: string
   maxOddsThreshold: number
+  showOnlyProfitable: boolean
 }
 
 export interface MatchesStore {
