@@ -46,9 +46,15 @@ export interface MatchTotals {
   [key: string]: TotalBet // "0.5", "1.5", "2.5", "3.5"
 }
 
+export interface BothTeamsToScore {
+  yes: BetOutcome
+  no: BetOutcome
+}
+
 export interface MatchEvents {
   "1x2": Match1X2
   totals: MatchTotals
+  both_teams_to_score?: BothTeamsToScore
 }
 
 export interface Match {
@@ -79,7 +85,7 @@ export interface LegacyMatch {
   bookmaker_odds?: any
 }
 
-export type FilterType = '1x2' | 'goals' | 'corners'
+export type FilterType = '1x2' | 'both_teams_to_score' | 'goals' | 'corners'
 
 export type ProfitabilityLevel = 'excellent' | 'good' | 'fair' | 'poor'
 

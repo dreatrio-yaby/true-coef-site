@@ -8,6 +8,7 @@ export function BetTypeSelector() {
 
   const betTypeFilters: { key: FilterType; label: string }[] = [
     { key: '1x2', label: '1X2' },
+    { key: 'both_teams_to_score', label: 'Обе забьют' },
     { key: 'goals', label: 'Тоталы голов' },
     { key: 'corners', label: 'Угловые' },
   ]

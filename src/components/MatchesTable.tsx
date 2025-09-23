@@ -177,6 +177,48 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       ]
     }
 
+    if (filters.betType === 'both_teams_to_score') {
+      return [
+        ...baseColumns,
+        columnHelper.display({
+          id: 'btts_yes',
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Да
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const mlValue = match.events.both_teams_to_score?.yes?.ml
+            const bookmakerOdds = getBestBookmakerOdds(
+              match.events.both_teams_to_score?.yes?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+          },
+          size: 60,
+        }),
+        columnHelper.display({
+          id: 'btts_no',
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Нет
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const mlValue = match.events.both_teams_to_score?.no?.ml
+            const bookmakerOdds = getBestBookmakerOdds(
+              match.events.both_teams_to_score?.no?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+          },
+          size: 60,
+        }),
+      ]
+    }
+
     if (filters.betType === 'goals') {
       const totals = ['0.5', '1.5', '2.5', '3.5', '4.5', '5.5']
       const totalColumns = totals.map((total) =>

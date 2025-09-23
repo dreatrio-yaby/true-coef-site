@@ -107,6 +107,20 @@ export function getAvailableBookmakers(matches: any[]): string[] {
         })
       }
 
+      // Process both_teams_to_score odds
+      if (match.events.both_teams_to_score) {
+        ['yes', 'no'].forEach(outcome => {
+          const outcomeData = match.events.both_teams_to_score[outcome]
+          if (outcomeData?.bookmaker_odds) {
+            outcomeData.bookmaker_odds.forEach((odds: BookmakerOdds) => {
+              if (odds.bookmaker_name) {
+                bookmakers.add(odds.bookmaker_name)
+              }
+            })
+          }
+        })
+      }
+
       // Process totals odds
       if (match.events.totals) {
         Object.values(match.events.totals).forEach((total: any) => {
@@ -178,6 +192,22 @@ export function hasMatchProfitableBets(
     const outcomes = ['P1', 'X', 'P2'] as const
     return outcomes.some(outcome => {
       const betData = match.events['1x2']?.[outcome]
+      if (!betData) return false
+
+      const mlValue = betData.ml
+      const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+      if (!mlValue || !bookmakerOdds) return false
+
+      const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+      return profitability !== 'poor'
+    })
+  }
+
+  if (betType === 'both_teams_to_score') {
+    const outcomes = ['yes', 'no'] as const
+    return outcomes.some(outcome => {
+      const betData = match.events.both_teams_to_score?.[outcome]
       if (!betData) return false
 
       const mlValue = betData.ml
