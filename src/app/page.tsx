@@ -56,7 +56,7 @@ export default function HomePage() {
             href="https://t.me/football_ai_odds"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-900 hover:bg-blue-950 rounded transition-colors duration-200 shadow-sm hover:shadow-md"
           >
             <svg
               className="w-4 h-4 flex-shrink-0"
