@@ -43,19 +43,17 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
         </span>
       </div>
 
-      {bookmakerOdds && (
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] text-gray-500">
-            {showBookmakerName ? bookmakerOdds.bookmaker_name : 'БК'}
-          </span>
-          <span className={`font-mono ${getProfitabilityColor()}`}>
-            {bookmakerOdds.value != null ? formatOdds(Number(bookmakerOdds.value)) : '-'}
-            {isProfitable && profitPercent > 0 && (
-              <span className="ml-1 text-[9px]">+{profitPercent}%</span>
-            )}
-          </span>
-        </div>
-      )}
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] text-gray-500">
+          {showBookmakerName && bookmakerOdds ? bookmakerOdds.bookmaker_name : 'БК'}
+        </span>
+        <span className={`font-mono ${getProfitabilityColor()}`}>
+          {bookmakerOdds?.value != null ? formatOdds(Number(bookmakerOdds.value)) : '-'}
+          {isProfitable && profitPercent > 0 && bookmakerOdds && (
+            <span className="ml-1 text-[9px]">+{profitPercent}%</span>
+          )}
+        </span>
+      </div>
     </div>
   )
 }
