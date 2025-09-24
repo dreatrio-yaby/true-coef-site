@@ -221,8 +221,12 @@ export function hasMatchProfitableBets(
   }
 
   if (betType === 'goals') {
-    const totals = Object.entries(match.events.totals || {})
-    return totals.some(([, totalData]) => {
+    // Only check displayed totals: 1.5, 2.5, 3.5, 4.5 (excluding 0.5 and 5.5)
+    const displayedTotals = ['1.5', '2.5', '3.5', '4.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.totals?.[totalKey]
+      if (!totalData) return false
+
       const directions = ['over', 'under'] as const
       return directions.some(direction => {
         const betData = totalData[direction]
