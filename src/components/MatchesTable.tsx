@@ -220,7 +220,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
     }
 
     if (filters.betType === 'goals') {
-      const totals = ['0.5', '1.5', '2.5', '3.5', '4.5', '5.5']
+      const totals = ['1.5', '2.5', '3.5', '4.5']
       const totalColumns = totals.map((total) =>
         columnHelper.display({
           id: `total_${total}`,
