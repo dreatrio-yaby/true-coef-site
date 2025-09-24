@@ -46,10 +46,28 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 p-3">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-mono font-bold text-black">
             Football Stats AI
           </h1>
+
+          {/* Telegram Channel Link */}
+          <a
+            href="https://t.me/football_ai_odds"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+          >
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121L9.876 13.63l-2.915-.918c-.633-.196-.646-.633.132-.936l11.36-4.378c.538-.196 1.006.128.834.823z"/>
+            </svg>
+            <span className="hidden sm:inline">Telegram канал</span>
+            <span className="sm:hidden">TG</span>
+          </a>
         </div>
       </header>
 
