@@ -6,7 +6,76 @@ import { BetTypeSelector } from '@/components/BetTypeSelector'
 import { BookmakerSelector } from '@/components/BookmakerSelector'
 import { MatchesTable } from '@/components/MatchesTable'
 import { getAvailableBookmakers } from '@/lib/utils'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+
+function HowItWorksSection() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className="mb-4 border border-gray-200 rounded-lg bg-white">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50"
+      >
+        <span className="text-sm font-medium text-gray-700">Как это работает</span>
+        <svg
+          className={`w-4 h-4 text-gray-500 transform transition-transform ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="px-3 pb-3 border-t border-gray-200 bg-gray-50/30">
+          <div className="pt-3 text-xs text-gray-600 space-y-2">
+            <p>С помощью машинного обучения получены вероятности исходов футбольных событий, они обозначены в таблице как AI</p>
+            <p>ниже указан коэффициент либо выбранного букмекера, либо того у кого самый выгодный коэффициент, выбрать это можно справа от основной таблицы</p>
+            <p>выгодные ставки подсвечены зеленым, то есть те ставки у которых математическая вероятность выше, чем оценка у букмекера</p>
+
+            <div className="mt-4 pt-3 border-t border-gray-200">
+              <p className="font-medium mb-2">Примеры ставок:</p>
+
+              <div className="space-y-3">
+                <div className="bg-green-50 p-2 rounded border-l-4 border-green-400">
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 font-medium">✅</span>
+                    <div>
+                      <div className="font-medium text-green-800">Выгодная:</div>
+                      <div className="text-xs space-y-1">
+                        <div>- AI: 1.85 (54% вероятность)</div>
+                        <div>- БК: 2.10 +13%</div>
+                        <div className="text-green-700">- Логика: ML-модель считает событие более вероятным чем букмекер</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-red-50 p-2 rounded border-l-4 border-red-400">
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-600 font-medium">❌</span>
+                    <div>
+                      <div className="font-medium text-red-800">Невыгодная:</div>
+                      <div className="text-xs space-y-1">
+                        <div>- AI: 2.20 (45% вероятность)</div>
+                        <div>- БК: 1.95</div>
+                        <div className="text-red-700">- Логика: Букмекер предлагает хуже коэффициент чем ML-прогноз</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function HomePage() {
   const { data: matches = [], isLoading, error } = useMatches()
@@ -48,7 +117,7 @@ export default function HomePage() {
       <header className="border-b border-gray-200 p-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-mono font-bold text-black">
-            Football Stats AI
+            <span className="font-bold">Coefly</span><sup className="text-xs text-gray-500 ml-1">beta</sup> — сервис поиска выгодных футбольных ставок
           </h1>
 
           {/* Telegram Channel Link */}
@@ -74,6 +143,9 @@ export default function HomePage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-2 md:p-4">
         <FilterPanel />
+
+        {/* How it works collapsible section */}
+        <HowItWorksSection />
 
         {/* Mobile Layout - Stacked */}
         <div className="md:hidden space-y-4">

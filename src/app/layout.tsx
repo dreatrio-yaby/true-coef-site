@@ -7,9 +7,9 @@ import { Analytics } from "@vercel/analytics/next"
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
 export const metadata: Metadata = {
-  title: "Football Stats AI",
-  description: "Анализ футбольных матчей",
-  keywords: ["футбол", "ставки", "машинное обучение", "коэффициенты", "прогнозы"],
+  title: "Coefly — сервис поиска выгодных футбольных ставок",
+  description: "Анализ футбольных матчей с помощью машинного обучения для поиска выгодных ставок",
+  keywords: ["футбол", "ставки", "машинное обучение", "коэффициенты", "прогнозы", "coefly"],
 }
 
 export default function RootLayout({
