@@ -134,7 +134,7 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
 
       const results = await Promise.all(promises)
       const validMatches = results.filter((data): data is Match =>
-        data !== null && data.match_basic && data.events
+        data !== null && !!data.match_basic && !!data.events
       )
 
       allMatches.push(...validMatches)
