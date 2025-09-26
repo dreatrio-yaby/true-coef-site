@@ -100,7 +100,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         id: 'match',
         header: 'Матч',
         cell: ({ row }) => (
-          <div className="text-xs text-left px-1 md:px-2 py-1">
+          <div className="text-xs text-left px-0.5 md:px-2 py-1">
             <div className="flex flex-col md:flex-row md:items-center">
               <span className="font-medium text-[11px] md:text-xs">
                 {row.original.match_basic.home_team.fbref_name}
@@ -120,7 +120,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             </div>
           </div>
         ),
-        size: 120,
+        size: 100,
       }),
     ]
 
@@ -143,7 +143,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 60,
+          size: 50,
         }),
         columnHelper.display({
           id: 'draw',
@@ -161,7 +161,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 60,
+          size: 50,
         }),
         columnHelper.display({
           id: 'away_win',
@@ -179,7 +179,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 60,
+          size: 50,
         }),
       ]
     }
@@ -203,7 +203,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 60,
+          size: 50,
         }),
         columnHelper.display({
           id: 'btts_no',
@@ -221,7 +221,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             )
             return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
           },
-          size: 60,
+          size: 50,
         }),
       ]
     }
@@ -262,7 +262,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               </div>
             )
           },
-          size: 55,
+          size: 45,
         })
       )
 
@@ -308,7 +308,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-xs min-w-[400px] md:min-w-[800px]">
+        <table className="w-full text-xs min-w-[320px] md:min-w-[800px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -320,7 +320,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                     <th
                       key={header.id}
                       style={{ minWidth: header.getSize() }}
-                      className={`text-center px-1 md:px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0 ${
+                      className={`text-center px-0.5 md:px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0 ${
                         shouldHideOnMobile ? 'hidden md:table-cell' : ''
                       }`}
                     >
@@ -351,7 +351,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                   return (
                     <td
                       key={cell.id}
-                      className={`text-center px-1 md:px-2 py-1 border-r border-gray-100 last:border-r-0 ${
+                      className={`text-center px-0.5 md:px-2 py-1 border-r border-gray-100 last:border-r-0 ${
                         shouldHideOnMobile ? 'hidden md:table-cell' : ''
                       }`}
                     >
