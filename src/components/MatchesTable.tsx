@@ -111,12 +111,12 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                 {row.original.match_basic.away_team.fbref_name}
               </span>
             </div>
-            {/* Show time on mobile for all bet types */}
+            {/* Show date on mobile for all bet types */}
             <div className="text-[9px] text-gray-500 mt-0.5 md:hidden">
               {formatDateTime(
                 row.original.match_basic.date,
                 row.original.match_basic.time
-              ).split(' ')[1]}
+              ).split(' ')[0]}
             </div>
           </div>
         ),
