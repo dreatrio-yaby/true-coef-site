@@ -84,24 +84,50 @@ export async function loadSampleData(): Promise<Match[]> {
   }
 }
 
+function getDateFolders(): string[] {
+  const today = new Date()
+  const folders: string[] = []
+
+  // Generate date folders for today + 7 days forward
+  for (let i = 0; i <= 7; i++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i)
+    const dateStr = date.toISOString().split('T')[0] // YYYY-MM-DD format
+    folders.push(`${FOLDER_PATH}/${dateStr}`)
+  }
+
+  return folders
+}
+
 export async function loadMatchesFromS3(): Promise<Match[]> {
   try {
-    // Try to get file list from S3
-    const fileList = await getS3FileList(BUCKET_URL, FOLDER_PATH + '/')
+    const dateFolders = getDateFolders()
+    console.log(`🗓️ Searching for matches in date folders: ${dateFolders.map(f => f.split('/').pop()).join(', ')}`)
 
-    if (!fileList || fileList.length === 0) {
-      console.log('No S3 files found, falling back to sample data')
+    let allFiles: string[] = []
+
+    // Get files from each date folder
+    for (const folder of dateFolders) {
+      const fileList = await getS3FileList(BUCKET_URL, folder + '/')
+      if (fileList && fileList.length > 0) {
+        console.log(`📁 Found ${fileList.length} files in ${folder.split('/').pop()}`)
+        allFiles.push(...fileList)
+      }
+    }
+
+    if (allFiles.length === 0) {
+      console.log('No S3 files found in date range, falling back to sample data')
       return await loadSampleData()
     }
 
-    console.log(`Found ${fileList.length} files, loading...`)
+    console.log(`Found ${allFiles.length} total files, loading...`)
 
     // Load files in batches to avoid overwhelming the browser
     const BATCH_SIZE = 20
     const allMatches: Match[] = []
 
-    for (let i = 0; i < fileList.length; i += BATCH_SIZE) {
-      const batch = fileList.slice(i, i + BATCH_SIZE)
+    for (let i = 0; i < allFiles.length; i += BATCH_SIZE) {
+      const batch = allFiles.slice(i, i + BATCH_SIZE)
       const promises = batch.map(async (filePath) => {
         return await fetchFileWithFallback(`${BUCKET_URL}/${filePath}`)
       })
@@ -112,7 +138,7 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
       )
 
       allMatches.push(...validMatches)
-      console.log(`Loaded batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(fileList.length / BATCH_SIZE)}: ${validMatches.length} matches`)
+      console.log(`Loaded batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(allFiles.length / BATCH_SIZE)}: ${validMatches.length} matches`)
     }
 
     console.log(`Loaded ${allMatches.length} total matches from S3`)
