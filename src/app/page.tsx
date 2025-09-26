@@ -116,8 +116,8 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-gray-200 p-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-mono font-bold text-black">
-            <span className="font-bold">Coefly</span><sup className="text-xs text-gray-500 ml-1">beta</sup> — сервис поиска выгодных футбольных ставок
+          <h1 className="text-lg font-mono text-black">
+            <span className="font-bold">Coefly</span><sup className="text-xs text-gray-500 ml-1">beta</sup> <span className="font-normal">— сервис поиска выгодных футбольных ставок</span>
           </h1>
 
           {/* Telegram Channel Link */}
@@ -142,10 +142,10 @@ export default function HomePage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-2 md:p-4">
-        <FilterPanel />
-
         {/* How it works collapsible section */}
         <HowItWorksSection />
+
+        <FilterPanel />
 
         {/* Mobile Layout - Stacked */}
         <div className="md:hidden space-y-4">
