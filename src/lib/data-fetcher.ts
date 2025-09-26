@@ -3,7 +3,7 @@ import { Match } from './types'
 const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 const FOLDER_PATH = 'merged-matches'
 
-export async function fetchFileWithFallback(url: string): Promise<any> {
+export async function fetchFileWithFallback(url: string): Promise<Match | null> {
   try {
     const response = await fetch(url)
     if (response.status === 404) {
@@ -104,7 +104,7 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
     const dateFolders = getDateFolders()
     console.log(`🗓️ Searching for matches in date folders: ${dateFolders.map(f => f.split('/').pop()).join(', ')}`)
 
-    let allFiles: string[] = []
+    const allFiles: string[] = []
 
     // Get files from each date folder
     for (const folder of dateFolders) {
@@ -134,7 +134,7 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
 
       const results = await Promise.all(promises)
       const validMatches = results.filter((data): data is Match =>
-        data && data.match_basic && data.events
+        data !== null && data.match_basic && data.events
       )
 
       allMatches.push(...validMatches)
