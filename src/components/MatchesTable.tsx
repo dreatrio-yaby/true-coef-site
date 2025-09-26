@@ -99,20 +99,33 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       columnHelper.accessor('match_basic.home_team.fbref_name', {
         id: 'match',
         header: 'Матч',
-        cell: ({ row }) => (
-          <div className="text-xs text-left px-1 md:px-2 py-1">
-            <div className="flex flex-col md:flex-row md:items-center">
-              <span className="font-medium text-[10px] md:text-xs">
-                {row.original.match_basic.home_team.fbref_name}
-              </span>
-              <span className="text-gray-500 mx-1 hidden md:inline">-</span>
-              <span className="text-gray-500 text-[8px] md:hidden">vs</span>
-              <span className="font-medium text-[10px] md:text-xs">
-                {row.original.match_basic.away_team.fbref_name}
-              </span>
+        cell: ({ row }) => {
+          const isCompactMobile = (filters.betType === '1x2' || filters.betType === 'both_teams_to_score')
+
+          return (
+            <div className="text-xs text-left px-1 md:px-2 py-1">
+              <div className="flex flex-col md:flex-row md:items-center">
+                <span className="font-medium text-[11px] md:text-xs">
+                  {row.original.match_basic.home_team.fbref_name}
+                </span>
+                <span className="text-gray-500 mx-1 hidden md:inline">-</span>
+                <span className="text-gray-500 text-[9px] md:hidden">vs</span>
+                <span className="font-medium text-[11px] md:text-xs">
+                  {row.original.match_basic.away_team.fbref_name}
+                </span>
+              </div>
+              {/* Show time on mobile for compact views */}
+              {isCompactMobile && (
+                <div className="text-[9px] text-gray-500 mt-0.5 md:hidden">
+                  {formatDateTime(
+                    row.original.match_basic.date,
+                    row.original.match_basic.time
+                  ).split(' ')[1]}
+                </div>
+              )}
             </div>
-          </div>
-        ),
+          )
+        },
         size: 120,
       }),
     ]
@@ -286,6 +299,9 @@ export function MatchesTable({ matches }: MatchesTableProps) {
     )
   }
 
+  // Check if we should hide league/date columns on mobile for compact bet types
+  const isCompactMobile = (filters.betType === '1x2' || filters.betType === 'both_teams_to_score')
+
   return (
     <div className="overflow-hidden">
       <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
@@ -298,24 +314,31 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-xs min-w-[800px] md:min-w-0">
+        <table className="w-full text-xs min-w-[400px] md:min-w-[800px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    style={{ minWidth: header.getSize() }}
-                    className="text-center px-1 md:px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const isLeagueOrDate = header.id === 'league' || header.id === 'datetime'
+                  const shouldHideOnMobile = isCompactMobile && isLeagueOrDate
+
+                  return (
+                    <th
+                      key={header.id}
+                      style={{ minWidth: header.getSize() }}
+                      className={`text-center px-1 md:px-2 py-1 text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0 ${
+                        shouldHideOnMobile ? 'hidden md:table-cell' : ''
+                      }`}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </th>
+                  )
+                })}
               </tr>
             ))}
           </thead>
@@ -327,17 +350,24 @@ export function MatchesTable({ matches }: MatchesTableProps) {
                   index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
                 }`}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="text-center px-1 md:px-2 py-1 border-r border-gray-100 last:border-r-0"
-                  >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </td>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  const isLeagueOrDate = cell.column.id === 'league' || cell.column.id === 'datetime'
+                  const shouldHideOnMobile = isCompactMobile && isLeagueOrDate
+
+                  return (
+                    <td
+                      key={cell.id}
+                      className={`text-center px-1 md:px-2 py-1 border-r border-gray-100 last:border-r-0 ${
+                        shouldHideOnMobile ? 'hidden md:table-cell' : ''
+                      }`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  )
+                })}
               </tr>
             ))}
           </tbody>

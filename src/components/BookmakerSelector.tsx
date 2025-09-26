@@ -24,7 +24,7 @@ export function BookmakerSelector({ availableBookmakers }: BookmakerSelectorProp
       <h3 className="text-xs font-medium mb-2 text-gray-700">Букмекеры</h3>
       <div className="flex flex-wrap md:flex-col gap-1">
         <button
-          className={`flex-1 md:flex-none px-3 py-2 text-xs border rounded text-center md:text-left ${
+          className={`flex-shrink-0 px-3 py-2 text-xs border rounded text-center md:text-left ${
             filters.selectedBookmaker === null
               ? 'bg-black text-white border-black'
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -36,14 +36,14 @@ export function BookmakerSelector({ availableBookmakers }: BookmakerSelectorProp
         {sortedBookmakers().map((bookmaker) => (
           <button
             key={bookmaker}
-            className={`flex-1 md:flex-none px-3 py-2 text-xs border rounded text-center md:text-left min-w-0 ${
+            className={`flex-shrink-0 px-3 py-2 text-xs border rounded text-center md:text-left ${
               filters.selectedBookmaker === bookmaker
                 ? 'bg-black text-white border-black'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
             }`}
             onClick={() => updateFilter({ selectedBookmaker: bookmaker })}
           >
-            <span className="truncate">{bookmaker}</span>
+            {bookmaker}
           </button>
         ))}
       </div>
