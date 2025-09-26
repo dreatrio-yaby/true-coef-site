@@ -130,7 +130,7 @@ export default function HomePage() {
       <header className="border-b border-gray-200 p-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-mono text-black">
-            <span className="font-bold">Coefly</span><sup className="text-xs text-gray-500 ml-1">beta</sup> <span className="font-normal text-sm md:text-lg">— сервис поиска выгодных футбольных ставок</span>
+            <span className="font-bold">Coefly</span><sup className="text-xs text-gray-500 ml-1">beta</sup>
           </h1>
 
           <div className="flex items-center gap-4">
