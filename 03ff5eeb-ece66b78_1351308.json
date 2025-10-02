@@ -1,0 +1,1399 @@
+{
+  "match_id": "03ff5eeb-ece66b78_1351308",
+  "mapping_info": {
+    "confidence": "high",
+    "match_reason": "exact_teams; same_date",
+    "merged_at": "2025-10-02T14:09:38.826867"
+  },
+  "match_basic": {
+    "date": "2025-10-05",
+    "time": "20:30",
+    "league": {
+      "fbref_name": "Serie A",
+      "api_name": "Serie A",
+      "api_id": 71,
+      "country": "Brazil",
+      "logo": "https://media.api-sports.io/football/leagues/71.png",
+      "flag": "https://media.api-sports.io/flags/br.svg"
+    },
+    "venue": {
+      "id": 234,
+      "name": "Estádio Governador Magalhães Pinto",
+      "city": "Belo Horizonte"
+    },
+    "home_team": {
+      "fbref_id": "03ff5eeb",
+      "fbref_name": "Cruzeiro",
+      "api_name": "Cruzeiro",
+      "api_id": 135,
+      "logo": "https://media.api-sports.io/football/teams/135.png"
+    },
+    "away_team": {
+      "fbref_id": "ece66b78",
+      "fbref_name": "Sport Recife",
+      "api_name": "Sport Recife",
+      "api_id": 123,
+      "logo": "https://media.api-sports.io/football/teams/123.png"
+    }
+  },
+  "events": {
+    "1x2": {
+      "P1": {
+        "ml": 1.62,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.31,
+            "is_better": false
+          },
+          {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.33,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 11,
+          "bookmaker_name": "1xBet",
+          "value": 1.33
+        }
+      },
+      "X": {
+        "ml": 3.41,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 5.05,
+            "is_better": false
+          },
+          {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 5.11,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 11,
+          "bookmaker_name": "1xBet",
+          "value": 5.11
+        }
+      },
+      "P2": {
+        "ml": 6.74,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 10.75,
+            "is_better": false
+          },
+          {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 10.8,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 11,
+          "bookmaker_name": "1xBet",
+          "value": 10.8
+        }
+      }
+    },
+    "totals": {
+      "1.5": {
+        "over": {
+          "ml": 1.37,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.21,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.21,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.21
+          }
+        },
+        "under": {
+          "ml": 3.71,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 3.74,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 3.74,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 3.74
+          }
+        }
+      },
+      "1.75": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.27,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.27,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.27
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 3.32,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 3.32,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 3.32
+          }
+        }
+      },
+      "2.0": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.35,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.35,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.35
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.92,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.92,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.92
+          }
+        }
+      },
+      "2.25": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.57,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.57,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.57
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.27,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.27,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.27
+          }
+        }
+      },
+      "2.5": {
+        "over": {
+          "ml": 2.2,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.81,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.83,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.83
+          }
+        },
+        "under": {
+          "ml": 1.83,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.0,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.02,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 2.02
+          }
+        }
+      },
+      "2.75": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.97,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.97,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.97
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.76,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.76,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.76
+          }
+        }
+      },
+      "3.5": {
+        "over": {
+          "ml": 4.4,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.9,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.9,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.9
+          }
+        },
+        "under": {
+          "ml": 1.29,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.33,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.33,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.33
+          }
+        }
+      },
+      "1.0": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.0,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.0,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.0
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 9.7,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 9.7,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 9.7
+          }
+        }
+      },
+      "1.25": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.1,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.1,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.1
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 5.15,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 5.15,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 5.15
+          }
+        }
+      },
+      "3.0": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.32,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.32,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.32
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.53,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.53,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.53
+          }
+        }
+      },
+      "4.5": {
+        "over": {
+          "ml": 11.49,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 5.45,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 5.45,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 5.45
+          }
+        },
+        "under": {
+          "ml": 1.1,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.08,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.08,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.08
+          }
+        }
+      },
+      "3.25": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.6,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 2.6,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.6
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.42,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.42,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.42
+          }
+        }
+      },
+      "3.75": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 3.48,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 3.48,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 3.48
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.23,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.23,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.23
+          }
+        }
+      },
+      "4.0": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 4.7,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 4.7,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 4.7
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.12,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.12,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.12
+          }
+        }
+      },
+      "4.25": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 5.1,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 5.1,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 5.1
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.1,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.1,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.1
+          }
+        }
+      },
+      "4.75": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 7.0,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 7.0,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 7.0
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.04,
+              "is_better": false
+            },
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.04,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.04
+          }
+        }
+      },
+      "0.5": {
+        "over": {
+          "ml": 1.1,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.0,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.0
+          }
+        },
+        "under": {
+          "ml": 11.34,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 10.5,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 10.5
+          }
+        }
+      },
+      "5.0": {
+        "over": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 9.1,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 9.1
+          }
+        },
+        "under": {
+          "ml": null,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.04,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.04
+          }
+        }
+      },
+      "5.5": {
+        "over": {
+          "ml": 24.63,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 11.0,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 11.0
+          }
+        },
+        "under": {
+          "ml": 1.04,
+          "bookmaker_odds": [
+            {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.01,
+              "is_better": false
+            }
+          ],
+          "better_odds": {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.01
+          }
+        }
+      }
+    },
+    "both_teams_to_score": {
+      "yes": {
+        "ml": 2.09,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 2.23,
+            "is_better": false
+          },
+          {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 2.23,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 2,
+          "bookmaker_name": "Marathonbet",
+          "value": 2.23
+        }
+      },
+      "no": {
+        "ml": 1.92,
+        "bookmaker_odds": [
+          {
+            "bookmaker_id": 2,
+            "bookmaker_name": "Marathonbet",
+            "value": 1.58,
+            "is_better": false
+          },
+          {
+            "bookmaker_id": 11,
+            "bookmaker_name": "1xBet",
+            "value": 1.6,
+            "is_better": false
+          }
+        ],
+        "better_odds": {
+          "bookmaker_id": 11,
+          "bookmaker_name": "1xBet",
+          "value": 1.6
+        }
+      }
+    },
+    "corners": {
+      "home": {
+        "3_5": {
+          "over": {
+            "ml": 1.21,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 5.74,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "4_5": {
+          "over": {
+            "ml": 1.43,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 3.3,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "5_5": {
+          "over": {
+            "ml": 1.92,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 2.09,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "6_5": {
+          "over": {
+            "ml": 2.33,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.75,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "7_5": {
+          "over": {
+            "ml": 3.1,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.48,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        }
+      },
+      "away": {
+        "3_5": {
+          "over": {
+            "ml": 1.87,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 2.15,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "4_5": {
+          "over": {
+            "ml": 2.8,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.55,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "5_5": {
+          "over": {
+            "ml": 4.22,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.31,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "6_5": {
+          "over": {
+            "ml": 7.65,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.15,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "7_5": {
+          "over": {
+            "ml": 13.64,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.08,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        }
+      },
+      "total": {
+        "9_5": {
+          "over": {
+            "ml": 1.72,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 2.38,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "10_5": {
+          "over": {
+            "ml": 2.22,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.82,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        },
+        "11_5": {
+          "over": {
+            "ml": 2.95,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.51,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        }
+      }
+    },
+    "team_goals": {
+      "home": {
+        "0_5": {
+          "over": {
+            "ml": 1.19,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 1.06,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 1.06
+            }
+          },
+          "under": {
+            "ml": 6.14,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 7.4,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 11,
+              "bookmaker_name": "1xBet",
+              "value": 7.4
+            }
+          }
+        },
+        "1_5": {
+          "over": {
+            "ml": 1.94,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 1.49,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 1.49,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.49
+            }
+          },
+          "under": {
+            "ml": 2.06,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 2.54,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 2.54,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.54
+            }
+          }
+        },
+        "2_5": {
+          "over": {
+            "ml": 3.8,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 2.51,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 2.51,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.51
+            }
+          },
+          "under": {
+            "ml": 1.36,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 1.5,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 1.5,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.5
+            }
+          }
+        }
+      },
+      "away": {
+        "0_5": {
+          "over": {
+            "ml": 1.89,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 2.0,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 2.0,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 2.0
+            }
+          },
+          "under": {
+            "ml": 2.12,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 1.72,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 1.72,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.72
+            }
+          }
+        },
+        "1_5": {
+          "over": {
+            "ml": 5.08,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 6.95,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 6.95,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 6.95
+            }
+          },
+          "under": {
+            "ml": 1.25,
+            "bookmaker_odds": [
+              {
+                "bookmaker_id": 2,
+                "bookmaker_name": "Marathonbet",
+                "value": 1.08,
+                "is_better": false
+              },
+              {
+                "bookmaker_id": 11,
+                "bookmaker_name": "1xBet",
+                "value": 1.08,
+                "is_better": false
+              }
+            ],
+            "better_odds": {
+              "bookmaker_id": 2,
+              "bookmaker_name": "Marathonbet",
+              "value": 1.08
+            }
+          }
+        },
+        "2_5": {
+          "over": {
+            "ml": 22.62,
+            "bookmaker_odds": [],
+            "better_odds": null
+          },
+          "under": {
+            "ml": 1.05,
+            "bookmaker_odds": [],
+            "better_odds": null
+          }
+        }
+      }
+    }
+  },
+  "source_files": {
+    "fbref_key": "2025-10-05/03ff5eeb-ece66b78.json",
+    "odds_key": "1351308.json"
+  }
+}

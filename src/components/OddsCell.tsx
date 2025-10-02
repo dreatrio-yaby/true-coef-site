@@ -5,7 +5,7 @@ import { formatOdds, getProfitabilityLevel } from '@/lib/utils'
 import { useMatchesStore } from '@/stores/matches-store'
 
 interface OddsCellProps {
-  mlValue?: number
+  mlValue?: number | null
   bookmakerOdds?: BookmakerOdds | null
   className?: string
   showBookmakerName?: boolean

@@ -55,7 +55,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
   // Create columns based on filter type
   const columns = useMemo(() => {
     const baseColumns = [
-      columnHelper.accessor('match_basic.league', {
+      columnHelper.accessor((row) => row.match_basic.league.fbref_name, {
         id: 'league',
         header: ({ column }) => (
           <button
@@ -67,7 +67,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
         ),
         cell: ({ row }) => (
           <div className="text-xs text-left px-1 md:px-2 py-1">
-            {row.original.match_basic.league}
+            {row.original.match_basic.league.fbref_name}
           </div>
         ),
         size: 80,

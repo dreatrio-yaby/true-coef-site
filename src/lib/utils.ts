@@ -31,7 +31,7 @@ export function calculateUnderProbability(overProb: number): number {
 }
 
 export function getProfitabilityLevel(
-  mlCoef?: number,
+  mlCoef?: number | null,
   bookmakerCoef?: number | null,
   maxOddsThreshold?: number
 ): ProfitabilityLevel {

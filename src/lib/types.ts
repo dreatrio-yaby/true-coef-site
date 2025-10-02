@@ -1,13 +1,31 @@
 export interface TeamInfo {
   fbref_id: string
   fbref_name: string
-  odds_name: string
+  api_name: string
+  api_id: number
+  logo: string
+}
+
+export interface LeagueInfo {
+  fbref_name: string
+  api_name: string
+  api_id: number
+  country: string
+  logo: string
+  flag: string
+}
+
+export interface VenueInfo {
+  id: number
+  name: string
+  city: string
 }
 
 export interface MatchBasic {
   date: string
   time: string
-  league: string
+  league: LeagueInfo
+  venue: VenueInfo
   home_team: TeamInfo
   away_team: TeamInfo
 }
@@ -26,9 +44,9 @@ export interface BookmakerOdds {
 }
 
 export interface BetOutcome {
-  ml: number
+  ml: number | null
   bookmaker_odds: BookmakerOdds[]
-  better_odds?: BookmakerOdds
+  better_odds?: BookmakerOdds | null
 }
 
 export interface Match1X2 {
@@ -51,10 +69,23 @@ export interface BothTeamsToScore {
   no: BetOutcome
 }
 
+export interface CornerBets {
+  home: MatchTotals
+  away: MatchTotals
+  total: MatchTotals
+}
+
+export interface TeamGoalsBets {
+  home: MatchTotals
+  away: MatchTotals
+}
+
 export interface MatchEvents {
   "1x2": Match1X2
   totals: MatchTotals
   both_teams_to_score?: BothTeamsToScore
+  corners?: CornerBets
+  team_goals?: TeamGoalsBets
 }
 
 export interface Match {

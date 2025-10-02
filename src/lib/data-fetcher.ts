@@ -169,16 +169,32 @@ export function generateFallbackData(): Match[] {
       match_basic: {
         date: todayStr,
         time: "15:00",
-        league: "Premier League",
+        league: {
+          fbref_name: "Premier League",
+          api_name: "Premier League",
+          api_id: 39,
+          country: "England",
+          logo: "https://media.api-sports.io/football/leagues/39.png",
+          flag: "https://media.api-sports.io/flags/gb.svg"
+        },
+        venue: {
+          id: 1,
+          name: "Emirates Stadium",
+          city: "London"
+        },
         home_team: {
           fbref_id: "demo1",
           fbref_name: "Arsenal",
-          odds_name: "Арсенал"
+          api_name: "Arsenal",
+          api_id: 42,
+          logo: "https://media.api-sports.io/football/teams/42.png"
         },
         away_team: {
           fbref_id: "demo2",
           fbref_name: "Chelsea",
-          odds_name: "Челси"
+          api_name: "Chelsea",
+          api_id: 49,
+          logo: "https://media.api-sports.io/football/teams/49.png"
         }
       },
       events: {
@@ -382,16 +398,32 @@ export function generateFallbackData(): Match[] {
       match_basic: {
         date: tomorrowStr,
         time: "17:30",
-        league: "La Liga",
+        league: {
+          fbref_name: "La Liga",
+          api_name: "La Liga",
+          api_id: 140,
+          country: "Spain",
+          logo: "https://media.api-sports.io/football/leagues/140.png",
+          flag: "https://media.api-sports.io/flags/es.svg"
+        },
+        venue: {
+          id: 2,
+          name: "Santiago Bernabéu",
+          city: "Madrid"
+        },
         home_team: {
           fbref_id: "demo3",
           fbref_name: "Real Madrid",
-          odds_name: "Реал Мадрид"
+          api_name: "Real Madrid",
+          api_id: 541,
+          logo: "https://media.api-sports.io/football/teams/541.png"
         },
         away_team: {
           fbref_id: "demo4",
           fbref_name: "Barcelona",
-          odds_name: "Барселона"
+          api_name: "Barcelona",
+          api_id: 529,
+          logo: "https://media.api-sports.io/football/teams/529.png"
         }
       },
       events: {
