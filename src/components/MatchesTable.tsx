@@ -269,6 +269,221 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       return [...baseColumns, ...totalColumns]
     }
 
+    if (filters.betType === 'total_corners') {
+      const totals = ['9.5', '10.5', '11.5']
+      const totalColumns = totals.map((total) =>
+        columnHelper.display({
+          id: `total_corners_${total}`,
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Т{total}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const overMl = match.events.total_corners?.[total]?.over?.ml
+            const underMl = match.events.total_corners?.[total]?.under?.ml
+            const overBookmaker = getBestBookmakerOdds(
+              match.events.total_corners?.[total]?.over?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            const underBookmaker = getBestBookmakerOdds(
+              match.events.total_corners?.[total]?.under?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+
+            return (
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+              </div>
+            )
+          },
+          size: 45,
+        })
+      )
+
+      return [...baseColumns, ...totalColumns]
+    }
+
+    if (filters.betType === 'home_goals') {
+      const totals = ['0.5', '1.5', '2.5']
+      const totalColumns = totals.map((total) =>
+        columnHelper.display({
+          id: `home_goals_${total}`,
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Т{total}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const overMl = match.events.home_goals?.[total]?.over?.ml
+            const underMl = match.events.home_goals?.[total]?.under?.ml
+            const overBookmaker = getBestBookmakerOdds(
+              match.events.home_goals?.[total]?.over?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            const underBookmaker = getBestBookmakerOdds(
+              match.events.home_goals?.[total]?.under?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+
+            return (
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+              </div>
+            )
+          },
+          size: 45,
+        })
+      )
+
+      return [...baseColumns, ...totalColumns]
+    }
+
+    if (filters.betType === 'away_goals') {
+      const totals = ['0.5', '1.5', '2.5']
+      const totalColumns = totals.map((total) =>
+        columnHelper.display({
+          id: `away_goals_${total}`,
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Т{total}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const overMl = match.events.away_goals?.[total]?.over?.ml
+            const underMl = match.events.away_goals?.[total]?.under?.ml
+            const overBookmaker = getBestBookmakerOdds(
+              match.events.away_goals?.[total]?.over?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            const underBookmaker = getBestBookmakerOdds(
+              match.events.away_goals?.[total]?.under?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+
+            return (
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+              </div>
+            )
+          },
+          size: 45,
+        })
+      )
+
+      return [...baseColumns, ...totalColumns]
+    }
+
+    if (filters.betType === 'home_corners') {
+      const totals = ['4.5', '5.5', '6.5', '7.5']
+      const totalColumns = totals.map((total) =>
+        columnHelper.display({
+          id: `home_corners_${total}`,
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Т{total}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const overMl = match.events.home_corners?.[total]?.over?.ml
+            const underMl = match.events.home_corners?.[total]?.under?.ml
+            const overBookmaker = getBestBookmakerOdds(
+              match.events.home_corners?.[total]?.over?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            const underBookmaker = getBestBookmakerOdds(
+              match.events.home_corners?.[total]?.under?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+
+            return (
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+              </div>
+            )
+          },
+          size: 45,
+        })
+      )
+
+      return [...baseColumns, ...totalColumns]
+    }
+
+    if (filters.betType === 'away_corners') {
+      const totals = ['3.5', '4.5', '5.5', '6.5']
+      const totalColumns = totals.map((total) =>
+        columnHelper.display({
+          id: `away_corners_${total}`,
+          header: () => (
+            <div className="text-center text-xs font-semibold">
+              Т{total}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const match = row.original
+            const overMl = match.events.away_corners?.[total]?.over?.ml
+            const underMl = match.events.away_corners?.[total]?.under?.ml
+            const overBookmaker = getBestBookmakerOdds(
+              match.events.away_corners?.[total]?.over?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+            const underBookmaker = getBestBookmakerOdds(
+              match.events.away_corners?.[total]?.under?.bookmaker_odds || [],
+              filters.selectedBookmaker
+            )
+
+            return (
+              <div className="space-y-1 text-xs">
+                <div className="border-b border-gray-200 pb-1">
+                  <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
+                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
+                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                </div>
+              </div>
+            )
+          },
+          size: 45,
+        })
+      )
+
+      return [...baseColumns, ...totalColumns]
+    }
+
     return baseColumns
   }, [filters.betType, filters.selectedBookmaker])
 

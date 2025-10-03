@@ -84,8 +84,11 @@ export interface MatchEvents {
   "1x2": Match1X2
   totals: MatchTotals
   both_teams_to_score?: BothTeamsToScore
-  corners?: CornerBets
-  team_goals?: TeamGoalsBets
+  total_corners?: MatchTotals
+  home_corners?: MatchTotals
+  away_corners?: MatchTotals
+  home_goals?: MatchTotals
+  away_goals?: MatchTotals
 }
 
 export interface Match {
@@ -116,7 +119,7 @@ export interface LegacyMatch {
   bookmaker_odds?: any
 }
 
-export type FilterType = '1x2' | 'both_teams_to_score' | 'goals' | 'corners'
+export type FilterType = '1x2' | 'both_teams_to_score' | 'goals' | 'corners' | 'total_corners' | 'home_goals' | 'away_goals' | 'home_corners' | 'away_corners'
 
 export type ProfitabilityLevel = 'excellent' | 'good' | 'fair' | 'poor'
 

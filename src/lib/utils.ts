@@ -243,5 +243,115 @@ export function hasMatchProfitableBets(
     })
   }
 
+  if (betType === 'total_corners') {
+    const displayedTotals = ['9.5', '10.5', '11.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.total_corners?.[totalKey]
+      if (!totalData) return false
+
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
+  if (betType === 'home_goals') {
+    const displayedTotals = ['0.5', '1.5', '2.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.home_goals?.[totalKey]
+      if (!totalData) return false
+
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
+  if (betType === 'away_goals') {
+    const displayedTotals = ['0.5', '1.5', '2.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.away_goals?.[totalKey]
+      if (!totalData) return false
+
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
+  if (betType === 'home_corners') {
+    const displayedTotals = ['4.5', '5.5', '6.5', '7.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.home_corners?.[totalKey]
+      if (!totalData) return false
+
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
+  if (betType === 'away_corners') {
+    const displayedTotals = ['3.5', '4.5', '5.5', '6.5']
+    return displayedTotals.some(totalKey => {
+      const totalData = match.events.away_corners?.[totalKey]
+      if (!totalData) return false
+
+      const directions = ['over', 'under'] as const
+      return directions.some(direction => {
+        const betData = totalData[direction]
+        if (!betData) return false
+
+        const mlValue = betData.ml
+        const bookmakerOdds = getBestBookmakerOdds(betData.bookmaker_odds || [], selectedBookmaker)
+
+        if (!mlValue || !bookmakerOdds) return false
+
+        const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
+        return profitability !== 'poor'
+      })
+    })
+  }
+
   return false
 }
