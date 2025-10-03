@@ -142,6 +142,33 @@ export function getAvailableBookmakers(matches: any[]): string[] {
   return Array.from(bookmakers).sort()
 }
 
+export interface LeagueInfo {
+  name: string
+  flag: string
+  country: string
+}
+
+export function getAvailableLeagues(matches: any[]): LeagueInfo[] {
+  const leaguesMap = new Map<string, LeagueInfo>()
+
+  matches.forEach(match => {
+    if (match.match_basic?.league) {
+      const league = match.match_basic.league
+      const name = league.fbref_name || league.api_name
+
+      if (name && !leaguesMap.has(name)) {
+        leaguesMap.set(name, {
+          name,
+          flag: league.flag || '',
+          country: league.country || ''
+        })
+      }
+    }
+  })
+
+  return Array.from(leaguesMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+}
+
 export function filterMatchesByDate(matches: any[], dateFilter?: string): any[] {
   const today = new Date().toISOString().split('T')[0]
   const targetDate = dateFilter || today
@@ -180,6 +207,17 @@ export function groupMatchesByLeague(matches: any[]): Record<string, any[]> {
   })
 
   return grouped
+}
+
+export function filterMatchesByLeague(matches: any[], selectedLeague?: string | null): any[] {
+  if (!selectedLeague) {
+    return matches
+  }
+
+  return matches.filter(match => {
+    const leagueName = match.match_basic?.league?.fbref_name || match.match_basic?.league?.api_name
+    return leagueName === selectedLeague
+  })
 }
 
 export function hasMatchProfitableBets(

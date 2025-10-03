@@ -132,6 +132,7 @@ export interface OddsCellData {
 export interface FilterState {
   betType: FilterType
   selectedBookmaker: string | null
+  selectedLeague: string | null
   dateFilter: string
   maxOddsThreshold: number
   showOnlyProfitable: boolean

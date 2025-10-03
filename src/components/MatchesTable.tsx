@@ -16,6 +16,7 @@ import {
   formatDateTime,
   getBestBookmakerOdds,
   filterMatchesByDate,
+  filterMatchesByLeague,
   hasMatchProfitableBets,
 } from '@/lib/utils'
 import { OddsCell } from './OddsCell'
@@ -33,9 +34,12 @@ export function MatchesTable({ matches }: MatchesTableProps) {
     { id: 'datetime', desc: false }
   ])
 
-  // Filter matches by date and profitability
+  // Filter matches by date, league, and profitability
   const filteredMatches = useMemo(() => {
     let filtered = filterMatchesByDate(matches, filters.dateFilter)
+
+    // Apply league filter if enabled
+    filtered = filterMatchesByLeague(filtered, filters.selectedLeague)
 
     // Apply profitability filter if enabled
     if (filters.showOnlyProfitable) {
@@ -50,7 +54,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
     }
 
     return filtered
-  }, [matches, filters.dateFilter, filters.showOnlyProfitable, filters.betType, filters.selectedBookmaker, filters.maxOddsThreshold])
+  }, [matches, filters.dateFilter, filters.selectedLeague, filters.showOnlyProfitable, filters.betType, filters.selectedBookmaker, filters.maxOddsThreshold])
 
   // Create columns based on filter type
   const columns = useMemo(() => {

@@ -10,6 +10,7 @@ export const useMatchesStore = create<MatchesStore>()(
       filters: {
         betType: '1x2',
         selectedBookmaker: 'Pinnacle',
+        selectedLeague: null,
         dateFilter: new Date().toISOString().split('T')[0],
         maxOddsThreshold: 2.5,
         showOnlyProfitable: false,

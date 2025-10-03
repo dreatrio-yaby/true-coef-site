@@ -4,8 +4,9 @@ import { useMatches } from '@/hooks/useMatches'
 import { FilterPanel } from '@/components/FilterPanel'
 import { BetTypeSelector } from '@/components/BetTypeSelector'
 import { BookmakerSelector } from '@/components/BookmakerSelector'
+import { LeagueSelector } from '@/components/LeagueSelector'
 import { MatchesTable } from '@/components/MatchesTable'
-import { getAvailableBookmakers } from '@/lib/utils'
+import { getAvailableBookmakers, getAvailableLeagues } from '@/lib/utils'
 import { useMemo, useState } from 'react'
 
 function HowItWorksModal() {
@@ -93,9 +94,13 @@ function HowItWorksModal() {
 export default function HomePage() {
   const { data: matches = [], isLoading, error } = useMatches()
 
-  // Get available bookmakers from matches data
+  // Get available bookmakers and leagues from matches data
   const availableBookmakers = useMemo(() => {
     return Array.isArray(matches) ? getAvailableBookmakers(matches) : []
+  }, [matches])
+
+  const availableLeagues = useMemo(() => {
+    return Array.isArray(matches) ? getAvailableLeagues(matches) : []
   }, [matches])
 
   if (isLoading) {
@@ -174,6 +179,11 @@ export default function HomePage() {
             <BookmakerSelector availableBookmakers={availableBookmakers} />
           </div>
 
+          {/* Mobile Leagues */}
+          <div className="border border-gray-200 rounded-lg bg-white p-3">
+            <LeagueSelector availableLeagues={availableLeagues} />
+          </div>
+
           {/* Mobile Table */}
           <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
             <MatchesTable matches={Array.isArray(matches) ? matches : []} />
@@ -195,10 +205,11 @@ export default function HomePage() {
               <MatchesTable matches={Array.isArray(matches) ? matches : []} />
             </div>
 
-            {/* Right sidebar - Bookmakers */}
+            {/* Right sidebar - Bookmakers and Leagues */}
             <div className="flex-shrink-0 border-l border-gray-200 bg-gray-50/50">
-              <div className="p-3">
+              <div className="p-3 space-y-4">
                 <BookmakerSelector availableBookmakers={availableBookmakers} />
+                <LeagueSelector availableLeagues={availableLeagues} />
               </div>
             </div>
           </div>
