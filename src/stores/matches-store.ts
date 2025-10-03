@@ -9,7 +9,7 @@ export const useMatchesStore = create<MatchesStore>()(
     (set) => ({
       filters: {
         betType: '1x2',
-        selectedBookmaker: 'Фонбет',
+        selectedBookmaker: 'Pinnacle',
         dateFilter: new Date().toISOString().split('T')[0],
         maxOddsThreshold: 2.5,
         showOnlyProfitable: false,

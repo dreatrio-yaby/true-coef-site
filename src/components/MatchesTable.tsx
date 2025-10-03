@@ -66,8 +66,15 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs text-left px-1 md:px-2 py-1">
-            {row.original.match_basic.league.fbref_name}
+          <div className="text-xs text-left px-1 md:px-2 py-1 flex items-center gap-1">
+            {row.original.match_basic.league.flag && (
+              <img
+                src={row.original.match_basic.league.flag}
+                alt={row.original.match_basic.league.country}
+                className="h-3 w-auto inline-block"
+              />
+            )}
+            <span>{row.original.match_basic.league.fbref_name}</span>
           </div>
         ),
         size: 80,
@@ -83,15 +90,12 @@ export function MatchesTable({ matches }: MatchesTableProps) {
             className="hover:text-foreground font-medium"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Дата/Время
+            Дата
           </button>
         ),
         cell: ({ row }) => (
           <div className="text-xs px-1 md:px-2 py-1">
-            {formatDateTime(
-              row.original.match_basic.date,
-              row.original.match_basic.time
-            )}
+            {row.original.match_basic.date}
           </div>
         ),
         size: 70,
