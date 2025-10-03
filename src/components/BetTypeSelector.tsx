@@ -10,6 +10,11 @@ export function BetTypeSelector() {
     { key: '1x2', label: '1X2' },
     { key: 'both_teams_to_score', label: 'Обе забьют' },
     { key: 'goals', label: 'Тотал голов' },
+    { key: 'total_corners', label: 'Тотал угловых' },
+    { key: 'home_goals', label: 'Голы хозяев' },
+    { key: 'away_goals', label: 'Голы гостей' },
+    { key: 'home_corners', label: 'Угловые хозяев' },
+    { key: 'away_corners', label: 'Угловые гостей' },
   ]
 
   return (

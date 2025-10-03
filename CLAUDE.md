@@ -45,10 +45,21 @@ src/
 
 ### Key Components
 
-1. **FilterPanel**: Modern filter interface with bookmaker selection and bet type switching
-2. **MatchesTable**: Advanced table with sorting, league grouping, and responsive design
-3. **OddsCell**: Smart odds display showing ML vs bookmaker coefficients with profitability indicators
-4. **API Routes**: Server-side data fetching with fallback mechanisms
+1. **BetTypeSelector** (`src/components/BetTypeSelector.tsx`): **IMPORTANT** - This is where bet types are defined and displayed in the LEFT sidebar. When adding new bet types, modify this file, NOT FilterPanel.
+2. **FilterPanel** (`src/components/FilterPanel.tsx`): Modern filter interface with probability sliders and "show profitable only" toggles - does NOT contain bet type selection.
+3. **BookmakerSelector** (`src/components/BookmakerSelector.tsx`): Bookmaker selection in the RIGHT sidebar.
+4. **MatchesTable** (`src/components/MatchesTable.tsx`): Advanced table with sorting, league grouping, and responsive design - contains the column rendering logic for each bet type.
+5. **OddsCell**: Smart odds display showing ML vs bookmaker coefficients with profitability indicators.
+6. **API Routes**: Server-side data fetching with fallback mechanisms.
+
+### UI Layout
+
+The application uses a **three-panel desktop layout**:
+- **LEFT SIDEBAR**: Bet type selection (BetTypeSelector) - 1X2, Обе забьют, Тотал голов, Тотал угловых, Голы хозяев, Голы гостей, Угловые хозяев, Угловые гостей
+- **CENTER**: Matches table (MatchesTable)
+- **RIGHT SIDEBAR**: Bookmaker selection (BookmakerSelector)
+
+On mobile, these panels stack vertically.
 
 ### Data Structure
 
