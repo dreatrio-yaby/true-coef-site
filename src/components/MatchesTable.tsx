@@ -94,7 +94,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <div className="text-xs px-1 md:px-2 py-1">
+          <div className="text-xs px-1 md:px-2 py-1 whitespace-nowrap">
             {row.original.match_basic.date}
           </div>
         ),
