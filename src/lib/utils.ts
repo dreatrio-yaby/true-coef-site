@@ -50,8 +50,8 @@ export function getProfitabilityLevel(
   const profitRatio = bookmakerCoef / mlCoef
 
   if (profitRatio >= 1.15) return 'excellent'  // 15%+ better
-  if (profitRatio >= 1.08) return 'good'       // 8-14% better
-  if (profitRatio >= 1.02) return 'fair'       // 2-7% better
+  if (profitRatio >= 1.10) return 'good'       // 10-15% better
+  if (profitRatio > 1.0) return 'fair'         // 0-10% better
   return 'poor'                                 // Equal or worse
 }
 

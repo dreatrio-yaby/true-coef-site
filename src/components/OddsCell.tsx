@@ -26,9 +26,9 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
       case 'excellent':
         return 'text-green-700 dark:text-green-400 font-bold'
       case 'good':
-        return 'text-green-700 dark:text-green-400 font-bold'
+        return 'text-green-700 dark:text-green-400'
       case 'fair':
-        return 'text-green-700 dark:text-green-400 font-medium'
+        return 'text-gray-600 dark:text-gray-400'
       default:
         return 'text-gray-600 dark:text-gray-400'
     }
