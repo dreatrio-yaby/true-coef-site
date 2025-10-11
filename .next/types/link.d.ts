@@ -32,6 +32,7 @@ declare namespace __next_route_internal_types__ {
     | `/`
     | `/api/matches`
     | `/api/sample-data`
+    | `/api/s3-proxy`
     | `/logo-preview`
   type DynamicRoutes<T extends string = string> = never
 

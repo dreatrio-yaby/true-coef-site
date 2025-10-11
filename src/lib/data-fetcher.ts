@@ -3,8 +3,22 @@ import { Match } from './types'
 const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 const FOLDER_PATH = 'merged-matches'
 
-export async function fetchFileWithFallback(url: string): Promise<Match | null> {
+// Используем API-прокси для обхода блокировок провайдеров
+const USE_PROXY = true
+const PROXY_ENDPOINT = '/api/s3-proxy'
+
+export async function fetchFileWithFallback(filePath: string): Promise<Match | null> {
   try {
+    let url: string
+
+    if (USE_PROXY) {
+      // Через прокси - обходим блокировки провайдеров
+      url = `${PROXY_ENDPOINT}?path=${encodeURIComponent(filePath)}`
+    } else {
+      // Прямой запрос к S3 (может блокироваться)
+      url = filePath.startsWith('http') ? filePath : `${BUCKET_URL}/${filePath}`
+    }
+
     const response = await fetch(url)
     if (response.status === 404) {
       return null
@@ -14,16 +28,25 @@ export async function fetchFileWithFallback(url: string): Promise<Match | null> 
     }
     return await response.json()
   } catch (error) {
-    console.error(`Error fetching ${url}:`, error)
+    console.error(`Error fetching ${filePath}:`, error)
     return null
   }
 }
 
 export async function getS3FileList(bucketUrl: string, prefix: string): Promise<string[] | null> {
-  const listUrl = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`
-
   try {
-    console.log(`🗂️ Trying S3 ListObjects: ${listUrl}`)
+    let listUrl: string
+    let xmlText: string
+
+    if (USE_PROXY) {
+      // Через прокси - обходим блокировки провайдеров
+      listUrl = `${PROXY_ENDPOINT}?action=list&path=${encodeURIComponent(prefix)}`
+      console.log(`🗂️ Using proxy for S3 ListObjects: ${prefix}`)
+    } else {
+      // Прямой запрос к S3 (может блокироваться)
+      listUrl = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`
+      console.log(`🗂️ Direct S3 ListObjects: ${listUrl}`)
+    }
 
     const response = await fetch(listUrl, {
       method: 'GET',
@@ -36,7 +59,9 @@ export async function getS3FileList(bucketUrl: string, prefix: string): Promise<
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
 
-    const xmlText = await response.text()
+    xmlText = await response.text()
+
+    // Parse XML response
     const parser = new DOMParser()
     const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
 
@@ -129,7 +154,8 @@ export async function loadMatchesFromS3(): Promise<Match[]> {
     for (let i = 0; i < allFiles.length; i += BATCH_SIZE) {
       const batch = allFiles.slice(i, i + BATCH_SIZE)
       const promises = batch.map(async (filePath) => {
-        return await fetchFileWithFallback(`${BUCKET_URL}/${filePath}`)
+        // fetchFileWithFallback теперь автоматически использует прокси, если USE_PROXY = true
+        return await fetchFileWithFallback(filePath)
       })
 
       const results = await Promise.all(promises)

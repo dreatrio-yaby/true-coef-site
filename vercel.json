@@ -7,6 +7,9 @@
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/s3-proxy/route.ts": {
+      "maxDuration": 60
     }
   },
   "headers": [
@@ -24,6 +27,15 @@
         {
           "key": "Access-Control-Allow-Headers",
           "value": "Content-Type, Authorization"
+        }
+      ]
+    },
+    {
+      "source": "/api/s3-proxy",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=300, stale-while-revalidate=600"
         }
       ]
     }
