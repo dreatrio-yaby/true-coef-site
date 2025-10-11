@@ -29,6 +29,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Coefly" }],
   creator: "Coefly",
   publisher: "Coefly",
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.svg', type: 'image/svg+xml' },
+    ],
+  },
   robots: {
     index: true,
     follow: true,
