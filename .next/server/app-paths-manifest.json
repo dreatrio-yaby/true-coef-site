@@ -1,6 +1,7 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/sample-data/route": "app/api/sample-data/route.js",
+  "/api/matches/route": "app/api/matches/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
   "/page": "app/page.js",
-  "/api/matches/route": "app/api/matches/route.js"
+  "/api/sample-data/route": "app/api/sample-data/route.js"
 }

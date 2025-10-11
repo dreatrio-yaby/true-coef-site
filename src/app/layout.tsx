@@ -3,13 +3,73 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "./providers"
 import { Analytics } from "@vercel/analytics/next"
+import { StructuredData } from "@/components/StructuredData"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
 export const metadata: Metadata = {
-  title: "Coefly — сервис поиска выгодных футбольных ставок",
-  description: "Анализ футбольных матчей с помощью машинного обучения для поиска выгодных ставок",
-  keywords: ["футбол", "ставки", "машинное обучение", "коэффициенты", "прогнозы", "coefly"],
+  metadataBase: new URL('https://coefly.ru'),
+  title: {
+    default: "Coefly — AI прогнозы и анализ футбольных матчей | Поиск выгодных ставок",
+    template: "%s | Coefly"
+  },
+  description: "Бесплатный сервис анализа футбольных матчей с помощью машинного обучения. Сравнивайте AI-прогнозы с коэффициентами букмекеров и находите выгодные ставки на футбол онлайн.",
+  keywords: [
+    "футбольные прогнозы",
+    "AI ставки на футбол",
+    "машинное обучение",
+    "анализ коэффициентов",
+    "выгодные ставки",
+    "прогнозы на футбол",
+    "букмекерские коэффициенты",
+    "value betting",
+    "сравнение букмекеров",
+    "coefly"
+  ],
+  authors: [{ name: "Coefly" }],
+  creator: "Coefly",
+  publisher: "Coefly",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ru_RU',
+    url: 'https://coefly.ru',
+    siteName: 'Coefly',
+    title: 'Coefly — AI прогнозы и анализ футбольных матчей',
+    description: 'Бесплатный сервис анализа футбольных матчей с помощью машинного обучения. Сравнивайте AI-прогнозы с коэффициентами букмекеров.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coefly - AI анализ футбольных матчей',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Coefly — AI прогнозы на футбол',
+    description: 'Бесплатный сервис анализа футбольных матчей с помощью машинного обучения',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://coefly.ru',
+  },
+  verification: {
+    // Добавьте коды верификации для Google Search Console и Yandex Webmaster
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
+  },
 }
 
 export default function RootLayout({
@@ -19,6 +79,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
+      <head>
+        <StructuredData />
+      </head>
       <body className={inter.className}>
         <QueryProvider>
           {children}

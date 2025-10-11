@@ -1,0 +1,30 @@
+# Coefly - AI Football Betting Analysis
+# https://coefly.ru/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://coefly.ru/sitemap.xml
+
+# Crawl-delay for bots (optional)
+Crawl-delay: 1
+
+# Yandex-specific rules
+User-agent: Yandex
+Allow: /
+Disallow: /api/
+Clean-param: utm_source&utm_medium&utm_campaign
+
+# Google-specific rules
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+
+# Block bad bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
