@@ -36,7 +36,6 @@ export async function fetchFileWithFallback(filePath: string): Promise<Match | n
 export async function getS3FileList(bucketUrl: string, prefix: string): Promise<string[] | null> {
   try {
     let listUrl: string
-    let xmlText: string
 
     if (USE_PROXY) {
       // Через прокси - обходим блокировки провайдеров
@@ -59,7 +58,7 @@ export async function getS3FileList(bucketUrl: string, prefix: string): Promise<
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
 
-    xmlText = await response.text()
+    const xmlText = await response.text()
 
     // Parse XML response
     const parser = new DOMParser()
