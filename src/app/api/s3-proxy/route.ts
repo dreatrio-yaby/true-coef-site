@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 
-// Cache configuration for Edge Runtime
-export const runtime = 'edge'
+// Cache configuration
 export const revalidate = 300 // 5 minutes cache
 
 /**

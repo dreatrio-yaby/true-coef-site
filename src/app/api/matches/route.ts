@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { loadMatchesFromS3 } from '@/lib/data-fetcher'
 
-// Configure Edge Runtime for Cloudflare Pages
-export const runtime = 'edge'
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)

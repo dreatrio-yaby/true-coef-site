@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
 import { generateFallbackData } from '@/lib/data-fetcher'
 
-// Configure Edge Runtime for Cloudflare Pages
-export const runtime = 'edge'
-
 export async function GET() {
   try {
     const sampleData = generateFallbackData()
