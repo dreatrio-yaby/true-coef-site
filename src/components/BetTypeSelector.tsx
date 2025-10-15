@@ -20,11 +20,11 @@ export function BetTypeSelector() {
   return (
     <div className="w-full md:w-36">
       <h3 className="text-xs font-medium mb-2 text-gray-700">Типы ставок</h3>
-      <div className="flex flex-row md:flex-col gap-1 md:gap-1">
+      <div className="flex flex-wrap md:flex-col gap-1">
         {betTypeFilters.map((filter) => (
           <button
             key={filter.key}
-            className={`flex-1 md:flex-none px-3 py-2 text-xs border rounded text-center md:text-left ${
+            className={`flex-shrink-0 px-3 py-2 text-xs border rounded text-center md:text-left ${
               filters.betType === filter.key
                 ? 'bg-black text-white border-black'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
