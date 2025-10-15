@@ -1,4 +1,0 @@
-# Cloudflare Pages redirects configuration
-
-# Rewrite sample data to API endpoint
-/sample_match.json /api/sample-data 200

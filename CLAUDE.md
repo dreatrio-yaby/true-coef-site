@@ -23,24 +23,34 @@ The project is built with modern web technologies:
 ```
 src/
 ├── app/                     # Next.js App Router
-│   ├── api/                 # API routes for data fetching
+│   ├── api/                 # API routes
+│   │   ├── matches/         # Main data fetching endpoint
+│   │   └── s3-proxy/        # S3 proxy for bypassing restrictions
 │   ├── globals.css          # Global styles with Tailwind
-│   ├── layout.tsx           # Root layout with providers
-│   ├── page.tsx             # Main home page
-│   └── providers.tsx        # React Query provider setup
+│   ├── layout.tsx           # Root layout with providers and analytics
+│   ├── page.tsx             # Main home page with 3-panel layout
+│   ├── providers.tsx        # React Query provider setup
+│   └── sitemap.ts           # Dynamic sitemap generation
 ├── components/              # React components
 │   ├── ui/                  # shadcn/ui base components (Button, Card, Badge)
-│   ├── FilterPanel.tsx      # Betting filters and controls
+│   ├── BetTypeSelector.tsx  # Left sidebar bet type selection
+│   ├── BookmakerSelector.tsx # Right sidebar bookmaker selection
+│   ├── FilterPanel.tsx      # Probability filters and profit toggle
+│   ├── GoogleAnalytics.tsx  # GA4 integration component
+│   ├── LeagueSelector.tsx   # League filter dropdown
+│   ├── Logo.tsx             # CF logo component with variants
 │   ├── MatchesTable.tsx     # Main data table with TanStack Table
-│   └── OddsCell.tsx         # Individual odds display component
+│   ├── OddsCell.tsx         # Smart odds display with profitability
+│   └── StructuredData.tsx   # SEO structured data (JSON-LD)
 ├── hooks/                   # Custom React hooks
 │   └── useMatches.ts        # Data fetching hook with React Query
 ├── lib/                     # Utilities and configuration
+│   ├── analytics.ts         # Google Analytics helper functions
 │   ├── data-fetcher.ts      # S3 and API data loading logic
 │   ├── types.ts             # TypeScript type definitions
-│   └── utils.ts             # Helper functions and utilities
+│   └── utils.ts             # Helper functions and cn() utility
 └── stores/                  # State management
-    └── matches-store.ts     # Zustand store for app state
+    └── matches-store.ts     # Zustand store with persistence
 ```
 
 ### Key Components
@@ -49,8 +59,11 @@ src/
 2. **FilterPanel** (`src/components/FilterPanel.tsx`): Modern filter interface with probability sliders and "show profitable only" toggles - does NOT contain bet type selection.
 3. **BookmakerSelector** (`src/components/BookmakerSelector.tsx`): Bookmaker selection in the RIGHT sidebar.
 4. **MatchesTable** (`src/components/MatchesTable.tsx`): Advanced table with sorting, league grouping, and responsive design - contains the column rendering logic for each bet type.
-5. **OddsCell**: Smart odds display showing ML vs bookmaker coefficients with profitability indicators.
-6. **API Routes**: Server-side data fetching with fallback mechanisms.
+5. **OddsCell** (`src/components/OddsCell.tsx`): Smart odds display showing ML vs bookmaker coefficients with profitability indicators.
+6. **LeagueSelector** (`src/components/LeagueSelector.tsx`): Dropdown for filtering matches by league.
+7. **Logo** (`src/components/Logo.tsx`): Brand logo with multiple style variants.
+8. **GoogleAnalytics** (`src/components/GoogleAnalytics.tsx`): GA4 tracking integration.
+9. **StructuredData** (`src/components/StructuredData.tsx`): JSON-LD structured data for SEO.
 
 ### UI Layout
 
@@ -126,7 +139,9 @@ interface BetOutcome {
 - **Advanced Filtering**: Filter by bookmakers, bet types, and profitability levels
 - **Responsive Design**: Mobile-first approach with adaptive table layouts
 - **Data Caching**: Intelligent caching with React Query for optimal performance
-- **Fallback System**: Graceful degradation from S3 → API → demo data
+- **Fallback System**: Graceful degradation with S3 proxy for bypassing restrictions
+- **SEO Optimization**: Full metadata, sitemap, robots.txt, and structured data
+- **Analytics**: Google Analytics 4 integration for tracking user behavior
 
 ### Profitability Analysis
 
@@ -142,7 +157,7 @@ The app uses sophisticated logic to determine profitability by comparing ML coef
 ### API Endpoints
 
 - `/api/matches` - Load matches with pagination support
-- `/api/sample-data` - Fallback demo data endpoint
+- `/api/s3-proxy` - Proxy for S3 data to bypass mobile operator restrictions
 
 ### Commands
 
