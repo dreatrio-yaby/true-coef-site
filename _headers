@@ -1,0 +1,19 @@
+# Cloudflare Pages headers configuration
+# This file configures HTTP headers for your site
+
+# API routes headers
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+
+# S3 proxy caching
+/api/s3-proxy
+  Cache-Control: public, s-maxage=300, stale-while-revalidate=600
+
+# Security headers for all pages
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
