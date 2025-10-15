@@ -4,7 +4,7 @@ export function StructuredData() {
     "@type": "WebSite",
     "name": "Coefly",
     "url": "https://coefly.ru",
-    "description": "Бесплатный сервис анализа футбольных матчей с помощью машинного обучения",
+    "description": "Сервис анализа футбольных матчей с помощью машинного обучения",
     "inLanguage": "ru-RU",
     "potentialAction": {
       "@type": "SearchAction",
