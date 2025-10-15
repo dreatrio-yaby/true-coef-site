@@ -3,8 +3,8 @@ import { Match } from './types'
 const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 const FOLDER_PATH = 'merged-matches'
 
-// Используем API-прокси для обхода блокировок провайдеров
-const USE_PROXY = true
+// Прямое подключение к Yandex Cloud Storage (не блокируется в России)
+const USE_PROXY = false
 const PROXY_ENDPOINT = '/api/s3-proxy'
 
 export async function fetchFileWithFallback(filePath: string): Promise<Match | null> {
