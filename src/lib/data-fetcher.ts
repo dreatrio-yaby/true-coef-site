@@ -4,7 +4,7 @@ const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 const FOLDER_PATH = 'merged-matches'
 
 // Использовать прокси для обхода блокировок мобильных операторов
-const USE_PROXY = true
+const USE_PROXY = false // Отключаем прокси - используем прямой доступ к S3
 const PROXY_ENDPOINT = '/api/s3-proxy'
 
 export async function fetchFileWithFallback(filePath: string): Promise<Match | null> {
