@@ -29,9 +29,10 @@ npm install --save-dev @cloudflare/next-on-pages wrangler
 
 ### 3. Обновленные скрипты в package.json
 
-- `npm run pages:build` - сборка для Cloudflare Pages
-- `npm run pages:deploy` - деплой через CLI (опционально)
+- `npm run pages:build` - сборка для Cloudflare Pages (для локального тестирования)
 - `npm run pages:dev` - локальная разработка с Cloudflare окружением
+
+**Примечание**: Деплой происходит автоматически через Cloudflare Dashboard, ручной деплой через CLI не требуется.
 
 ## Деплой через Cloudflare Dashboard (рекомендуется)
 
@@ -54,9 +55,15 @@ npm install --save-dev @cloudflare/next-on-pages wrangler
 **Production branch**: `main`
 
 **Build settings**:
-- **Framework preset**: `Next.js`
+- **Framework preset**: `Next.js (Static HTML Export)` или оставьте `None`
 - **Build command**: `npx @cloudflare/next-on-pages`
 - **Build output directory**: `.vercel/output/static`
+- **Root directory**: `/` (оставьте пустым или укажите корень)
+
+⚠️ **ВАЖНО**:
+- НЕ указывайте "Deploy command" - Cloudflare Pages деплоит автоматически!
+- НЕ выбирайте обычный "Next.js" preset - он не подходит для Cloudflare
+- Используйте команду сборки `npx @cloudflare/next-on-pages` вместо `next build`
 
 **Environment variables** (если есть):
 - Добавьте все переменные окружения из Vercel
@@ -227,21 +234,22 @@ npm run dev
 npm run pages:dev
 ```
 
-## Деплой через CLI (альтернативный способ)
+## Деплой через CLI (НЕ рекомендуется для Cloudflare Pages)
 
-Если хотите деплоить вручную:
+**Важно**: Cloudflare Pages работает через автоматический Git-деплой. Ручной деплой через CLI не требуется и может вызывать ошибки.
 
-### Шаг 1: Авторизация
+Если всё же нужен ручной деплой через Wrangler CLI:
 
 ```bash
+# Сборка проекта
+npm run pages:build
+
+# Ручной деплой (требуется авторизация)
 npx wrangler login
+npx wrangler pages deploy .vercel/output/static --project-name=football-stats-ai
 ```
 
-### Шаг 2: Сборка и деплой
-
-```bash
-npm run pages:deploy
-```
+**Рекомендация**: Используйте автоматический деплой через Git вместо ручного CLI деплоя.
 
 ## Мониторинг и логи
 
