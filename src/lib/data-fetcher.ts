@@ -60,28 +60,22 @@ export async function getS3FileList(bucketUrl: string, prefix: string): Promise<
 
     const xmlText = await response.text()
 
-    // Parse XML response
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
-
+    // Parse XML using regex (works on both client and server)
     // Check for errors
-    const error = xmlDoc.getElementsByTagName('Error')[0]
-    if (error) {
-      const code = error.getElementsByTagName('Code')[0]?.textContent
+    if (xmlText.includes('<Error>')) {
+      const codeMatch = xmlText.match(/<Code>(.*?)<\/Code>/)
+      const code = codeMatch ? codeMatch[1] : 'Unknown'
       throw new Error(`S3 Error: ${code}`)
     }
 
-    // Extract files
-    const contents = xmlDoc.getElementsByTagName('Contents')
+    // Extract files using regex
+    const keyMatches = xmlText.matchAll(/<Key>(.*?)<\/Key>/g)
     const files: string[] = []
 
-    for (let i = 0; i < contents.length; i++) {
-      const keyElement = contents[i].getElementsByTagName('Key')[0]
-      if (keyElement) {
-        const key = keyElement.textContent
-        if (key && key.endsWith('.json')) {
-          files.push(key)
-        }
+    for (const match of keyMatches) {
+      const key = match[1]
+      if (key && key.endsWith('.json')) {
+        files.push(key)
       }
     }
 
@@ -95,17 +89,8 @@ export async function getS3FileList(bucketUrl: string, prefix: string): Promise<
 }
 
 export async function loadSampleData(): Promise<Match[]> {
-  try {
-    const response = await fetch('/api/sample-data')
-    if (response.ok) {
-      const data = await response.json()
-      return Array.isArray(data) ? data : [data]
-    }
-    throw new Error('Sample data not available')
-  } catch (error) {
-    console.error('Error loading sample data:', error)
-    return generateFallbackData()
-  }
+  console.log('📦 Using fallback sample data')
+  return generateFallbackData()
 }
 
 function getDateFolders(): string[] {
