@@ -68,11 +68,12 @@ export async function getS3FileList(bucketUrl: string, prefix: string): Promise<
       throw new Error(`S3 Error: ${code}`)
     }
 
-    // Extract files using regex
-    const keyMatches = xmlText.matchAll(/<Key>(.*?)<\/Key>/g)
+    // Extract files using regex (compatible with older TypeScript)
+    const keyRegex = /<Key>(.*?)<\/Key>/g
     const files: string[] = []
+    let match
 
-    for (const match of keyMatches) {
+    while ((match = keyRegex.exec(xmlText)) !== null) {
       const key = match[1]
       if (key && key.endsWith('.json')) {
         files.push(key)
