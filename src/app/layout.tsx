@@ -4,6 +4,7 @@ import "./globals.css"
 import { QueryProvider } from "./providers"
 import { StructuredData } from "@/components/StructuredData"
 import { GoogleAnalytics } from "@/components/GoogleAnalytics"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -96,6 +97,7 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   )
