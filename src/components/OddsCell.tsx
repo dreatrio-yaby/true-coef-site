@@ -15,6 +15,7 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
   const { filters } = useMatchesStore()
   const profitability = getProfitabilityLevel(mlValue, bookmakerOdds?.value, filters.maxOddsThreshold)
   const isProfitable = profitability !== 'poor'
+  const isHighlyProfitable = profitability === 'good' || profitability === 'excellent'
 
   // Calculate profit percentage
   const profitPercent = mlValue && bookmakerOdds?.value != null
@@ -32,6 +33,17 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
       default:
         return 'text-gray-600 dark:text-gray-400'
     }
+  }
+
+  // If "show only profitable" is enabled and this bet is not profitable enough (< 10%), show empty cell
+  if (filters.showOnlyProfitable && !isHighlyProfitable) {
+    return (
+      <div className={`text-xs space-y-0.5 ${className}`}>
+        <div className="flex items-center justify-center text-gray-400">
+          -
+        </div>
+      </div>
+    )
   }
 
   return (
