@@ -238,7 +238,7 @@ export function hasMatchProfitableBets(
       if (!mlValue || !bookmakerOdds) return false
 
       const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-      return profitability === 'good' || profitability === 'excellent'
+      return profitability !== 'poor'
     })
   }
 
@@ -254,7 +254,7 @@ export function hasMatchProfitableBets(
       if (!mlValue || !bookmakerOdds) return false
 
       const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-      return profitability === 'good' || profitability === 'excellent'
+      return profitability !== 'poor'
     })
   }
 
