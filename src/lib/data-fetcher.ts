@@ -1,4 +1,4 @@
-import { Match } from './types'
+import { Match, AllMatchesResponse } from './types'
 
 const BUCKET_URL = 'https://storage.yandexcloud.net/screen-shared'
 const FOLDER_PATH = 'merged-matches'
@@ -7,8 +7,9 @@ const FOLDER_PATH = 'merged-matches'
 const USE_PROXY = false // Отключаем прокси - используем прямой доступ к S3
 const PROXY_ENDPOINT = '/api/s3-proxy'
 
-export async function fetchFileWithFallback(filePath: string): Promise<Match | null> {
+export async function fetchAllMatchesFile(date: string): Promise<AllMatchesResponse | null> {
   try {
+    const filePath = `${FOLDER_PATH}/${date}/all_matches.json`
     let url: string
 
     if (USE_PROXY) {
@@ -16,148 +17,77 @@ export async function fetchFileWithFallback(filePath: string): Promise<Match | n
       url = `${PROXY_ENDPOINT}?path=${encodeURIComponent(filePath)}`
     } else {
       // Прямой запрос к S3 (может блокироваться)
-      url = filePath.startsWith('http') ? filePath : `${BUCKET_URL}/${filePath}`
+      url = `${BUCKET_URL}/${filePath}`
     }
+
+    console.log(`📥 Fetching all_matches.json for ${date} from ${url}`)
 
     const response = await fetch(url)
     if (response.status === 404) {
+      console.log(`⚠️ No matches found for ${date}`)
       return null
     }
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    return await response.json()
+
+    const data: AllMatchesResponse = await response.json()
+    console.log(`✅ Loaded ${data.matches_count} matches for ${date}`)
+    return data
   } catch (error) {
-    console.error(`Error fetching ${filePath}:`, error)
+    console.error(`❌ Error fetching all_matches.json for ${date}:`, error)
     return null
   }
 }
 
-export async function getS3FileList(bucketUrl: string, prefix: string): Promise<string[] | null> {
-  try {
-    let listUrl: string
-
-    if (USE_PROXY) {
-      // Через прокси - обходим блокировки провайдеров
-      listUrl = `${PROXY_ENDPOINT}?action=list&path=${encodeURIComponent(prefix)}`
-      console.log(`🗂️ Using proxy for S3 ListObjects: ${prefix}`)
-    } else {
-      // Прямой запрос к S3 (может блокироваться)
-      listUrl = `${bucketUrl}/?list-type=2&prefix=${encodeURIComponent(prefix)}`
-      console.log(`🗂️ Direct S3 ListObjects: ${listUrl}`)
-    }
-
-    const response = await fetch(listUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/xml'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const xmlText = await response.text()
-
-    // Parse XML using regex (works on both client and server)
-    // Check for errors
-    if (xmlText.includes('<Error>')) {
-      const codeMatch = xmlText.match(/<Code>(.*?)<\/Code>/)
-      const code = codeMatch ? codeMatch[1] : 'Unknown'
-      throw new Error(`S3 Error: ${code}`)
-    }
-
-    // Extract files using regex (compatible with older TypeScript)
-    const keyRegex = /<Key>(.*?)<\/Key>/g
-    const files: string[] = []
-    let match
-
-    while ((match = keyRegex.exec(xmlText)) !== null) {
-      const key = match[1]
-      if (key && key.endsWith('.json')) {
-        files.push(key)
-      }
-    }
-
-    console.log(`✅ S3 API returned ${files.length} files`)
-    return files
-
-  } catch (error) {
-    console.log(`❌ S3 API failed: ${error}`)
-    return null
-  }
-}
 
 export async function loadSampleData(): Promise<Match[]> {
   console.log('📦 Using fallback sample data')
   return generateFallbackData()
 }
 
-function getDateFolders(): string[] {
+function getDateList(): string[] {
   const today = new Date()
-  const folders: string[] = []
+  const dates: string[] = []
 
-  // Generate date folders for today + 7 days forward
+  // Generate date list for today + 7 days forward
   for (let i = 0; i <= 7; i++) {
     const date = new Date(today)
     date.setDate(today.getDate() + i)
     const dateStr = date.toISOString().split('T')[0] // YYYY-MM-DD format
-    folders.push(`${FOLDER_PATH}/${dateStr}`)
+    dates.push(dateStr)
   }
 
-  return folders
+  return dates
 }
 
 export async function loadMatchesFromS3(): Promise<Match[]> {
   try {
-    const dateFolders = getDateFolders()
-    console.log(`🗓️ Searching for matches in date folders: ${dateFolders.map(f => f.split('/').pop()).join(', ')}`)
+    const dates = getDateList()
+    console.log(`🗓️ Loading matches for dates: ${dates.join(', ')}`)
 
-    const allFiles: string[] = []
+    const allMatches: Match[] = []
 
-    // Get files from each date folder
-    for (const folder of dateFolders) {
-      const fileList = await getS3FileList(BUCKET_URL, folder + '/')
-      if (fileList && fileList.length > 0) {
-        console.log(`📁 Found ${fileList.length} files in ${folder.split('/').pop()}`)
-        allFiles.push(...fileList)
+    // Load all_matches.json for each date
+    for (const date of dates) {
+      const matchesData = await fetchAllMatchesFile(date)
+      if (matchesData && matchesData.matches && matchesData.matches.length > 0) {
+        console.log(`📊 Loaded ${matchesData.matches_count} matches for ${date}`)
+        allMatches.push(...matchesData.matches)
       }
     }
 
-    if (allFiles.length === 0) {
-      console.log('No S3 files found in date range, falling back to sample data')
+    if (allMatches.length === 0) {
+      console.log('⚠️ No matches found in S3, falling back to sample data')
       return await loadSampleData()
     }
 
-    console.log(`Found ${allFiles.length} total files, loading...`)
-
-    // Load files in batches to avoid overwhelming the browser
-    const BATCH_SIZE = 20
-    const allMatches: Match[] = []
-
-    for (let i = 0; i < allFiles.length; i += BATCH_SIZE) {
-      const batch = allFiles.slice(i, i + BATCH_SIZE)
-      const promises = batch.map(async (filePath) => {
-        // fetchFileWithFallback теперь автоматически использует прокси, если USE_PROXY = true
-        return await fetchFileWithFallback(filePath)
-      })
-
-      const results = await Promise.all(promises)
-      const validMatches = results.filter((data): data is Match =>
-        data !== null && !!data.match_basic && !!data.events
-      )
-
-      allMatches.push(...validMatches)
-      console.log(`Loaded batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(allFiles.length / BATCH_SIZE)}: ${validMatches.length} matches`)
-    }
-
-    console.log(`Loaded ${allMatches.length} total matches from S3`)
+    console.log(`✅ Total: ${allMatches.length} matches loaded from S3`)
     return allMatches
 
   } catch (error) {
-    console.error('Error loading from S3:', error)
-    console.log('Fallback to sample data')
+    console.error('❌ Error loading from S3:', error)
+    console.log('📦 Fallback to sample data')
     return await loadSampleData()
   }
 }

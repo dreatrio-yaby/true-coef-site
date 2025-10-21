@@ -142,3 +142,10 @@ export interface MatchesStore {
   filters: FilterState
   updateFilter: (filter: Partial<FilterState>) => void
 }
+
+export interface AllMatchesResponse {
+  date: string
+  matches_count: number
+  generated_at: string
+  matches: Match[]
+}
