@@ -16,7 +16,7 @@ export function FilterPanel() {
           <span className="text-sm font-bold">{probabilityFromOdds(filters.maxOddsThreshold || 2.5)}%</span>
           <span className="text-gray-500"> (&lt;{(filters.maxOddsThreshold || 2.5).toFixed(1)})</span>
         </h3>
-        <div className="w-full max-w-xs md:w-48">
+        <div className="w-full">
           <input
             type="range"
             min="1.5"
@@ -24,29 +24,7 @@ export function FilterPanel() {
             step="0.5"
             value={filters.maxOddsThreshold ?? 2.5}
             onChange={(e) => updateFilter({ maxOddsThreshold: parseFloat(e.target.value) })}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-custom"
           />
-          <style jsx>{`
-            .slider-custom::-webkit-slider-thumb {
-              appearance: none;
-              width: 16px;
-              height: 16px;
-              border-radius: 50%;
-              background: #374151;
-              cursor: pointer;
-              border: 2px solid #fff;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-            .slider-custom::-moz-range-thumb {
-              width: 16px;
-              height: 16px;
-              border-radius: 50%;
-              background: #374151;
-              cursor: pointer;
-              border: 2px solid #fff;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-          `}</style>
         </div>
       </div>
 
@@ -56,7 +34,7 @@ export function FilterPanel() {
           <span className="block md:inline">Минимальный размер профита </span>
           <span className="text-sm font-bold">+{filters.minProfitPercent ?? 10}%</span>
         </h3>
-        <div className="w-full max-w-xs md:w-48">
+        <div className="w-full">
           <input
             type="range"
             min="0"
@@ -64,7 +42,6 @@ export function FilterPanel() {
             step="5"
             value={filters.minProfitPercent ?? 10}
             onChange={(e) => updateFilter({ minProfitPercent: parseFloat(e.target.value) })}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-custom"
           />
         </div>
       </div>
