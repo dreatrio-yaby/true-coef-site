@@ -150,11 +150,28 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error fetching bets:', error)
+
+    // Provide more specific error message for DNS/connection issues
+    let errorMessage = 'Internal server error'
+    let errorDetails = error instanceof Error ? error.message : 'Unknown error'
+
+    if (errorDetails.includes('DNS') || errorDetails.includes('UNAVAILABLE')) {
+      errorMessage = 'Database connection error'
+      errorDetails = 'Unable to connect to database. This may be a temporary issue. Please check your environment variables (YDB_ENDPOINT, YDB_DATABASE, YDB_SERVICE_ACCOUNT_KEY_JSON) are correctly set in Vercel.'
+
+      // Log environment check
+      console.error('Environment check:', {
+        hasEndpoint: !!process.env.YDB_ENDPOINT,
+        hasDatabase: !!process.env.YDB_DATABASE,
+        hasServiceAccount: !!process.env.YDB_SERVICE_ACCOUNT_KEY_JSON,
+      })
+    }
+
     return NextResponse.json<ErrorResponse>(
       {
         success: false,
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
+        details: errorDetails,
       },
       { status: 500 }
     )

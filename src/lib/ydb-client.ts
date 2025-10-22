@@ -10,12 +10,19 @@ export async function getYDBDriver(): Promise<Driver> {
     return driver
   }
 
-  const endpoint = process.env.YDB_ENDPOINT
+  let endpoint = process.env.YDB_ENDPOINT
   const database = process.env.YDB_DATABASE
 
   if (!endpoint || !database) {
     throw new Error('YDB_ENDPOINT and YDB_DATABASE must be set in environment variables')
   }
+
+  // Normalize endpoint - ensure it uses grpcs:// for secure connection
+  if (!endpoint.startsWith('grpc://') && !endpoint.startsWith('grpcs://')) {
+    endpoint = `grpcs://${endpoint}`
+  }
+
+  console.log(`Connecting to YDB: ${endpoint} / ${database}`)
 
   // Get credentials from service account key file or JSON string
   let authService
@@ -40,15 +47,36 @@ export async function getYDBDriver(): Promise<Driver> {
     authService = new AnonymousAuthService()
   }
 
+  // Configure driver with SSL and connection pooling for serverless
   driver = new Driver({
     endpoint,
     database,
     authService,
+    // SSL configuration for secure connection
+    sslCredentials: {
+      // Use system's root certificates
+      rootCertificates: undefined,
+    },
+    // Optimize for serverless/Lambda environment
+    poolSettings: {
+      minLimit: 1,
+      maxLimit: 5,
+    },
   })
 
-  const timeout = 10000
-  if (!(await driver.ready(timeout))) {
-    throw new Error(`YDB driver has not become ready in ${timeout}ms`)
+  const timeout = 15000 // Increased timeout for cold starts
+  try {
+    if (!(await driver.ready(timeout))) {
+      throw new Error(`YDB driver has not become ready in ${timeout}ms`)
+    }
+  } catch (error) {
+    console.error('Failed to initialize YDB driver:', error)
+    // Clean up on failure
+    if (driver) {
+      await driver.destroy().catch(() => {})
+      driver = null
+    }
+    throw error
   }
 
   console.log('YDB driver initialized successfully')
