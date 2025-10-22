@@ -13,6 +13,8 @@ The project is built with modern web technologies:
 - **Framework**: Next.js 14 with App Router
 - **Language**: TypeScript for type safety
 - **Styling**: Tailwind CSS with shadcn/ui components
+- **Authentication**: Clerk for user authentication and management
+- **Database**: Yandex Database (YDB) for bet tracking data
 - **State Management**: Zustand with persistence
 - **Data Fetching**: TanStack Query (React Query) for caching
 - **Tables**: TanStack Table for advanced sorting and filtering
