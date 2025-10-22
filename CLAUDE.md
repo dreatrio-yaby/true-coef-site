@@ -14,7 +14,7 @@ The project is built with modern web technologies:
 - **Language**: TypeScript for type safety
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **Authentication**: Clerk for user authentication and management
-- **Database**: Yandex Database (YDB) for bet tracking data
+- **Database**: Neon Postgres (serverless) for bet tracking data
 - **State Management**: Zustand with persistence
 - **Data Fetching**: TanStack Query (React Query) for caching
 - **Tables**: TanStack Table for advanced sorting and filtering
@@ -30,6 +30,8 @@ src/
 │   │   │   ├── track/       # Track a bet (POST)
 │   │   │   ├── untrack/     # Untrack a bet (DELETE)
 │   │   │   └── my-bets/     # Get user's tracked bets (GET)
+│   │   ├── db/              # Database management
+│   │   │   └── init/        # Initialize database schema (GET)
 │   │   ├── matches/         # Main data fetching endpoint
 │   │   └── s3-proxy/        # S3 proxy for bypassing restrictions
 │   ├── profile/             # User profile page
@@ -60,10 +62,9 @@ src/
 │   ├── api-types.ts         # Zod schemas and types for API
 │   ├── bet-utils.ts         # Bet ID generation and validation utilities
 │   ├── data-fetcher.ts      # S3 and API data loading logic
+│   ├── db-client.ts         # Neon Postgres database client
 │   ├── types.ts             # TypeScript type definitions
-│   ├── utils.ts             # Helper functions and cn() utility
-│   ├── ydb-client.ts        # YDB database client
-│   └── ydb-migrations.ts    # YDB table migrations
+│   └── utils.ts             # Helper functions and cn() utility
 ├── stores/                  # State management
 │   └── matches-store.ts     # Zustand store with persistence
 └── middleware.ts            # Clerk authentication middleware
@@ -152,7 +153,7 @@ interface BetOutcome {
 ### Key Features
 
 - **Smart Profitability Analysis**: Real-time comparison of ML vs bookmaker odds
-- **Bet Tracking System**: Click-to-track functionality with persistent storage in YDB
+- **Bet Tracking System**: Click-to-track functionality with persistent storage in Neon Postgres
 - **User Authentication**: Clerk-based authentication with protected profile page
 - **Advanced Filtering**: Filter by bookmakers, bet types, and profitability levels
 - **Responsive Design**: Mobile-first approach with adaptive table layouts
@@ -189,11 +190,14 @@ The app uses sophisticated logic to determine profitability by comparing ML coef
   - Query params: `status=all|active|won|lost`, `limit=50`, `offset=0`
   - Returns: `{ bets: TrackedBet[], total: number, hasMore: boolean }`
 
+#### Database Management
+- `GET /api/db/init` - Initialize Postgres database schema (run once after setup)
+
 ### Bet Tracking System
 
 The application includes a complete bet tracking system with the following features:
 
-#### Database Schema (YDB)
+#### Database Schema (Neon Postgres)
 Table `tracked_bets` with columns:
 - `id` (PK) - Unique bet ID
 - `userId` - Clerk user ID
@@ -227,9 +231,11 @@ Table `tracked_bets` with columns:
 - Empty state with call-to-action to track bets
 
 #### Technical Implementation
+- **Neon Postgres**: Serverless PostgreSQL with connection pooling
+- **Vercel SDK**: @vercel/postgres for optimized database access
 - **React Query**: Optimistic updates and automatic cache invalidation
 - **Unique key constraint**: Prevents duplicate tracking of the same bet
-- **YDB migrations**: `npm run migrate` to create/update tables
+- **Database initialization**: Visit `/api/db/init` to create tables
 - **Type safety**: Full TypeScript with Zod validation
 - **Error handling**: Silent errors with console logging (no user-facing toasts)
 
@@ -240,8 +246,14 @@ Table `tracked_bets` with columns:
 - `npm run start` - Production server
 - `npm run lint` - ESLint checks
 - `npm run type-check` - TypeScript validation
-- `npm run migrate` - Run YDB database migrations
-- `npx tsx scripts/migrate.ts down` - Rollback migrations (drop tables)
+
+### Database Setup
+
+1. **Create Neon Postgres database** in Vercel dashboard (Storage → Create Database → Neon)
+2. **Initialize schema**: Visit `/api/db/init` endpoint (locally or on Vercel)
+3. Environment variables are auto-configured by Vercel
+
+See [POSTGRES_SETUP.md](POSTGRES_SETUP.md) for detailed setup instructions.
 
 ### Deployment
 
