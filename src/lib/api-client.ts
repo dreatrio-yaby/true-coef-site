@@ -1,7 +1,6 @@
 import type {
   TrackBetRequest,
   TrackBetResponse,
-  UntrackBetRequest,
   UntrackBetResponse,
   GetBetsResponse,
   ErrorResponse,

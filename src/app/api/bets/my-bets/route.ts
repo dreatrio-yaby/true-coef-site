@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           error: 'Invalid query parameters',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       )
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       const preparedQuery = await session.prepareQuery(query)
       const { resultSets } = await session.executeQuery(preparedQuery, params)
 
-      return resultSets && resultSets[0]?.rows || []
+      return resultSets?.[0]?.rows ?? []
     })
 
     // Check if there are more results
@@ -108,7 +108,9 @@ export async function GET(request: NextRequest) {
       const preparedQuery = await session.prepareQuery(query)
       const { resultSets } = await session.executeQuery(preparedQuery, params)
 
-      return resultSets && resultSets[0]?.rows[0]?.count || 0
+      const row = resultSets?.[0]?.rows?.[0]
+      const count = row?.items?.[0]?.uint64Value
+      return typeof count === 'string' ? Number(count) : 0
     })
 
     // Map bets to response format

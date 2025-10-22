@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { BookmakerOdds } from '@/lib/types'
 import { formatOdds, getProfitabilityLevel } from '@/lib/utils'
 import { useMatchesStore } from '@/stores/matches-store'
@@ -44,7 +44,6 @@ export function OddsCell({
   const isProfitable = profitability !== 'poor'
 
   // Tracking state
-  const [isHovered, setIsHovered] = useState(false)
   const { mutate: trackBet, isPending: isTrackPending } = useTrackBet()
   const { mutate: untrackBet, isPending: isUntrackPending } = useUntrackBet()
 
@@ -126,8 +125,6 @@ export function OddsCell({
         ${className}
       `}
       onClick={canTrack ? handleClick : undefined}
-      onMouseEnter={() => canTrack && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-gray-500">AI</span>

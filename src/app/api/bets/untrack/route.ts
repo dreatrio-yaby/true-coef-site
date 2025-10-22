@@ -25,7 +25,7 @@ export async function DELETE(request: NextRequest) {
         {
           success: false,
           error: 'Invalid request data',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       )
@@ -50,7 +50,7 @@ export async function DELETE(request: NextRequest) {
         '$id': TypedValues.utf8(betId),
       })
 
-      return resultSets && resultSets[0]?.rows[0]
+      return resultSets?.[0]?.rows?.[0] ?? null
     })
 
     // Check if bet exists

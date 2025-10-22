@@ -66,7 +66,6 @@ export default function ProfilePage() {
 
   const bets = data?.bets || []
   const totalBets = bets.length
-  const activeBets = bets.filter(b => b.status === 'active').length
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">

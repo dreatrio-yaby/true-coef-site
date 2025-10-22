@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Invalid request data',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       )
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         '$uniqueKey': TypedValues.utf8(uniqueKey),
       })
 
-      return resultSets && resultSets[0]?.rows[0]
+      return resultSets?.[0]?.rows?.[0] ?? null
     })
 
     // If bet already exists, return it
