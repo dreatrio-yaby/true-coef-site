@@ -49,3 +49,10 @@ coverage/
 sample_*.json
 *_sample.json
 test_data/
+
+# Tasks
+tasks/
+
+# YDB Service Account Keys
+ydb-service-account-key.json
+*-service-account-key.json

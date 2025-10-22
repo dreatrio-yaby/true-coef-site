@@ -5,6 +5,8 @@ import { QueryProvider } from "./providers"
 import { StructuredData } from "@/components/StructuredData"
 import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 import { Analytics } from "@vercel/analytics/next"
+import { ClerkProvider } from '@clerk/nextjs'
+import { ruRU } from '@clerk/localizations'
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -88,17 +90,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ru">
-      <head>
-        <StructuredData />
-      </head>
-      <body className={inter.className}>
-        <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
-        <QueryProvider>
-          {children}
-        </QueryProvider>
-        <Analytics />
-      </body>
-    </html>
+    <ClerkProvider localization={ruRU}>
+      <html lang="ru">
+        <head>
+          <StructuredData />
+        </head>
+        <body className={inter.className}>
+          <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

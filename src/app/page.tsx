@@ -8,6 +8,7 @@ import { LeagueSelector } from '@/components/LeagueSelector'
 import { MatchesTable } from '@/components/MatchesTable'
 import { getAvailableBookmakers, getAvailableLeagues } from '@/lib/utils'
 import { useMemo, useState } from 'react'
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 function HowItWorksModal() {
   const [isOpen, setIsOpen] = useState(false)
@@ -138,7 +139,7 @@ export default function HomePage() {
             <span className="font-bold">Coefly</span>
           </h1>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* How it works button */}
             <HowItWorksModal />
 
@@ -159,6 +160,28 @@ export default function HomePage() {
               <span className="hidden sm:inline">Telegram канал</span>
               <span className="sm:hidden">TG</span>
             </a>
+
+            {/* Auth buttons */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span className="hidden sm:inline">Вход</span>
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8"
+                  }
+                }}
+              />
+            </SignedIn>
           </div>
         </div>
       </header>
