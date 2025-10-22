@@ -18,3 +18,18 @@
   }
 }
 
+@layer components {
+  /* Bet tracking styles */
+  .bet-tracked {
+    @apply bg-green-50 border-2 border-green-500 rounded-md p-1.5 transition-all duration-200;
+  }
+
+  .bet-tracked:hover {
+    @apply bg-green-100 border-green-600;
+  }
+
+  .bet-loading {
+    @apply opacity-60 pointer-events-none;
+  }
+}
+

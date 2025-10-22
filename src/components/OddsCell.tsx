@@ -1,20 +1,102 @@
 'use client'
 
+import React, { useState } from 'react'
 import { BookmakerOdds } from '@/lib/types'
 import { formatOdds, getProfitabilityLevel } from '@/lib/utils'
 import { useMatchesStore } from '@/stores/matches-store'
+import { useUser } from '@clerk/nextjs'
+import { useTrackBet, useUntrackBet } from '@/hooks/useBetTracking'
+import { useIsBetTracked } from '@/hooks/useIsBetTracked'
 
 interface OddsCellProps {
   mlValue?: number | null
   bookmakerOdds?: BookmakerOdds | null
   className?: string
   showBookmakerName?: boolean
+  // Tracking props
+  matchId?: string
+  betType?: string
+  betOutcome?: string
+  enableTracking?: boolean
+  homeTeam?: string
+  awayTeam?: string
+  league?: string
+  matchDate?: string
 }
 
-export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName = false }: OddsCellProps) {
+export function OddsCell({
+  mlValue,
+  bookmakerOdds,
+  className,
+  showBookmakerName = false,
+  matchId,
+  betType,
+  betOutcome,
+  enableTracking = false,
+  homeTeam,
+  awayTeam,
+  league,
+  matchDate,
+}: OddsCellProps) {
   const { filters } = useMatchesStore()
+  const { user } = useUser()
   const profitability = getProfitabilityLevel(mlValue, bookmakerOdds?.value, filters.maxOddsThreshold)
   const isProfitable = profitability !== 'poor'
+
+  // Tracking state
+  const [isHovered, setIsHovered] = useState(false)
+  const { mutate: trackBet, isPending: isTrackPending } = useTrackBet()
+  const { mutate: untrackBet, isPending: isUntrackPending } = useUntrackBet()
+
+  const { isTracked, betId } = useIsBetTracked(
+    matchId || '',
+    betType || '',
+    betOutcome || ''
+  )
+
+  const isLoading = isTrackPending || isUntrackPending
+  const canTrack = enableTracking && user && matchId && betType && betOutcome && bookmakerOdds
+
+  // Debug logging
+  React.useEffect(() => {
+    if (canTrack) {
+      console.log(`[OddsCell] ${matchId}-${betType}-${betOutcome}:`, {
+        isTracked,
+        betId,
+        isLoading,
+        canTrack,
+        hasUser: !!user,
+        enableTracking,
+      })
+    }
+  }, [isTracked, betId, isLoading, canTrack, matchId, betType, betOutcome, user, enableTracking])
+
+  // Handle click to toggle tracking
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    if (!canTrack || isLoading) return
+
+    if (isTracked && betId) {
+      // Untrack
+      untrackBet(betId)
+    } else {
+      // Track
+      trackBet({
+        matchId: matchId!,
+        betType: betType!,
+        betOutcome: betOutcome!,
+        bookmaker: bookmakerOdds!.bookmaker_name,
+        odds: Number(bookmakerOdds!.value),
+        mlCoefficient: mlValue || undefined,
+        profitabilityLevel: profitability,
+        homeTeam,
+        awayTeam,
+        league,
+        matchDate,
+      })
+    }
+  }
 
   // Calculate profit percentage
   const profitPercent = mlValue && bookmakerOdds?.value != null
@@ -35,7 +117,18 @@ export function OddsCell({ mlValue, bookmakerOdds, className, showBookmakerName 
   }
 
   return (
-    <div className={`text-xs space-y-0.5 ${className}`}>
+    <div
+      className={`
+        text-xs space-y-0.5 relative
+        ${canTrack ? 'cursor-pointer' : ''}
+        ${isTracked ? 'bet-tracked' : ''}
+        ${isLoading ? 'bet-loading' : ''}
+        ${className}
+      `}
+      onClick={canTrack ? handleClick : undefined}
+      onMouseEnter={() => canTrack && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-gray-500">AI</span>
         <span className="font-mono">

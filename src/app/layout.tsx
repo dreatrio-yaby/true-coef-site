@@ -7,6 +7,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 import { Analytics } from "@vercel/analytics/next"
 import { ClerkProvider } from '@clerk/nextjs'
 import { ruRU } from '@clerk/localizations'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -100,6 +101,7 @@ export default function RootLayout({
           <QueryProvider>
             {children}
           </QueryProvider>
+          <Toaster position="top-center" richColors />
           <Analytics />
         </body>
       </html>

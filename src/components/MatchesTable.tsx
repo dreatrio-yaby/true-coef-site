@@ -149,7 +149,21 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.P1?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+            return (
+              <OddsCell
+                mlValue={mlValue}
+                bookmakerOdds={bookmakerOdds}
+                showBookmakerName={filters.selectedBookmaker === null}
+                matchId={match.match_id}
+                betType="1x2"
+                betOutcome="P1"
+                enableTracking={true}
+                homeTeam={match.match_basic.home_team.fbref_name}
+                awayTeam={match.match_basic.away_team.fbref_name}
+                league={match.match_basic.league.fbref_name}
+                matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+              />
+            )
           },
           size: 50,
         }),
@@ -167,7 +181,21 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.X?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+            return (
+              <OddsCell
+                mlValue={mlValue}
+                bookmakerOdds={bookmakerOdds}
+                showBookmakerName={filters.selectedBookmaker === null}
+                matchId={match.match_id}
+                betType="1x2"
+                betOutcome="X"
+                enableTracking={true}
+                homeTeam={match.match_basic.home_team.fbref_name}
+                awayTeam={match.match_basic.away_team.fbref_name}
+                league={match.match_basic.league.fbref_name}
+                matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+              />
+            )
           },
           size: 50,
         }),
@@ -185,7 +213,21 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events['1x2']?.P2?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+            return (
+              <OddsCell
+                mlValue={mlValue}
+                bookmakerOdds={bookmakerOdds}
+                showBookmakerName={filters.selectedBookmaker === null}
+                matchId={match.match_id}
+                betType="1x2"
+                betOutcome="P2"
+                enableTracking={true}
+                homeTeam={match.match_basic.home_team.fbref_name}
+                awayTeam={match.match_basic.away_team.fbref_name}
+                league={match.match_basic.league.fbref_name}
+                matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+              />
+            )
           },
           size: 50,
         }),
@@ -209,7 +251,21 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events.both_teams_to_score?.yes?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+            return (
+              <OddsCell
+                mlValue={mlValue}
+                bookmakerOdds={bookmakerOdds}
+                showBookmakerName={filters.selectedBookmaker === null}
+                matchId={match.match_id}
+                betType="both_teams_to_score"
+                betOutcome="yes"
+                enableTracking={true}
+                homeTeam={match.match_basic.home_team.fbref_name}
+                awayTeam={match.match_basic.away_team.fbref_name}
+                league={match.match_basic.league.fbref_name}
+                matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+              />
+            )
           },
           size: 50,
         }),
@@ -227,7 +283,21 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               match.events.both_teams_to_score?.no?.bookmaker_odds || [],
               filters.selectedBookmaker
             )
-            return <OddsCell mlValue={mlValue} bookmakerOdds={bookmakerOdds} showBookmakerName={filters.selectedBookmaker === null} />
+            return (
+              <OddsCell
+                mlValue={mlValue}
+                bookmakerOdds={bookmakerOdds}
+                showBookmakerName={filters.selectedBookmaker === null}
+                matchId={match.match_id}
+                betType="both_teams_to_score"
+                betOutcome="no"
+                enableTracking={true}
+                homeTeam={match.match_basic.home_team.fbref_name}
+                awayTeam={match.match_basic.away_team.fbref_name}
+                league={match.match_basic.league.fbref_name}
+                matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+              />
+            )
           },
           size: 50,
         }),
@@ -261,11 +331,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="totals"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="totals"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )
@@ -304,11 +398,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="total_corners"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="total_corners"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )
@@ -347,11 +465,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="home_goals"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="home_goals"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )
@@ -390,11 +532,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="away_goals"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="away_goals"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )
@@ -433,11 +599,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="home_corners"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="home_corners"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )
@@ -476,11 +666,35 @@ export function MatchesTable({ matches }: MatchesTableProps) {
               <div className="space-y-1 text-xs">
                 <div className="border-b border-gray-200 pb-1">
                   <div className="text-[10px] text-gray-500 mb-0.5">Б{total}</div>
-                  <OddsCell mlValue={overMl} bookmakerOdds={overBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={overMl}
+                    bookmakerOdds={overBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="away_corners"
+                    betOutcome={`over_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
                 <div>
                   <div className="text-[10px] text-gray-500 mb-0.5">М{total}</div>
-                  <OddsCell mlValue={underMl} bookmakerOdds={underBookmaker} showBookmakerName={filters.selectedBookmaker === null} />
+                  <OddsCell
+                    mlValue={underMl}
+                    bookmakerOdds={underBookmaker}
+                    showBookmakerName={filters.selectedBookmaker === null}
+                    matchId={match.match_id}
+                    betType="away_corners"
+                    betOutcome={`under_${total}`}
+                    enableTracking={true}
+                    homeTeam={match.match_basic.home_team.fbref_name}
+                    awayTeam={match.match_basic.away_team.fbref_name}
+                    league={match.match_basic.league.fbref_name}
+                    matchDate={`${match.match_basic.date} ${match.match_basic.time}`}
+                  />
                 </div>
               </div>
             )

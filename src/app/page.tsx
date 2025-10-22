@@ -9,6 +9,7 @@ import { MatchesTable } from '@/components/MatchesTable'
 import { getAvailableBookmakers, getAvailableLeagues } from '@/lib/utils'
 import { useMemo, useState } from 'react'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import Link from 'next/link'
 
 function HowItWorksModal() {
   const [isOpen, setIsOpen] = useState(false)
@@ -142,6 +143,18 @@ export default function HomePage() {
           <div className="flex items-center gap-2 md:gap-4">
             {/* How it works button */}
             <HowItWorksModal />
+
+            {/* Profile button - только для авторизованных */}
+            <SignedIn>
+              <Link href="/profile">
+                <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">Профиль</span>
+                </button>
+              </Link>
+            </SignedIn>
 
             {/* Telegram Channel Link */}
             <a
