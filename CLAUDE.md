@@ -26,10 +26,16 @@ The project is built with modern web technologies:
 src/
 ├── app/                     # Next.js App Router
 │   ├── api/                 # API routes
+│   │   ├── bets/            # Bet tracking API endpoints
+│   │   │   ├── track/       # Track a bet (POST)
+│   │   │   ├── untrack/     # Untrack a bet (DELETE)
+│   │   │   └── my-bets/     # Get user's tracked bets (GET)
 │   │   ├── matches/         # Main data fetching endpoint
 │   │   └── s3-proxy/        # S3 proxy for bypassing restrictions
-│   ├── globals.css          # Global styles with Tailwind
-│   ├── layout.tsx           # Root layout with providers and analytics
+│   ├── profile/             # User profile page
+│   │   └── page.tsx         # Profile page with tracked bets table
+│   ├── globals.css          # Global styles with Tailwind (includes bet tracking styles)
+│   ├── layout.tsx           # Root layout with Clerk, providers and analytics
 │   ├── page.tsx             # Main home page with 3-panel layout
 │   ├── providers.tsx        # React Query provider setup
 │   └── sitemap.ts           # Dynamic sitemap generation
@@ -41,18 +47,26 @@ src/
 │   ├── GoogleAnalytics.tsx  # GA4 integration component
 │   ├── LeagueSelector.tsx   # League filter dropdown
 │   ├── Logo.tsx             # CF logo component with variants
-│   ├── MatchesTable.tsx     # Main data table with TanStack Table
-│   ├── OddsCell.tsx         # Smart odds display with profitability
+│   ├── MatchesTable.tsx     # Main data table with TanStack Table + bet tracking
+│   ├── OddsCell.tsx         # Smart odds display with profitability + click to track
 │   └── StructuredData.tsx   # SEO structured data (JSON-LD)
 ├── hooks/                   # Custom React hooks
+│   ├── useBetTracking.ts    # Bet tracking mutations and queries
+│   ├── useIsBetTracked.ts   # Check if a bet is tracked
 │   └── useMatches.ts        # Data fetching hook with React Query
 ├── lib/                     # Utilities and configuration
 │   ├── analytics.ts         # Google Analytics helper functions
+│   ├── api-client.ts        # API client for bet tracking
+│   ├── api-types.ts         # Zod schemas and types for API
+│   ├── bet-utils.ts         # Bet ID generation and validation utilities
 │   ├── data-fetcher.ts      # S3 and API data loading logic
 │   ├── types.ts             # TypeScript type definitions
-│   └── utils.ts             # Helper functions and cn() utility
-└── stores/                  # State management
-    └── matches-store.ts     # Zustand store with persistence
+│   ├── utils.ts             # Helper functions and cn() utility
+│   ├── ydb-client.ts        # YDB database client
+│   └── ydb-migrations.ts    # YDB table migrations
+├── stores/                  # State management
+│   └── matches-store.ts     # Zustand store with persistence
+└── middleware.ts            # Clerk authentication middleware
 ```
 
 ### Key Components
@@ -138,6 +152,8 @@ interface BetOutcome {
 ### Key Features
 
 - **Smart Profitability Analysis**: Real-time comparison of ML vs bookmaker odds
+- **Bet Tracking System**: Click-to-track functionality with persistent storage in YDB
+- **User Authentication**: Clerk-based authentication with protected profile page
 - **Advanced Filtering**: Filter by bookmakers, bet types, and profitability levels
 - **Responsive Design**: Mobile-first approach with adaptive table layouts
 - **Data Caching**: Intelligent caching with React Query for optimal performance
@@ -158,8 +174,64 @@ The app uses sophisticated logic to determine profitability by comparing ML coef
 
 ### API Endpoints
 
+#### Match Data
 - `/api/matches` - Load matches with pagination support
 - `/api/s3-proxy` - Proxy for S3 data to bypass mobile operator restrictions
+
+#### Bet Tracking (Protected by Clerk Auth)
+- `POST /api/bets/track` - Track a new bet
+  - Body: `{ matchId, betType, betOutcome, bookmaker, odds, mlCoefficient?, profitabilityLevel?, homeTeam?, awayTeam?, league?, matchDate? }`
+  - Returns: `{ success: true, bet: TrackedBet, alreadyExists?: boolean }`
+- `DELETE /api/bets/untrack` - Untrack a bet
+  - Body: `{ betId }`
+  - Returns: `{ success: true }`
+- `GET /api/bets/my-bets` - Get user's tracked bets
+  - Query params: `status=all|active|won|lost`, `limit=50`, `offset=0`
+  - Returns: `{ bets: TrackedBet[], total: number, hasMore: boolean }`
+
+### Bet Tracking System
+
+The application includes a complete bet tracking system with the following features:
+
+#### Database Schema (YDB)
+Table `tracked_bets` with columns:
+- `id` (PK) - Unique bet ID
+- `userId` - Clerk user ID
+- `matchId` - Match identifier
+- `betType` - Type of bet (1x2, totals, etc.)
+- `betOutcome` - Specific outcome (P1, X, P2, over_2.5, etc.)
+- `bookmaker` - Bookmaker name
+- `odds` - Bookmaker odds value
+- `mlCoefficient` - ML-generated coefficient
+- `profitabilityLevel` - excellent, good, fair, or poor
+- `status` - active, won, or lost
+- `trackedAt` - Timestamp when bet was tracked
+- `resultUpdatedAt` - Timestamp when result was updated
+- `uniqueKey` - Composite key (userId + matchId + betType + betOutcome)
+- `homeTeam` - Home team name
+- `awayTeam` - Away team name
+- `league` - League name
+- `matchDate` - Match date and time
+
+#### Visual Feedback
+- **Green border and background**: Indicates a tracked bet
+- **Hover effect**: Darker green on hover (no red - removed per user preference)
+- **Click to track/untrack**: Toggle tracking by clicking on OddsCell
+- **No toast notifications**: Visual feedback only (removed per user preference)
+
+#### Profile Page
+- Clean, minimal design with tracked bets table
+- Displays: Match (Team vs Team), Type, Outcome, Bookmaker, AI odds, BK odds, Profitability, Date
+- Compact table format matching main MatchesTable style
+- No statistics cards (removed per user preference)
+- Empty state with call-to-action to track bets
+
+#### Technical Implementation
+- **React Query**: Optimistic updates and automatic cache invalidation
+- **Unique key constraint**: Prevents duplicate tracking of the same bet
+- **YDB migrations**: `npm run migrate` to create/update tables
+- **Type safety**: Full TypeScript with Zod validation
+- **Error handling**: Silent errors with console logging (no user-facing toasts)
 
 ### Commands
 
@@ -168,6 +240,8 @@ The app uses sophisticated logic to determine profitability by comparing ML coef
 - `npm run start` - Production server
 - `npm run lint` - ESLint checks
 - `npm run type-check` - TypeScript validation
+- `npm run migrate` - Run YDB database migrations
+- `npx tsx scripts/migrate.ts down` - Rollback migrations (drop tables)
 
 ### Deployment
 
