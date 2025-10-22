@@ -55,6 +55,26 @@ export function getProfitabilityLevel(
   return 'poor'                                 // Equal or worse
 }
 
+export function calculateProfitPercent(
+  mlCoef?: number | null,
+  bookmakerCoef?: number | null
+): number {
+  if (!mlCoef || bookmakerCoef == null || mlCoef <= 0 || bookmakerCoef <= 0) {
+    return 0
+  }
+  return Math.round(((bookmakerCoef / mlCoef - 1) * 100))
+}
+
+export function meetsMinProfitRequirement(
+  mlCoef?: number | null,
+  bookmakerCoef?: number | null,
+  minProfitPercent?: number
+): boolean {
+  const profitPercent = calculateProfitPercent(mlCoef, bookmakerCoef)
+  const minRequired = minProfitPercent ?? 0
+  return profitPercent >= minRequired
+}
+
 export function getProfitabilityFromProbability(prob: number): ProfitabilityLevel {
   const coef = 1 / prob
   if (coef <= 1.4) return 'excellent'
@@ -224,7 +244,8 @@ export function hasMatchProfitableBets(
   match: Match,
   betType: FilterType,
   selectedBookmaker: string | null,
-  maxOddsThreshold: number
+  maxOddsThreshold: number,
+  minProfitPercent?: number
 ): boolean {
   if (betType === '1x2') {
     const outcomes = ['P1', 'X', 'P2'] as const
@@ -238,7 +259,8 @@ export function hasMatchProfitableBets(
       if (!mlValue || !bookmakerOdds) return false
 
       const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-      return profitability !== 'poor'
+      const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+      return profitability !== 'poor' && meetsProfitRequirement
     })
   }
 
@@ -254,7 +276,8 @@ export function hasMatchProfitableBets(
       if (!mlValue || !bookmakerOdds) return false
 
       const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-      return profitability !== 'poor'
+      const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+      return profitability !== 'poor' && meetsProfitRequirement
     })
   }
 
@@ -276,7 +299,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }
@@ -298,7 +322,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }
@@ -320,7 +345,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }
@@ -342,7 +368,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }
@@ -364,7 +391,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }
@@ -386,7 +414,8 @@ export function hasMatchProfitableBets(
         if (!mlValue || !bookmakerOdds) return false
 
         const profitability = getProfitabilityLevel(mlValue, bookmakerOdds.value, maxOddsThreshold)
-        return profitability !== 'poor'
+        const meetsProfitRequirement = meetsMinProfitRequirement(mlValue, bookmakerOdds.value, minProfitPercent)
+        return profitability !== 'poor' && meetsProfitRequirement
       })
     })
   }

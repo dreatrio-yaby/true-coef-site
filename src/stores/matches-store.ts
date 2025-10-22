@@ -13,6 +13,7 @@ export const useMatchesStore = create<MatchesStore>()(
         selectedLeague: null,
         dateFilter: new Date().toISOString().split('T')[0],
         maxOddsThreshold: 2.5,
+        minProfitPercent: 10,
         showOnlyProfitable: false,
       },
 

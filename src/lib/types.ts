@@ -135,6 +135,7 @@ export interface FilterState {
   selectedLeague: string | null
   dateFilter: string
   maxOddsThreshold: number
+  minProfitPercent: number
   showOnlyProfitable: boolean
 }
 

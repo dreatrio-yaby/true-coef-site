@@ -48,13 +48,14 @@ export function MatchesTable({ matches }: MatchesTableProps) {
           match,
           filters.betType,
           filters.selectedBookmaker,
-          filters.maxOddsThreshold
+          filters.maxOddsThreshold,
+          filters.minProfitPercent
         )
       )
     }
 
     return filtered
-  }, [matches, filters.dateFilter, filters.selectedLeague, filters.showOnlyProfitable, filters.betType, filters.selectedBookmaker, filters.maxOddsThreshold])
+  }, [matches, filters.dateFilter, filters.selectedLeague, filters.showOnlyProfitable, filters.betType, filters.selectedBookmaker, filters.maxOddsThreshold, filters.minProfitPercent])
 
   // Create columns based on filter type
   const columns = useMemo(() => {

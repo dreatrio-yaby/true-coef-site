@@ -9,7 +9,7 @@ export function FilterPanel() {
 
   return (
     <div className="border border-gray-200 rounded mb-4 p-3">
-      {/* Слайдер */}
+      {/* Слайдер вероятности */}
       <div className="mb-4">
         <h3 className="text-xs font-medium mb-2 text-gray-700">
           <span className="block md:inline">Показывать выгодные ставки, вероятность которых выше </span>
@@ -47,6 +47,25 @@ export function FilterPanel() {
               box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
           `}</style>
+        </div>
+      </div>
+
+      {/* Слайдер минимального профита */}
+      <div className="mb-4">
+        <h3 className="text-xs font-medium mb-2 text-gray-700">
+          <span className="block md:inline">Минимальный размер профита </span>
+          <span className="text-sm font-bold">+{filters.minProfitPercent ?? 10}%</span>
+        </h3>
+        <div className="w-full max-w-xs md:w-48">
+          <input
+            type="range"
+            min="0"
+            max="30"
+            step="5"
+            value={filters.minProfitPercent ?? 10}
+            onChange={(e) => updateFilter({ minProfitPercent: parseFloat(e.target.value) })}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-custom"
+          />
         </div>
       </div>
 
